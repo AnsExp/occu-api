@@ -34,7 +34,9 @@ class CertificateController extends Controller
         if ($type) {
             $query->where('type', $type);
         }
-        $certificates = $query->orderByDesc('created_at')->paginate(10);
+        $certificates = $query->orderByDesc('created_at')
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
         return [
             'filters' => $filters,
             'certificates' => $certificates,

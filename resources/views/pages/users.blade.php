@@ -76,7 +76,7 @@
                                         @endcan
                                         @can(PermissionEnum::DESTROY_USERS->code())
                                             <form action="{{ route('users.destroy', ['user' => $user->id]) }}" method="POST"
-                                                class="inline">
+                                                class="inline" onsubmit="return confirm('Esta acción es irreversible. ¿Desea continuar?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"

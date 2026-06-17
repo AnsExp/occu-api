@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,9 @@ Route::get('/orders', [OrderController::class, 'index'])->middleware('auth')->na
 Route::post('/orders', [OrderController::class, 'store'])->middleware('auth')->name('orders.store');
 
 Route::get('/patients', [PatientController::class, 'index'])->middleware('auth')->name('patients');
+Route::put('/patients/{patient}', [PatientController::class, 'update'])->middleware('auth')->name('patients.update');
+Route::post('/patients/{patient}', [PatientController::class, 'store'])->middleware('auth')->name('patients.store');
+Route::get('/patients/edit/{patient}', [PatientController::class, 'edit'])->middleware('auth')->name('patients.edit');
 
 Route::get('/audiology', [AudiologyController::class, 'index'])->middleware('auth')->name('audiology.index');
 Route::get('/occupational', [OccupationalController::class, 'index'])->middleware('auth')->name('occupational.index');
@@ -65,3 +69,6 @@ Route::get('/documents/{certificate:certificate_number}', [PDFController::class,
 
 Route::get('/audit', [AuditoryController::class, 'index'])->middleware('auth')->name('audit.index');
 Route::get('/audit/{log}', [AuditoryController::class, 'detail'])->middleware('auth')->name('audit.detail');
+
+Route::get('/settings', [SettingsController::class, 'index'])->middleware('auth')->name('settings.index');
+Route::post('/settings/pagination', [SettingsController::class, 'pagination'])->middleware('auth')->name('settings.pagination');

@@ -53,7 +53,9 @@ class AuditoryController extends Controller
             $query->where('level', $filters['level']);
         }
 
-        $data = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+        $data = $query->orderBy('created_at', 'desc')
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
 
         $users = User::query()->orderBy('name')->get(['id', 'name']);
 

@@ -159,7 +159,7 @@
 									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->title }}</td>
 									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->order->patient->first_name }} {{ $certificate->order->patient->last_name }}</td>
 									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->order->patient->id_card }}</td>
-									<td class="px-4 py-3 align-top text-gray-700">{{ format_datetime($certificate->created_at, false, true) }}</td>
+									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->created_at->translatedFormat('j \d\e F, Y') }}</td>
 									<td class="px-4 py-3 align-top text-right text-gray-700">
 										<div class="flex justify-end gap-2">
 											<a href="{{ route('certificates.pdf', ['certificate' => $certificate->certificate_number]) }}"

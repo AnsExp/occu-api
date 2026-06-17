@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.ico') }}">
     <title>@yield('title', config('app.name', 'Laravel'))</title>
+    @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -17,6 +18,7 @@
         </div>
     </div>
     @include('components.footer')
+    @livewireScripts
     @stack('scripts')
 </body>
 

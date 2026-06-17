@@ -173,7 +173,7 @@
             <td>
                 <p class="document-title">ORDEN DE PAGO: {{ $order->order_number }}</p>
                 <div class="document-meta">
-                    <div><strong>Fecha:</strong> {{ format_datetime($order->created_at, false, true) }}</div>
+                    <div><strong>Fecha:</strong> {{ $order->created_at ? $order->created_at->translatedFormat('j \\d\\e F, Y') : 'N/A' }}</div>
                 </div>
             </td>
         </tr>

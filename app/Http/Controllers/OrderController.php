@@ -61,8 +61,9 @@ class OrderController extends Controller
         }
 
         // Ejecutar query con paginación
-        $perPage = 10;
-        $ordersPaginated = $query->orderByDesc('created_at')->paginate($perPage);
+        $ordersPaginated = $query->orderByDesc('created_at')
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
 
         return view('pages.orders', ['filters' => $filters, 'orders' => $ordersPaginated]);
     }

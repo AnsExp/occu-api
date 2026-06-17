@@ -26,7 +26,9 @@ class PlanController extends Controller
         }
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
-        $data = Plan::orderBy($sort, $direction)->paginate(10);
+        $data = Plan::orderBy($sort, $direction)
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
         return view('pages.plans', compact('data', 'sort', 'direction'));
     }
 

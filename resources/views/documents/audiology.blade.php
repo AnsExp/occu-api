@@ -103,7 +103,6 @@
 <body>
     @php
         use App\Enums\SpecialtyEnum;
-        \Carbon\Carbon::setLocale('es');
 
         $patient = $certificate->order->patient;
         $doctor = $certificate->doctor;
@@ -111,9 +110,7 @@
         $patientName = $patient ? trim(($patient->first_name ?? '') . ' ' . ($patient->last_name ?? '')) : 'N/D';
         $doctorName = $doctor ? trim(($doctor->first_name ?? '') . ' ' . ($doctor->last_name ?? '')) : 'N/D';
         $issuedAt = $certificate->created_at ? $certificate->created_at->translatedFormat('j \\d\\e F, Y') : 'N/A';
-        $birthDate = !empty($patient?->birth_date)
-            ? \Illuminate\Support\Carbon::parse($patient->birth_date)->translatedFormat('j \\d\\e F, Y')
-            : 'N/D';
+        $birthDate = $patient?->birth_date ? $patient->birth_date->translatedFormat('j \\d\\e F, Y') : 'N/D';
 
         $contentRaw = $certificate->content;
         $content = is_array($contentRaw) ? $contentRaw : (json_decode($contentRaw ?? '', true) ?: []);

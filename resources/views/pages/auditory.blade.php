@@ -117,7 +117,7 @@
 							@foreach ($data as $log)
 								<tr class="hover:bg-gray-50">
 									<td class="whitespace-nowrap px-4 py-3 align-top text-gray-700">
-										{{ format_datetime($log->created_at, false, true) }}</td>
+										{{ $log->created_at->translatedFormat('j \d\e F, Y') }}</td>
 									<td class="px-4 py-3 align-top text-gray-700">{{ $log->user?->name ?? 'Sistema' }}</td>
 									<td class="px-4 py-3 align-top">
 										@php

@@ -14,14 +14,10 @@
 
 <body>
     @php
-        \Carbon\Carbon::setLocale('es');
-
         $patient = $certificate->patient;
         $patientName = $patient ? trim(($patient->first_name ?? '') . ' ' . ($patient->last_name ?? '')) : 'N/A';
         $issuedAt = $certificate->created_at ? $certificate->created_at->translatedFormat('j \\d\\e F, Y') : 'N/A';
-        $birthDate = !empty($patient?->date_of_birth)
-            ? \Illuminate\Support\Carbon::parse($patient->date_of_birth)->translatedFormat('j \\d\\e F, Y')
-            : 'N/A';
+        $birthDate = $patient?->date_of_birth ? $patient->date_of_birth->translatedFormat('j \\d\\e F, Y') : 'N/A';
 
         $contentRaw = $certificate->content;
         $content = is_array($contentRaw) ? $contentRaw : (json_decode($contentRaw ?? '', true) ?: []);

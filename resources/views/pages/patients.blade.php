@@ -26,6 +26,12 @@
             </span>
         </div>
 
+        @if (session('status'))
+            <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {{ session('status') }}
+            </div>
+        @endif
+
         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full divide-y divide-gray-200 text-sm">
@@ -39,9 +45,6 @@
                                     </a>
                                 </th>
                             @endforeach
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-600">Acciones
-                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 bg-white">
@@ -57,7 +60,7 @@
                                     {{ App\Enums\GenderEnum::fromCode($patient->gender)?->label() ?? 'Desconocido' }}
                                 </td>
                                 <td class="px-4 py-3 align-top text-gray-700">
-                                    {{ format_datetime($patient->birth_date) }}
+                                    {{ $patient->birth_date->translatedFormat('j \d\e F, Y') }}
                                 </td>
                                 <td class="px-4 py-3 align-top text-gray-700">
                                     {{ $patient->email }}
@@ -66,7 +69,12 @@
                                     {{ $patient->phone }}
                                 </td>
                                 <td class="px-4 py-3 align-top text-right text-gray-700">
-                                    <a href="{{ route('orders', ['id_card' => $patient->id_card]) }}" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Certificados</a>
+                                    <div class="flex justify-end gap-2">
+                                        <a href="{{ route('orders', ['id_card' => $patient->id_card]) }}"
+                                            class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Certificados</a>
+                                        <a href="{{ route('patients.edit', ['patient' => $patient]) }}"
+                                            class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Editar</a>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

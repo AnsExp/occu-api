@@ -5,21 +5,14 @@ namespace App\Models;
 use App\Enums\ActionEnum;
 use App\Enums\TableEnum;
 use App\Http\Controllers\AuditoryController;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['title', 'type', 'order_id', 'doctor_id', 'certificate_number', 'content'])]
 class Certificate extends Model
 {
-    protected $fillable = [
-        'title',
-        'type',
-        'order_id',
-        'doctor_id',
-        'certificate_number',
-        'content',
-    ];
-
     protected function casts(): array
     {
         return [

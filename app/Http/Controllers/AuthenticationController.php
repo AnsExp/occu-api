@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,6 +27,14 @@ class AuthenticationController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
+
+        $exists = User::where('email', $credentials['email'])->where('deleted', true)->exists();
+
+        if ($exists) {
+            return back()
+                ->withErrors(['email' => 'Este usuario ha sido eliminado.'])
+                ->onlyInput('email');
+        }
 
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()

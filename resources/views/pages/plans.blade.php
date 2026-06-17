@@ -48,9 +48,6 @@
                                     </a>
                                 </th>
                             @endforeach
-                            <th scope="col"
-                                class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-600">Acciones
-                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 bg-white">
@@ -64,7 +61,8 @@
                                 </td>
                                 @can (PermissionEnum::UPDATE_PLANS->code())
                                     <td class="px-4 py-3 align-top text-right text-gray-700">
-                                        <a href="{{ route('plans.edit', ['plan' => $plan->id]) }}" class="text-gray-700 hover:underline">Editar</a>
+                                        <a href="{{ route('plans.edit', ['plan' => $plan->id]) }}"
+                                            class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Editar</a>
                                     </td>
                                 @endcan
                             </tr>

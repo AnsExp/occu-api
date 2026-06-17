@@ -51,6 +51,12 @@
             'allow' => PermissionEnum::can(PermissionEnum::VIEW_LOGS)
         ],
         [
+            'label' => 'Configuración',
+            'href' => route('settings.index'),
+            'active' => request()->is('settings') || request()->is('settings/*'),
+            'allow' => auth()->check() && auth()->user()->hasRole(App\Enums\RoleEnum::ADMINISTRATOR->code())
+        ],
+        [
             'label' => 'Cerrar sesión',
             'href' => route('logout'),
             'active' => false,

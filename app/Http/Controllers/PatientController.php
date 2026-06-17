@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PatientRequest;
 use App\Models\Patient;
-use App\Models\Plan;
-use App\Models\PlanDetail;
 use App\Policies\PatientPolicy;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PatientController extends Controller
 {
@@ -27,7 +26,9 @@ class PatientController extends Controller
         }
         $sort = request('sort', 'first_name');
         $direction = request('direction', 'asc');
-        $data = Patient::orderBy($sort, $direction)->paginate(10);
+        $data = Patient::orderBy($sort, $direction)
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
         return view('pages.patients', compact('data', 'sort', 'direction'));
     }
 
@@ -36,32 +37,30 @@ class PatientController extends Controller
      */
     public function create()
     {
-        //
+        if (!$this->policy->create(request()->user())) {
+            abort(403, 'No tienes permiso para crear pacientes.');
+        }
+        return view('forms.patients', ['patient' => null]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PatientRequest $request)
     {
         if (!$this->policy->create(request()->user())) {
             abort(403, 'No tienes permiso para crear pacientes.');
         }
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'string', 'max:255'],
-            'periodicity' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-        ]);
-        $items = explode("\n", $request->input('items', ''));
-        $plan = Plan::create($data);
-        foreach ($items as $item) {
-            $detail = new PlanDetail();
-            $detail->plan_id = $plan->id;
-            $detail->detail = trim($item);
-            $detail->save();
+        $validated = $request->validated();
+
+        $patient = new Patient($validated);
+
+        if ($request->hasFile('id_card_file')) {
+            $patient->id_card_file_path = $request->file('id_card_file')->store('patients/id-cards', 'public');
         }
-        return redirect()->route('plans')->with('status', 'Plan registrado correctamente.');
+
+        $patient->save();
+        return redirect()->route('patients.edit', ['patient' => $patient])->with('status', 'Paciente creado correctamente.');
     }
 
     /**
@@ -77,15 +76,34 @@ class PatientController extends Controller
      */
     public function edit(Patient $patient)
     {
-        //
+        if (!$this->policy->update(request()->user(), $patient)) {
+            abort(403, 'No tienes permiso para editar pacientes.');
+        }
+        $patient->load('metadata');
+        return view('forms.patients', ['patient' => $patient]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Patient $patient)
+    public function update(PatientRequest $request, Patient $patient)
     {
-        //
+        if (!$this->policy->update(request()->user(), $patient)) {
+            abort(403, 'No tienes permiso para editar pacientes.');
+        }
+        $validated = $request->validated();
+
+        if ($request->hasFile('id_card_file')) {
+            if ($patient->id_card_file_path) {
+                Storage::disk('public')->delete($patient->id_card_file_path);
+            }
+
+            $id_card_file_path = $request->file('id_card_file')->store('patients/id-cards', 'public');
+            $patient->setMeta('id_card_file_path', $id_card_file_path);
+        }
+
+        $patient->update($validated);
+        return redirect()->route('patients')->with('status', 'Paciente actualizado correctamente.');
     }
 
     /**

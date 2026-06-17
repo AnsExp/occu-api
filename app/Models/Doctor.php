@@ -5,20 +5,13 @@ namespace App\Models;
 use App\Enums\ActionEnum;
 use App\Enums\TableEnum;
 use App\Http\Controllers\AuditoryController;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['first_name', 'last_name', 'user_id', 'id_card', 'specialty_id', 'phone'])]
 class Doctor extends Model
 {
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'user_id',
-        'id_card',
-        'specialty_id',
-        'phone',
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -109,7 +109,7 @@
 									{{ $order->patient->id_card }}
 								</td>
 								<td class="px-4 py-3 align-top text-gray-700">
-									{{ format_datetime($order->created_at, false, true) }}
+									{{ $order->created_at->translatedFormat('j \d\e F, Y') }}
 								</td>
 								<td class="px-4 py-3 align-top text-right text-gray-700">
 									<div class="flex justify-end gap-2">

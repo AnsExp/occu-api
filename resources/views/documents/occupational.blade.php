@@ -94,8 +94,6 @@
 
 <body>
     @php
-        \Carbon\Carbon::setLocale('es');
-
         $patient = $certificate->order->patient;
         $doctor = $certificate->doctor;
         $order = $certificate->order;
@@ -103,10 +101,7 @@
         $patientName = $patient ? trim(($patient->first_name ?? '') . ' ' . ($patient->last_name ?? '')) : 'N/D';
         $doctorName = $doctor ? trim(($doctor->first_name ?? '') . ' ' . ($doctor->last_name ?? '')) : 'N/D';
         $issuedAt = $certificate->created_at ? $certificate->created_at->translatedFormat('j \\d\\e F, Y') : 'N/D';
-        $birthDateSource = $patient->birth_date ?? $patient->date_of_birth ?? null;
-        $birthDate = $birthDateSource
-            ? \Illuminate\Support\Carbon::parse($birthDateSource)->translatedFormat('j \\d\\e F, Y')
-            : 'N/D';
+        $birthDate = $patient->birth_date ? $patient->birth_date->translatedFormat('j \\d\\e F, Y') : 'N/D';
 
         $contentRaw = $certificate->content;
         $content = is_array($contentRaw) ? $contentRaw : (json_decode($contentRaw ?? '', true) ?: []);
@@ -257,7 +252,8 @@
             </tr>
             <tr>
                 <td class="info-label">Radiografía de tórax</td>
-                <td>{{ $fieldText($clinicalData['chest_xray']['status'] === 'was_done' ? 'Realizada' : 'No realizada') }}</td>
+                <td>{{ $fieldText($clinicalData['chest_xray']['status'] === 'was_done' ? 'Realizada' : 'No realizada') }}
+                </td>
                 <td class="info-label">Fecha radiografía</td>
                 <td>{{ $fieldText($clinicalData['chest_xray']['date'] ?? null) }}</td>
                 <td class="info-label">Tipo</td>
@@ -345,7 +341,8 @@
         <tbody>
             <tr>
                 <td class="info-label" style="width: 25%;">Vigía</td>
-                <td style="width: 25%;">{{ $fieldText($aptitudeEval['watchkeeping'] === 'fit' ? 'Apto' : 'No apto') }}</td>
+                <td style="width: 25%;">{{ $fieldText($aptitudeEval['watchkeeping'] === 'fit' ? 'Apto' : 'No apto') }}
+                </td>
                 <td class="info-label" style="width: 25%;">Restricciones</td>
                 <td style="width: 25%;">{{ $boolText($aptitudeEval['restrictions'] ?? null) }}</td>
             </tr>

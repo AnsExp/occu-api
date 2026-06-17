@@ -4,7 +4,215 @@
 
 @section('content')
 	@php
-		$orderItems = App\Models\Order::$STACK;
+		$orderItems = [
+			[
+				'name' => 'ELECTROCARDIOGRAMA',
+				'price' => 25,
+			],
+			[
+				'name' => 'BIOMETRIA COSTA',
+				'price' => 7,
+			],
+			[
+				'name' => 'RX TORAX STANDAR AP',
+				'price' => 30,
+			],
+			[
+				'name' => 'TRIGLICERIDOS',
+				'price' => 2.9,
+			],
+			[
+				'name' => 'INSUMOS CARNET DE TIPIFICACION',
+				'price' => 1.71,
+			],
+			[
+				'name' => 'CONSULTA PSICOLOGIA',
+				'price' => 20,
+			],
+			[
+				'name' => 'CONSULTA MEDICINA GENERAL',
+				'price' => 15,
+			],
+			[
+				'name' => 'CONSULTA OPTOMETRICA',
+				'price' => 15,
+			],
+			[
+				'name' => 'DIAGNOSTICO ODONTOLOGICO',
+				'price' => 20,
+			],
+			[
+				'name' => 'COLESTEROL',
+				'price' => 3.5,
+			],
+			[
+				'name' => 'AUDIOMETRIA',
+				'price' => 20,
+			],
+			[
+				'name' => 'EMO',
+				'price' => 4,
+			],
+			[
+				'name' => 'TIPIFICACION SANGUINEA',
+				'price' => 5.03,
+			],
+			[
+				'name' => 'TGO/ASAT',
+				'price' => 3.9,
+			],
+			[
+				'name' => 'UREA / BUN',
+				'price' => 2.8,
+			],
+			[
+				'name' => 'TGP/ALAT',
+				'price' => 3.9,
+			],
+			[
+				'name' => 'COPROPARASITARIO',
+				'price' => 3.5,
+			],
+			[
+				'name' => 'CREATININA',
+				'price' => 3.6,
+			],
+			[
+				'name' => 'HIV 1 2',
+				'price' => 11,
+			],
+			[
+				'name' => 'ACIDO URICO',
+				'price' => 3,
+			],
+			[
+				'name' => 'GLUCOSA BASAL',
+				'price' => 2.9,
+			],
+			[
+				'name' => 'VDRL',
+				'price' => 6,
+			],
+		];
+		$hierachy = [
+			[
+				'section' => 'Vigía',
+				'classifications' => [
+					[
+						'name' => 'Gente de pesca',
+						'roles' => [
+							'Capitán de B/P',
+							'Patrón de altura B/P',
+							'Patrón costanero B/P',
+							'Marinero de Primera de Puente B/P',
+						],
+					],
+					[
+						'name' => 'Gente de mar',
+						'roles' => [
+							'Capitán de Altura',
+							'Primer Oficial de Cubierta',
+							'Segundo Oficial de Cubierta',
+							'Tercer Oficial de Cubierta',
+							'Patrón de Altura',
+							'Patrón costanero',
+							'Contramaestre',
+							'Marinero de Primera de Puente',
+							'Marinero de Cubierta',
+							'Marinero Electrotécnico',
+						],
+					],
+				],
+			],
+			[
+				'section' => 'Maquinas',
+				'classifications' => [
+					[
+						'name' => 'Gente de pesca',
+						'roles' => [
+							'Jefe de Máquinas B/P',
+							'Primer Oficial de Máquinas B/P',
+							'Marinero de Primera de Máquinas B/P',
+							'Marinero de Máquinas B/P',
+						],
+					],
+					[
+						'name' => 'Gente de mar',
+						'roles' => [
+							'Jefe de Máquinas',
+							'Primer Oficial de Máquinas',
+							'Segundo Oficial de Máquinas',
+							'Tercer Oficial de Máquinas',
+							'Marinero de Primera de Máquinas',
+							'Marinero de Máquinas',
+						],
+					],
+				],
+			],
+			[
+				'section' => 'Electrotécnicos',
+				'classifications' => [
+					[
+						'name' => 'Gente de pesca',
+						'roles' => [
+							'Mecánico de helicóptero',
+							'Piloto de helicóptero',
+							'Observado de pesca',
+							'Capitán de pesca',
+						],
+					],
+					[
+						'name' => 'Gente de mar',
+						'roles' => [
+							'Técnico de mantenimiento de equipos hoteleros',
+							'Informático',
+							'Oficial Electrotécnico',
+							'Marinero Electrotécnico',
+							'Director de crucero',
+							'Gerente hotelero',
+							'Asistente de gerente hotelero',
+							'Administrador',
+							'Guía de turismo',
+							'Guía naturalista',
+							'Gasfitero',
+							'Ama de llaves',
+							'Encargado de boutique',
+							'Mayordomo',
+							'Lavandera/o',
+							'Bodeguero/guardalmacén',
+							'Carpintero/ebanista',
+							'Profesor de idiomas',
+							'Masajista',
+							'Fotógrafo',
+							'Músico',
+							'Médico',
+							'Enfermero',
+							'Soldador',
+							'Tornero',
+							'Operador de bomba',
+							'Electricista',
+							'Refrigerante',
+							'Operador de grúa',
+							'Representante de armador',
+							'Contramaestre',
+							'y otros que considere la autoridad marítima',
+						],
+					],
+				],
+			],
+			[
+				'section' => 'Subacuáticas',
+				'classifications' => [
+					[
+						'name' => 'Gente de mar',
+						'roles' => [
+							'Buzos científicos y recreativos',
+							'Buzos comerciales',
+						],
+					],
+				],
+			],
+		];
 		$taxRate = config('app.tax_rate');
 		$patientSection = $patient ? optional($patient->metadata->firstWhere('meta_key', 'section'))->meta_value : '';
 		$patientHierarchy = $patient ? optional($patient->metadata->firstWhere('meta_key', 'hierarchy'))->meta_value : '';
@@ -21,8 +229,7 @@
 		<div class="grid gap-6 lg:grid-cols-[360px_1fr]">
 			<div class="space-y-6">
 				<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-					<form method="get" action="{{ route('orders.create') }}"
-						class="space-y-4">
+					<form method="get" action="{{ route('orders.create') }}" class="space-y-4">
 						<div
 							class="flex flex-col gap-2 border-b border-gray-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
 							<div>
@@ -161,7 +368,7 @@
 										class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-base text-gray-900 shadow-sm focus:border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-800 sm:text-sm"
 										value="{{ $patientSection }}">
 										<option value="" selected disabled>Selecciona una opción</option>
-										@foreach (App\Models\Hierarchy::$STACK as $section)
+										@foreach ($hierachy as $section)
 											<option value="{{ $section['section'] }}" {{ $patientSection === $section['section'] ? 'selected' : '' }}>
 												{{ $section['section'] }}
 											</option>
@@ -178,7 +385,7 @@
 										class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-base text-gray-900 shadow-sm focus:border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-800 sm:text-sm"
 										value="{{ $patientHierarchy }}">
 										<option value="" selected disabled>Selecciona una opción</option>
-										@foreach (App\Models\Hierarchy::$STACK as $section)
+										@foreach ($hierachy as $section)
 											@foreach ($section['classifications'] as $classification)
 												<option data-section="{{ $section['section'] }}"
 													value="{{ $classification['name'] }}" {{ $patientHierarchy === $classification['name'] ? 'selected' : '' }}>
@@ -198,12 +405,11 @@
 										class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-base text-gray-900 shadow-sm focus:border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-800 sm:text-sm"
 										value="{{ $patientRole }}">
 										<option value="" selected disabled>Selecciona una opción</option>
-										@foreach (App\Models\Hierarchy::$STACK as $section)
+										@foreach ($hierachy as $section)
 											@foreach ($section['classifications'] as $classification)
 												@foreach ($classification['roles'] as $role)
 													<option data-classification="{{ $classification['name'] }}"
-														data-section="{{ $section['section'] }}"
-														value="{{ $role }}" {{ $patientRole === $role ? 'selected' : '' }}>
+														data-section="{{ $section['section'] }}" value="{{ $role }}" {{ $patientRole === $role ? 'selected' : '' }}>
 														{{ $role }}
 													</option>
 												@endforeach

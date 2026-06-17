@@ -2,14 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-class Metadata extends Model
-{
-    protected $fillable = [
-        'meta_type',
-        'meta_id',
-        'meta_key',
-        'meta_value'
-    ];
-}
+#[Fillable(['meta_type', 'meta_id', 'meta_key', 'meta_value'])]
+class Metadata extends Model { }

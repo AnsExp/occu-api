@@ -25,7 +25,10 @@ class UserController extends Controller
         }
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
-        $data = User::orderBy($sort, $direction)->paginate(10);
+        $data = User::where('deleted', false)
+            ->orderBy($sort, $direction)
+            ->paginate(get_setting('pagination_per_page', 10))
+            ->withQueryString();
         return view('pages.users', compact('data', 'sort', 'direction'));
     }
 
@@ -93,7 +96,8 @@ class UserController extends Controller
         if (!$this->policy->delete(request()->user(), $user)) {
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
-        $user->delete();
+        $user->deleted = true;
+        $user->save();
         return redirect()->route('users')->with('status', 'Usuario eliminado correctamente.');
     }
 }

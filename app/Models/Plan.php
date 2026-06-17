@@ -5,18 +5,13 @@ namespace App\Models;
 use App\Enums\ActionEnum;
 use App\Enums\TableEnum;
 use App\Http\Controllers\AuditoryController;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['name', 'price', 'periodicity', 'description'])]
 class Plan extends Model
 {
-    protected $fillable = [
-        'name',
-        'price',
-        'periodicity',
-        'description',
-    ];
-
     public function details(): HasMany
     {
         return $this->hasMany(PlanDetail::class);
