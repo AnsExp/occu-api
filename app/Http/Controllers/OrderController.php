@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Metadata;
 use App\Models\Certificate;
 use App\Models\CertificateType;
 use App\Models\Order;
 use App\Models\Patient;
 use App\Policies\OrderPolicy;
+use App\Services\OrderCreationService;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class OrderController extends Controller
 {
     private OrderPolicy $policy;
+    private OrderCreationService $orderCreationService;
 
     public function __construct()
     {
         $this->policy = new OrderPolicy();
+        $this->orderCreationService = new OrderCreationService();
     }
 
     public function index()
@@ -94,56 +96,8 @@ class OrderController extends Controller
         if (!$this->policy->create(request()->user())) {
             abort(403, 'No tienes permiso para crear órdenes de pago.');
         }
-        $details = $request->input('order.details', []);
-        $data = [];
-        foreach ($details as $detail) {
-            if (isset($detail['selected']) && boolval($detail['selected'])) {
-                $data[] = $detail;
-            }
-        }
-        $data = array_map(function ($item) {
-            return [
-                'name' => $item['name'] ?? '',
-                'price' => floatval($item['price'] ?? 0),
-                'quantity' => intval($item['quantity'] ?? 0),
-            ];
-        }, $data);
 
-        $patient = Patient::find($request->input('patient.id')) ?? new Patient();
-        $patient->fill($request->input('patient', []));
-        $patient->save();
-        foreach ([
-            'role' => $request->input('patient.role'),
-            'section' => $request->input('patient.section'),
-            'address' => $request->input('patient.address'),
-            'hierarchy' => $request->input('patient.hierarchy'),
-        ] as $key => $value) {
-            Metadata::updateOrCreate(
-                [
-                    'meta_type' => 'patient',
-                    'meta_id' => $patient->id,
-                    'meta_key' => $key,
-                ],
-                [
-                    'meta_value' => $value,
-                ]
-            );
-        }
-
-        $order = new Order(['order_number' => Order::generate_number()]);
-
-        $order->patient()->associate($patient);
-        $order->save();
-
-        foreach ($data as $item) {
-            $order->details()->create([
-                'item' => $item['name'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-            ]);
-        }
-
-        $order->load(['patient', 'details']);
+        $order = $this->orderCreationService->createFromRequest($request);
 
         return redirect()->intended(route('orders.pdf', ['order' => $order->order_number]));
     }

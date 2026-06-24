@@ -62,7 +62,7 @@
         </div>
 
         <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-            <x-search-order :url="route('occupational.index')" class="mt-6" />
+            <x-search-order :url="route('occupational.create')" class="mt-6" />
         </div>
 
         <div class="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">

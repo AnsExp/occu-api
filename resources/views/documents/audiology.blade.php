@@ -123,12 +123,6 @@
             return $value !== null && $value !== '' ? $value : 'N/D';
         };
 
-        $ishiharaLabels = [
-            'amarillo' => 'Amarillo',
-            'verde' => 'Verde',
-            'rojo' => 'Rojo',
-            'azul' => 'Azul',
-        ];
     @endphp
 
     <table class="header" cellspacing="0" cellpadding="0">
@@ -204,28 +198,6 @@
             </tr>
         </tbody>
     </table>
-
-    <div class="section-title">Test de Ishihara</div>
-    <table class="result-table" cellspacing="0" cellpadding="0">
-        <thead>
-            <tr>
-                <th style="width: 40%;">Color</th>
-                <th style="width: 60%;" class="center">Resultado</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($ishiharaLabels as $key => $label)
-                @php
-                    $value = $ishihara[$key] ?? $ishihara[$label] ?? null;
-                @endphp
-                <tr>
-                    <td>{{ $label }}</td>
-                    <td class="center">{{ strtoupper($fieldText($value)) }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
     <div class="footer">
         Documento generado automáticamente por el sistema de salud ocupacional.
     </div>

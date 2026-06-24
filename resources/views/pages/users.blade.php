@@ -7,8 +7,8 @@
         use App\Enums\PermissionEnum;
 
         $headers = [
-            ['label' => 'Nombre', 'href' => route('users', ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Correo', 'href' => route('users', ['sort' => 'email', 'direction' => $sort === 'email' && $direction === 'asc' ? 'desc' : 'asc'])]
+            ['label' => 'Nombre', 'href' => route('users.index', ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Correo', 'href' => route('users.index', ['sort' => 'email', 'direction' => $sort === 'email' && $direction === 'asc' ? 'desc' : 'asc'])]
         ];
     @endphp
 

@@ -122,6 +122,13 @@
         $visualField = is_array($content['visual_field'] ?? null) ? $content['visual_field'] : [];
         $colorVision = $content['color_vision'] ?? 'N/D';
 
+        $ishiharaLabels = [
+            'amarillo' => 'Amarillo',
+            'verde' => 'Verde',
+            'rojo' => 'Rojo',
+            'azul' => 'Azul',
+        ];
+
         $fieldText = static function ($value) {
             return $value !== null && $value !== '' ? $value : 'N/D';
         };
@@ -226,6 +233,27 @@
         </tbody>
     </table>
 
+    <div class="section-title">Test de Ishihara</div>
+    <table class="result-table" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th style="width: 40%;">Color</th>
+                <th style="width: 60%;" class="center">Resultado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($ishiharaLabels as $key => $label)
+                @php
+                    $value = $ishihara[$key] ?? $ishihara[$label] ?? null;
+                @endphp
+                <tr>
+                    <td>{{ $label }}</td>
+                    {{-- <td class="center">{{ strtoupper($fieldText($value)) }}</td> --}}
+                    <td class="center">C</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
     <div class="footer">
         Documento generado automáticamente por el sistema de salud ocupacional.
     </div>

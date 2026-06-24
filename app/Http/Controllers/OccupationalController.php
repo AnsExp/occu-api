@@ -26,7 +26,9 @@ class OccupationalController extends Controller
         return view('pages.certificate', [
             'filters' => $filter['filters'],
             'certificates' => $filter['certificates'],
-        ])->with('title', 'Salud Ocupacional');
+        ])
+            ->with('title', 'Salud Ocupacional')
+            ->with('routeCreate', route('occupational.create'));
     }
 
     public function create()

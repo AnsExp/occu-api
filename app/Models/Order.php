@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['patient_id', 'order_number'])]
+#[Fillable(['order_number'])]
 class Order extends Model
 {
     public function patient(): BelongsTo
@@ -32,7 +32,7 @@ class Order extends Model
     {
         $number = str_pad((string) mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
 
-        $exists = Order::where('order_number', $number)->exists();
+        $exists = self::where('order_number', $number)->exists();
         if ($exists) {
             return self::generate_number();
         }

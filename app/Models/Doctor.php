@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['first_name', 'last_name', 'user_id', 'id_card', 'specialty_id', 'phone'])]
+#[Fillable(['first_name', 'last_name', 'id_card', 'phone'])]
 class Doctor extends Model
 {
     public function user(): BelongsTo

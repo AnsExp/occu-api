@@ -5,13 +5,14 @@
 @section('content')
 
     @php
+        use App\Enums\PermissionEnum;
         $headers = [
-            ['label' => 'Paciente', 'href' => route('patients', ['sort' => 'first_name', 'direction' => $sort === 'first_name' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Cédula', 'href' => route('patients', ['sort' => 'id_card', 'direction' => $sort === 'id_card' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Género', 'href' => route('patients', ['sort' => 'gender', 'direction' => $sort === 'gender' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Nacimiento', 'href' => route('patients', ['sort' => 'birth_date', 'direction' => $sort === 'birth_date' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Correo', 'href' => route('patients', ['sort' => 'email', 'direction' => $sort === 'email' && $direction === 'asc' ? 'desc' : 'asc'])],
-            ['label' => 'Teléfono', 'href' => route('patients', ['sort' => 'phone', 'direction' => $sort === 'phone' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Paciente', 'href' => route('patients.index', ['sort' => 'first_name', 'direction' => $sort === 'first_name' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Cédula', 'href' => route('patients.index', ['sort' => 'id_card', 'direction' => $sort === 'id_card' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Género', 'href' => route('patients.index', ['sort' => 'gender', 'direction' => $sort === 'gender' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Nacimiento', 'href' => route('patients.index', ['sort' => 'birth_date', 'direction' => $sort === 'birth_date' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Correo', 'href' => route('patients.index', ['sort' => 'email', 'direction' => $sort === 'email' && $direction === 'asc' ? 'desc' : 'asc'])],
+            ['label' => 'Teléfono', 'href' => route('patients.index', ['sort' => 'phone', 'direction' => $sort === 'phone' && $direction === 'asc' ? 'desc' : 'asc'])],
         ];
     @endphp
 
@@ -70,10 +71,14 @@
                                 </td>
                                 <td class="px-4 py-3 align-top text-right text-gray-700">
                                     <div class="flex justify-end gap-2">
-                                        <a href="{{ route('orders', ['id_card' => $patient->id_card]) }}"
-                                            class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Certificados</a>
-                                        <a href="{{ route('patients.edit', ['patient' => $patient]) }}"
-                                            class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Editar</a>
+                                        @can(PermissionEnum::VIEW_CERTIFICATES->code())
+                                            <a href="{{ route('orders.index', ['id_card' => $patient->id_card]) }}"
+                                                class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Certificados</a>
+                                        @endcan
+                                        @can(PermissionEnum::UPDATE_PATIENTS->code())
+                                            <a href="{{ route('patients.edit', ['patient' => $patient]) }}"
+                                                class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Editar</a>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

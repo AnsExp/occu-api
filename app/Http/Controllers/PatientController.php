@@ -103,7 +103,7 @@ class PatientController extends Controller
         }
 
         $patient->update($validated);
-        return redirect()->route('patients')->with('status', 'Paciente actualizado correctamente.');
+        return redirect()->route('patients.index')->with('status', 'Paciente actualizado correctamente.');
     }
 
     /**
@@ -115,6 +115,6 @@ class PatientController extends Controller
             abort(403, 'No tienes permiso para eliminar pacientes.');
         }
         $patient->delete();
-        return redirect()->route('patients')->with('status', 'Paciente eliminado correctamente.');
+        return redirect()->route('patients.index')->with('status', 'Paciente eliminado correctamente.');
     }
 }

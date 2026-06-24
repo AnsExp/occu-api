@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActionEnum;
 use App\Enums\LevelEnum;
-use App\Enums\PermissionEnum;
 use App\Enums\TableEnum;
 use App\Models\AuditLog;
 use App\Models\User;
@@ -72,15 +71,15 @@ class AuditoryController extends Controller
         ]);
     }
 
-    public function detail(AuditLog $log)
+    public function show(AuditLog $audit)
     {
-        if (!$this->policy->view(auth()->user(), $log)) {
+        if (!$this->policy->view(auth()->user(), $audit)) {
             abort(403, 'No tienes permiso para acceder a los registros de auditoría.');
         }
 
-        $log->load('user');
+        $audit->load('user');
 
-        return view('pages.auditory_detail', ['log' => $log]);
+        return view('pages.auditory_detail', ['log' => $audit]);
     }
 
     public static function info(TableEnum $table, ActionEnum $action, int $record_id, array $old_data = [], array $new_data = [])

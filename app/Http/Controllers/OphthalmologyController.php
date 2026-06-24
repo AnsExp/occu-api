@@ -26,7 +26,9 @@ class OphthalmologyController extends Controller
         return view('pages.certificate', [
             'filters' => $filter['filters'],
             'certificates' => $filter['certificates'],
-        ])->with('title', 'Oftalmología');
+        ])
+            ->with('title', 'Oftalmología')
+            ->with('routeCreate', route('ophthalmology.create'));
     }
 
     public function create()

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RoleEnum;
 use App\Http\Requests\AudiologyRequest;
 use App\Models\Certificate;
 use App\Models\CertificateType;
 use App\Models\Order;
+use App\Models\User;
 use App\Policies\AudiologyPolicy;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class AudiologyController extends Controller
 {
@@ -26,7 +29,9 @@ class AudiologyController extends Controller
         return view('pages.certificate', [
             'filters' => $filter['filters'],
             'certificates' => $filter['certificates'],
-        ])->with('title', 'Audiología');
+        ])
+            ->with('title', 'Audiología')
+            ->with('routeCreate', route('audiology.create'));
     }
 
     public function create()
@@ -46,7 +51,8 @@ class AudiologyController extends Controller
                 return view('forms.audiology')->with('error', 'Ya existe un certificado de audiología para esta orden. Por favor, ingrese otro número de orden.');
             }
         }
-        return view('forms.audiology', ['order' => $order]);
+        $doctors = User::role(RoleEnum::DOCTOR->code())->with('doctor')->get();
+        return view('forms.audiology', ['order' => $order, 'doctors' => $doctors]);
     }
 
     public function store(AudiologyRequest $request)
@@ -74,6 +80,14 @@ class AudiologyController extends Controller
         if (!$this->policy->view(auth()->user(), $certificate)) {
             abort(403, 'No tienes permiso para acceder a este certificado.');
         }
+        // $certificate->load(['doctor', 'order']);
+        // $content = view('documents.audiology', ['certificate' => $certificate])->render();
+        // $pdf = PDF::loadView('documents.document', ['content' => $content]);
+        // $pdf->setPaper('A4', 'portrait');
+        // $pdf->render();
+        // return response($pdf->output(), 200)
+        //     ->header('Content-Type', 'application/pdf')
+        //     ->header('Content-Disposition', 'inline; filename="audiology-' . $certificate->certificate_number . '.pdf"');
         return view('documents.audiology', ['certificate' => $certificate]);
     }
 

@@ -8,10 +8,21 @@
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between">
 				<div>
-					<h1 class="text-2xl font-semibold tracking-tight text-gray-900">{{ isset($title) ? $title : 'Certificados médicos' }}</h1>
+					<h1 class="text-2xl font-semibold tracking-tight text-gray-900">
+						{{ isset($title) ? $title : 'Certificados médicos' }}
+					</h1>
 					<p class="mt-2 text-sm text-gray-600">Busca y filtra certificados por número, cédula del paciente o
 						rango de fechas.</p>
 				</div>
+				@if (isset($routeCreate))
+					<div>
+						<span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+							1 registros
+						</span>
+						<a href="{{ $routeCreate }}"
+							class="ml-4 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white">Crear</a>
+					</div>
+				@endif
 			</div>
 		</div>
 
@@ -157,9 +168,13 @@
 							@foreach($certificates as $certificate)
 								<tr class="hover:bg-gray-50">
 									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->title }}</td>
-									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->order->patient->first_name }} {{ $certificate->order->patient->last_name }}</td>
+									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->order->patient->first_name }}
+										{{ $certificate->order->patient->last_name }}
+									</td>
 									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->order->patient->id_card }}</td>
-									<td class="px-4 py-3 align-top text-gray-700">{{ $certificate->created_at->translatedFormat('j \d\e F, Y') }}</td>
+									<td class="px-4 py-3 align-top text-gray-700">
+										{{ $certificate->created_at->translatedFormat('j \d\e F, Y') }}
+									</td>
 									<td class="px-4 py-3 align-top text-right text-gray-700">
 										<div class="flex justify-end gap-2">
 											<a href="{{ route('certificates.pdf', ['certificate' => $certificate->certificate_number]) }}"

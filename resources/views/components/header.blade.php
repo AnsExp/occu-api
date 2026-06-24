@@ -12,25 +12,25 @@
         ],
         [
             'label' => 'Planes',
-            'href' => route('plans'),
+            'href' => route('plans.index'),
             'active' => request()->is('plans') || request()->is('plans/*'),
             'allow' => PermissionEnum::can(PermissionEnum::VIEW_PLANS)
         ],
         [
             'label' => 'Órdenes',
-            'href' => route('orders'),
+            'href' => route('orders.index'),
             'active' => request()->is('orders') || request()->is('orders/*'),
             'allow' => PermissionEnum::can(PermissionEnum::VIEW_ORDERS)
         ],
         [
             'label' => 'Usuarios',
-            'href' => route('users'),
+            'href' => route('users.index'),
             'active' => request()->is('users') || request()->is('users/*'),
             'allow' => PermissionEnum::can(PermissionEnum::VIEW_USERS)
         ],
         [
             'label' => 'Pacientes',
-            'href' => route('patients'),
+            'href' => route('patients.index'),
             'active' => request()->is('patients') || request()->is('patients/*'),
             'allow' => PermissionEnum::can(PermissionEnum::VIEW_PATIENTS)
         ],

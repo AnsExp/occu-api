@@ -7,8 +7,8 @@
     use App\Enums\PermissionEnum;
 
     $headers = [
-        ['label' => 'Nombre', 'href' => route('plans', ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])],
-        ['label' => 'Precio', 'href' => route('plans', ['sort' => 'price', 'direction' => $sort === 'price' && $direction === 'asc' ? 'desc' : 'asc'])],
+        ['label' => 'Nombre', 'href' => route('plans.index', ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])],
+        ['label' => 'Precio', 'href' => route('plans.index', ['sort' => 'price', 'direction' => $sort === 'price' && $direction === 'asc' ? 'desc' : 'asc'])],
     ];
 @endphp
 
@@ -59,12 +59,22 @@
                                 <td class="px-4 py-3 align-top text-gray-700">
                                     {{ $plan->price }} / {{ PeriodicityEnum::fromCode($plan->periodicity)?->label() ?? 'N/D' }}
                                 </td>
-                                @can (PermissionEnum::UPDATE_PLANS->code())
-                                    <td class="px-4 py-3 align-top text-right text-gray-700">
+                                <td class="px-4 py-3 align-top text-right text-gray-700">
+                                    @can (PermissionEnum::UPDATE_PLANS->code())
                                         <a href="{{ route('plans.edit', ['plan' => $plan->id]) }}"
                                             class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Editar</a>
-                                    </td>
-                                @endcan
+                                    @endcan
+                                    @can (PermissionEnum::DESTROY_PLANS->code())
+                                        <form action="{{ route('plans.destroy', ['plan' => $plan->id]) }}" method="POST"
+                                            class="inline"
+                                            onsubmit="return confirm('Esta acción es irreversible. ¿Desea continuar?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-50">Eliminar</button>
+                                        </form>
+                                    @endcan
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -6,6 +6,7 @@ use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
 use App\Enums\SpecialtyEnum;
 use App\Models\Doctor;
+use App\Models\Specialty;
 use App\Models\User;
 use DB;
 
@@ -13,18 +14,18 @@ class UserStoreService
 {
     public function store(array $data)
     {
-        $saved = false;
-        DB::transaction(function () use ($data, &$saved) {
+        DB::transaction(function () use ($data) {
             $user = new User($data);
             $user->password = bcrypt($data['password']);
             $user->assignRole($data['role']);
             $userSaved = $user->save();
-            if ($userSaved && $data['role'] !== RoleEnum::DOCTOR->code()) {
+            if ($userSaved && $data['role'] === RoleEnum::DOCTOR->code()) {
                 $doctor = new Doctor($data);
+                $specialty = Specialty::where('name', $data['specialty'])->first();
                 $doctor->first_name = $user->name;
                 $doctor->user()->associate($user);
-                $doctorSaved = $doctor->save();
-                if ($doctorSaved) {
+                $doctor->specialty()->associate($specialty);
+                if ($doctor->save()) {
                     switch ($data['specialty']) {
                         case SpecialtyEnum::AUDIOLOGY->code():
                             $user->givePermissionTo([
@@ -47,8 +48,6 @@ class UserStoreService
                     }
                 }
             }
-            $saved = $userSaved && ($data['role'] !== RoleEnum::DOCTOR->code() || $doctorSaved);
         });
-        return $saved;
     }
 }

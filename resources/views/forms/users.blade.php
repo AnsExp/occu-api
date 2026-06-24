@@ -32,7 +32,7 @@
                 <form method="post" action="{{ $user ? route('users.update.profile', $user) : route('users.store') }}"
                     class="mt-4 space-y-4">
                     @csrf
-                    @method($user ? 'PATCH' : 'POST')
+                    @if ($user) @method('PATCH') @endif
 
                     <div>
                         <label for="name" class="mb-1 block text-sm font-medium text-gray-700">Nombre <span

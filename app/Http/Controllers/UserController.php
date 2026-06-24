@@ -38,11 +38,8 @@ class UserController extends Controller
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
         $validated = $request->validated();
-        $user = $service->store($validated);
-        if (!$user) {
-            return redirect()->route('users.edit')->with('error', 'Ha ocurrido un error al registrar el usuario.');
-        }
-        return redirect()->route('users.edit', ['user' => $user])->with('status', 'Usuario registrado correctamente.');
+        $service->store($validated);
+        return redirect()->route('users.index')->with('status', 'Usuario registrado correctamente.');
     }
 
     public function create()
@@ -88,7 +85,7 @@ class UserController extends Controller
         $user->password = bcrypt($validated['password']);
         $user->save();
 
-        return redirect()->route('users')->with('status', 'Contraseña restablecida correctamente. Nuevamente contraseña: ' . $validated['password']);
+        return redirect()->route('users.index')->with('status', 'Contraseña restablecida correctamente. Nuevamente contraseña: ' . $validated['password']);
     }
 
     public function destroy(User $user)
@@ -98,6 +95,6 @@ class UserController extends Controller
         }
         $user->deleted = true;
         $user->save();
-        return redirect()->route('users')->with('status', 'Usuario eliminado correctamente.');
+        return redirect()->route('users.index')->with('status', 'Usuario eliminado correctamente.');
     }
 }

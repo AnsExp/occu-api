@@ -139,7 +139,7 @@
 										{{ App\Enums\TableEnum::fromCode($log->table_name)?->label() ?? 'No definido' }}</td>
 									<td class="px-4 py-3 align-top text-gray-700">{{ $log->ip_address ?? '-' }}</td>
 									<td class="px-4 py-3 align-top text-gray-700">
-										<a href="{{ route('audit.detail', ['log' => $log->id]) }}"
+										<a href="{{ route('audit.show', [$log]) }}"
 											class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-200">
 											Ver detalles
 										</a>

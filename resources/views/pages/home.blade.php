@@ -1,6 +1,6 @@
 @extends('components.layout')
 
-@section('title', 'Home')
+@section('title', config('app.name'))
 
 @section('content')
 	@php
@@ -46,7 +46,7 @@
 					@endif
 
 					@if (PermissionEnum::can(PermissionEnum::VIEW_ORDERS))
-						<a href="{{ route('orders') }}"
+						<a href="{{ route('orders.index') }}"
 							class="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
 							Ver órdenes
 						</a>
