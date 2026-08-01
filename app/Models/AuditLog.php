@@ -2,25 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable([
-    'table_name',
-    'record_id',
-    'action',
-    'level',
-    'changes',
-    'user_id',
-    'ip_address',
-    'user_agent'
-])]
 class AuditLog extends Model
 {
+    protected $fillable = [
+        'table',
+        'table_id',
+        'action',
+        'level',
+        'changes',
+        'user_id',
+        'ip_address',
+        'user_agent'
+    ];
+
     protected function casts(): array
     {
         return [
-            'changes' => 'array',
+            'changes' => 'json',
         ];
     }
 

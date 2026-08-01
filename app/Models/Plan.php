@@ -2,47 +2,48 @@
 
 namespace App\Models;
 
-use App\Enums\ActionEnum;
-use App\Enums\TableEnum;
-use App\Http\Controllers\AuditoryController;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
-#[Fillable(['name', 'price', 'periodicity', 'description'])]
+/**
+ * @property int $id
+ * @property string $name
+ * @property float $price
+ * @property string $periodicity
+ * @property string $description
+ * @property array|null $features
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Plan extends Model
 {
-    public function details(): HasMany
+    use SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'price',
+        'periodicity',
+        'description',
+        'features'
+    ];
+
+    protected $casts = [
+        'features' => 'json',
+    ];
+
+    protected $hidden = [
+        'deleted_at',
+    ];
+
+    public function getPrettyCreatedAtAttribute()
     {
-        return $this->hasMany(PlanDetail::class);
+        return $this?->created_at?->translatedFormat('F j, Y') ?? null;
     }
 
-    protected static function booted()
+    public function getPrettyUpdatedAtAttribute()
     {
-        static::created(function ($plan) {
-            AuditoryController::info(
-                TableEnum::PLANS,
-                ActionEnum::INSERT,
-                $plan->id,
-                new_data: $plan->toArray()
-            );
-        });
-        static::updating(function ($plan) {
-            AuditoryController::info(
-                TableEnum::PLANS,
-                ActionEnum::UPDATE,
-                $plan->id,
-                old_data: $plan->getOriginal(),
-                new_data: $plan->getDirty()
-            );
-        });
-        static::deleted(function ($plan) {
-            AuditoryController::info(
-                TableEnum::PLANS,
-                ActionEnum::DELETE,
-                $plan->id,
-                old_data: $plan->toArray()
-            );
-        });
+        return $this?->updated_at?->translatedFormat('F j, Y') ?? null;
     }
 }

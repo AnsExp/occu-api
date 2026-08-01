@@ -1,37 +1,81 @@
 <?php
 
-use App\Models\Metadata;
+if (!function_exists('random_number')) {
+    function random_number(int $size): string
+    {
+        $result = '';
+
+        for ($i = 0; $i < $size; $i++) {
+            $result .= mt_rand(0, 9);
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('user_has_role')) {
+    function user_has_role(string $role): bool
+    {
+        return auth()->check() && auth()->user()->hasRole($role);
+    }
+}
+
+if (!function_exists('occu_hash')) {
+    function occu_hash(string $value): string
+    {
+        return hash('sha256', $value);
+    }
+}
 
 if (!function_exists('get_countries')) {
     function get_countries()
     {
-        $countries = json_decode(file_get_contents(resource_path('json/countries.json')), true);
+        $countries = config('occu_nationalities', []);
         return $countries;
     }
 }
 
-if (!function_exists('set_setting')) {
-    function set_setting(string $key, $value): void
+if (!function_exists('generate_laboratory_code')) {
+    function generate_laboratory_code()
     {
-        Metadata::updateOrCreate(
-            [
-                'meta_type' => 'settings',
-                'meta_id' => 0,
-                'meta_key' => $key
-            ],
-            ['meta_value' => serialize($value)]
-        );
+        $code = random_number(7);
+        $exists = false;
+        do {
+            $exists = App\Models\LaboratoryOrder::where('code', $code)->exists();
+            if ($exists) {
+                $code = random_number(7);
+            }
+        } while ($exists);
+        return $code;
     }
 }
 
-if (!function_exists('get_setting')) {
-    function get_setting(string $key, $default = null)
+if (!function_exists('set_option')) {
+    function set_option(string $key, $value): void
     {
-        $setting = Metadata::where('meta_type', 'settings')
-            ->where('meta_id', 0)
-            ->where('meta_key', $key)
-            ->first();
+        App\Models\Option::updateOrCreate(
+            ['key' => $key],
+            ['value' => $value]
+        );
+        $GLOBALS['APP_OPTIONS'][$key] = $value;
+    }
+}
 
-        return $setting ? unserialize($setting->meta_value) : $default;
+if (!function_exists('get_option')) {
+    function get_option(string $key, $default = null)
+    {
+        if (array_key_exists($key, $GLOBALS['APP_OPTIONS'])) {
+            return $GLOBALS['APP_OPTIONS'][$key];
+        }
+        $setting = App\Models\Option::where('key', $key)->first();
+
+        return $setting ? $setting->value : $default;
+    }
+}
+
+if (!function_exists('occu_storage')) {
+    function occu_storage()
+    {
+        return Illuminate\Support\Facades\Storage::disk('local');
     }
 }

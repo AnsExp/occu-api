@@ -2,9 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enums\PermissionEnum;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -13,7 +11,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can(PermissionEnum::VIEW_USERS->code());
+        return $user->can('read.users');
     }
 
     /**
@@ -21,7 +19,10 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->can(PermissionEnum::VIEW_USERS->code());
+        if (!$user->can('read.users')) {
+            return false;
+        }
+        return $user->id === $model->id;
     }
 
     /**
@@ -29,7 +30,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can(PermissionEnum::STORE_USERS->code());
+        return $user->can('create.users');
     }
 
     /**
@@ -37,7 +38,10 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->can(PermissionEnum::UPDATE_USERS->code());
+        if (!$user->can('update.users')) {
+            return false;
+        }
+        return $user->id === $model->id;
     }
 
     /**
@@ -45,7 +49,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->can(PermissionEnum::DESTROY_USERS->code());
+        if (!$user->can('delete.users')) {
+            return false;
+        }
+        return $user->id === $model->id;
     }
 
     /**
@@ -53,7 +60,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->can(PermissionEnum::UPDATE_USERS->code());
+        return false;
     }
 
     /**
@@ -61,6 +68,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->can(PermissionEnum::DESTROY_USERS->code());
+        return false;
     }
 }

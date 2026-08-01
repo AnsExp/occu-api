@@ -2,15 +2,50 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
-#[Fillable(['name'])]
+/**
+ * @property int $id
+ * @property string $slug
+ * @property string $name
+ * @property string|null $form
+ * @property string $description
+ * @property float $price_base
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Specialty extends Model
 {
-    public function doctors(): HasMany
+    use SoftDeletes;
+
+    protected $fillable = [
+        'slug',
+        'name',
+        'form',
+        'description',
+        'price_base',
+    ];
+
+    public function doctors()
     {
-        return $this->hasMany(Doctor::class, 'specialty_id');
+        return $this->hasMany(Doctor::class);
+    }
+
+    public function medicalDates()
+    {
+        return $this->hasMany(MedicalDate::class);
+    }
+
+    public function getPrettyCreatedAtAttribute()
+    {
+        return $this?->created_at?->translatedFormat('F j, Y') ?? null;
+    }
+
+    public function getPrettyUpdatedAtAttribute()
+    {
+        return $this?->updated_at?->translatedFormat('F j, Y') ?? null;
     }
 }

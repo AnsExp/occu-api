@@ -1,4 +1,4 @@
-@extends('components.layout')
+@extends('layouts.app')
 
 @section('title', 'Error 405 - Método no permitido')
 

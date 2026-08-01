@@ -3,43 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificate;
+use App\Models\CertificateKey;
+use App\Models\Order;
+use Illuminate\Http\Request;
+use Storage;
 
-class CertificateController extends Controller
+abstract class CertificateController extends Controller
 {
-    public static function filter(string $type = null)
+    protected $type = null;
+
+    public function orderByRequest(Request $request)
     {
-        $filters = [
-            'patient_id_card' => request('patient_id_card', null),
-            'certificate_number' => request('certificate_number', null),
-            'start_date' => request('start_date', null),
-            'end_date' => request('end_date', null),
-        ];
-        $query = Certificate::with('order.patient');
-        if ($filters['patient_id_card']) {
-            $query->whereHas('order.patient', function ($q) use ($filters) {
-                $q->where('id_card', 'like', "%{$filters['patient_id_card']}%");
-            });
+        $order = null;
+        if ($orderNumber = $request->input('order_number', false)) {
+            $order = Order::findByOrderNumber($orderNumber);
+            if (!$order) {
+                session()->flash('warning', __('messages.order_not_found'));
+            } elseif ($order->hasCertificateType($this->type)) {
+                session()->flash('error', __('messages.certificate_exists', ['type' => __('messages.' . $this->type)]));
+                $order = null;
+            }
+        } else {
+            session()->flash('info', __('messages.enter_order_number', ['type' => __('messages.' . $this->type)]));
         }
-        if ($filters['certificate_number']) {
-            $query->where('title', 'like', "%{$filters['certificate_number']}%");
+        return $order;
+    }
+
+    public function certificateKeyByRequest(Request $request, Certificate $certificate)
+    {
+        $certificateKey = null;
+        if ($certificateKeyValue = $request->input('certificate_key', false)) {
+            $certificateKey = CertificateKey::findByKey($certificateKeyValue);
         }
-        if ($filters['start_date'] && $filters['end_date']) {
-            $query->whereDate('created_at', '>=', $filters['start_date'])
-                ->whereDate('created_at', '<=', $filters['end_date']);
-        } elseif ($filters['start_date']) {
-            $query->whereDate('created_at', '>=', $filters['start_date']);
-        } elseif ($filters['end_date']) {
-            $query->whereDate('created_at', '<=', $filters['end_date']);
+        if (!($certificateKey?->isActive() ?? false)) {
+            return null;
         }
-        if ($type) {
-            $query->where('type', $type);
+        if ($certificateKey->certificate->id !== $certificate->id) {
+            return null;
         }
-        $certificates = $query->orderByDesc('created_at')
-            ->paginate(get_setting('pagination_per_page', 10))
-            ->withQueryString();
-        return [
-            'filters' => $filters,
-            'certificates' => $certificates,
-        ];
+        if ($certificateKey->authorizedUser->id !== auth()->user()->id) {
+            return null;
+        }
+        return $certificateKey;
+    }
+
+    protected function getFilePath(Certificate $certificate)
+    {
+        $filePath = $certificate->file_path;
+        if (!Storage::disk('local')->exists($filePath)) {
+            return false;
+        }
+        return storage_path('app/private/' . $filePath);
     }
 }

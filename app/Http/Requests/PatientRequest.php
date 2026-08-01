@@ -2,18 +2,23 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Patient;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class PatientRequest extends FormRequest
 {
-    private ?Patient $patient = null;
-
-    public function setPatient(Patient $patient): void
+    protected function prepareForValidation()
     {
-        $this->patient = $patient;
+        if ($this->has('id_card')) {
+            $this->merge([
+                'id_card_hash' => occu_hash($this->input('id_card')),
+            ]);
+        }
+        if ($this->has('email')) {
+            $this->merge([
+                'email_hash' => occu_hash($this->input('email')),
+            ]);
+        }
     }
 
     /**
@@ -31,44 +36,49 @@ class PatientRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'nationality' => ['required', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'max:255'],
-            'birth_date' => ['required', 'date'],
-            'id_card_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+            'nationality' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'in:male,female,other'],
+            'birth_date' => ['nullable', 'date'],
+            'id_card' => ['nullable', 'string', 'max:255'],
+            'id_card_hash' => ['nullable', 'string', 'max:255'],
+            'id_card_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
+            'email' => ['required', 'email', 'max:255'],
+            'email_hash' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:255'],
         ];
-
-        if ($this->patient) {
-            $rules['id_card'][] = ['required', 'string', 'max:255', Rule::unique('patients', 'id_card')->ignore($this->patient->id)];
-            $rules['email'][] = ['nullable', 'email', 'max:255', Rule::unique('patients', 'email')->ignore($this->patient->id)];
-            $rules['phone'][] = ['nullable', 'string', 'max:255', Rule::unique('patients', 'phone')->ignore($this->patient->id)];
-        } else {
-            $rules['id_card'][] = ['required', 'string', 'max:255', Rule::unique('patients', 'id_card')];
-            $rules['email'][] = ['nullable', 'email', 'max:255', Rule::unique('patients', 'email')];
-            $rules['phone'][] = ['nullable', 'string', 'max:255', Rule::unique('patients', 'phone')];
-        }
-
-        return $rules;
     }
 
     public function messages()
     {
         return [
-            'first_name.required' => 'El nombre es obligatorio.',
-            'last_name.required' => 'El apellido es obligatorio.',
-            'nationality.required' => 'La nacionalidad es obligatoria.',
-            'gender.required' => 'El género es obligatorio.',
-            'birth_date.required' => 'La fecha de nacimiento es obligatoria.',
-            'id_card.required' => 'La cédula es obligatoria.',
-            'id_card.unique' => 'La cédula ya está en uso.',
-            'email.email' => 'El correo electrónico no es válido.',
-            'email.unique' => 'El correo electrónico ya está en uso.',
-            'phone.unique' => 'El teléfono ya está en uso.',
-            'id_card_file.file' => 'El archivo de la cédula debe ser un archivo válido.',
-            'id_card_file.mimes' => 'El archivo de la cédula debe ser un archivo de tipo: pdf, jpg, jpeg, png, webp.',
-            'id_card_file.max' => 'El archivo de la cédula no debe ser mayor a 5MB.',
+            'first_name.required' => __('validation.required', ['attribute' => __('attributes.first_name')]),
+            'first_name.string' => __('validation.string', ['attribute' => __('attributes.first_name')]),
+            'first_name.max' => __('validation.max.string', ['attribute' => __('attributes.first_name'), 'max' => 255]),
+            'last_name.required' => __('validation.required', ['attribute' => __('attributes.last_name')]),
+            'last_name.string' => __('validation.string', ['attribute' => __('attributes.last_name')]),
+            'last_name.max' => __('validation.max.string', ['attribute' => __('attributes.last_name'), 'max' => 255]),
+            'nationality.required' => __('validation.required', ['attribute' => __('attributes.nationality')]),
+            'nationality.string' => __('validation.string', ['attribute' => __('attributes.nationality')]),
+            'nationality.max' => __('validation.max.string', ['attribute' => __('attributes.nationality'), 'max' => 255]),
+            'gender.required' => __('validation.required', ['attribute' => __('attributes.gender')]),
+            'gender.string' => __('validation.string', ['attribute' => __('attributes.gender')]),
+            'gender.max' => __('validation.max.string', ['attribute' => __('attributes.gender'), 'max' => 255]),
+            'birth_date.required' => __('validation.required', ['attribute' => __('attributes.birth_date')]),
+            'birth_date.date' => __('validation.date', ['attribute' => __('attributes.birth_date')]),
+            'id_card.required' => __('validation.required', ['attribute' => __('attributes.id_card')]),
+            'id_card.max' => __('validation.max.string', ['attribute' => __('attributes.id_card'), 'max' => 255]),
+            'id_card.string' => __('validation.string', ['attribute' => __('attributes.id_card')]),
+            'id_card_hash.required' => __('validation.required', ['attribute' => __('attributes.id_card')]),
+            'id_card_hash.max' => __('validation.max.string', ['attribute' => __('attributes.id_card'), 'max' => 255]),
+            'id_card_file.required' => __('validation.required', ['attribute' => __('attributes.id_card_file')]),
+            'id_card_file.file' => __('validation.file', ['attribute' => __('attributes.id_card_file')]),
+            'id_card_file.mimes' => __('validation.mimes', ['attribute' => __('attributes.id_card_file'), 'values' => 'pdf']),
+            'id_card_file.max' => __('validation.max.file', ['attribute' => __('attributes.id_card_file'), 'max' => 2048]),
+            'email.email' => __('validation.email', ['attribute' => __('attributes.email')]),
+            'email_hash.max' => __('validation.max.string', ['attribute' => __('attributes.email'), 'max' => 255]),
         ];
     }
 }

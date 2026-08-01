@@ -2,10 +2,8 @@
 
 namespace App\Policies;
 
-use App\Enums\PermissionEnum;
 use App\Models\Certificate;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CertificatePolicy
 {
@@ -14,7 +12,15 @@ class CertificatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can(PermissionEnum::VIEW_CERTIFICATES->code());
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+
+        if ($user->hasRole('doctor')) {
+            return $user->can('read.certificates');
+        }
+
+        return false;
     }
 
     /**
@@ -22,7 +28,13 @@ class CertificatePolicy
      */
     public function view(User $user, Certificate $certificate): bool
     {
-        return $user->can(PermissionEnum::VIEW_CERTIFICATES->code());
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+        if ($user->hasRole('doctor') && $user->doctor) {
+            return $user->can("read.{$user->doctor->specialty->name}");
+        }
+        return false;
     }
 
     /**
@@ -30,7 +42,10 @@ class CertificatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can(PermissionEnum::STORE_CERTIFICATES->code());
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+        return $user->can('create.certificates');
     }
 
     /**
@@ -38,7 +53,13 @@ class CertificatePolicy
      */
     public function update(User $user, Certificate $certificate): bool
     {
-        return $user->can(PermissionEnum::UPDATE_CERTIFICATES->code());
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+        if ($user->hasRole('doctor') && $user->doctor) {
+            return $user->can("update.{$user->doctor->specialty->name}");
+        }
+        return false;
     }
 
     /**
@@ -46,7 +67,13 @@ class CertificatePolicy
      */
     public function delete(User $user, Certificate $certificate): bool
     {
-        return $user->can(PermissionEnum::DESTROY_CERTIFICATES->code());
+        if ($user->hasRole('administrator')) {
+            return true;
+        }
+        if ($user->hasRole('doctor') && $user->doctor) {
+            return $user->can("delete.{$user->doctor->specialty->name}");
+        }
+        return false;
     }
 
     /**
@@ -54,7 +81,7 @@ class CertificatePolicy
      */
     public function restore(User $user, Certificate $certificate): bool
     {
-        return $user->can(PermissionEnum::UPDATE_CERTIFICATES->code());
+        return false;
     }
 
     /**
@@ -62,6 +89,6 @@ class CertificatePolicy
      */
     public function forceDelete(User $user, Certificate $certificate): bool
     {
-        return $user->can(PermissionEnum::DESTROY_CERTIFICATES->code());
+        return false;
     }
 }

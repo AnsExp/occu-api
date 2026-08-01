@@ -2,24 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Enums\SpecialtyEnum;
 use App\Models\Specialty;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class SpecialtySeeder extends Seeder
 {
-    use WithoutModelEvents;
+    private array $items = [
+        ['name' => 'Audiología', 'price_base' => 25, 'form' => 'forms.form-audiology',],
+        ['name' => 'Odontología', 'price_base' => 50, 'form' => 'forms.form-odontology',],
+        ['name' => 'Oftalmología', 'price_base' => 75, 'form' => 'forms.form-ophthalmology',],
+    ];
 
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        foreach (SpecialtyEnum::cases() as $specialty) {
+        foreach ($this->items as $item) {
             Specialty::updateOrCreate(
-                ['name' => $specialty->code()],
-                ['name' => $specialty->code()]
+                ['slug' => Str::slug($item['name'])],
+                [
+                    'name' => $item['name'],
+                    'price_base' => $item['price_base'],
+                    'form' => $item['form']
+                ]
             );
         }
     }

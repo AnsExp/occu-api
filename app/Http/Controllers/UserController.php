@@ -3,98 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use App\Http\Services\UserStoreService;
+use App\Http\Services\UserService;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    private UserPolicy $policy;
-
-    public function __construct()
-    {
-        $this->policy = new UserPolicy();
+    public function __construct(
+        private UserService $userService,
+        private UserPolicy $policy
+    ) {
+        $this->authorizeResource(User::class, 'user');
     }
 
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        if (!$this->policy->viewAny(request()->user())) {
-            abort(403);
-        }
-        $sort = request('sort', 'name');
-        $direction = request('direction', 'asc');
-        $data = User::where('deleted', false)
-            ->orderBy($sort, $direction)
-            ->paginate(get_setting('pagination_per_page', 10))
-            ->withQueryString();
-        return view('pages.users', compact('data', 'sort', 'direction'));
+        $data = User::paginate(10);
+        return view('users.index', compact('data'));
     }
 
-    public function store(UserRequest $request, UserStoreService $service)
-    {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
-        }
-        $validated = $request->validated();
-        $service->store($validated);
-        return redirect()->route('users.index')->with('status', 'Usuario registrado correctamente.');
-    }
-
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
-        }
-        return view('forms.users', ['user' => null]);
+        return view('users.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(UserRequest $request)
+    {
+        $this->userService->store($request);
+        return redirect()->route('users.index')->with('status', __('users.create.success'));
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(User $user)
     {
-        if (!$this->policy->update(request()->user(), $user)) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
-        }
-        if (!$user->exists) {
-            $user = null;
-        }
-        return view('forms.users', ['user' => $user]);
+        return view('users.edit', compact('user'));
     }
 
-    public function updateProfile(Request $request, User $user)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UserRequest $request, User $user)
     {
-        $validated = $request->validateWithBag('profile', [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'profile_option' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        $user->save();
-
-        return redirect()->route('users')->with('status', 'Perfil actualizado correctamente.');
+        return response()->json($request->validated());
     }
 
-    public function updatePassword(Request $request, User $user)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function changePassword(Request $request, User $user)
     {
-        $validated = $request->validateWithBag('password', [
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string', 'min:8', 'same:password'],
         ]);
-
         $user->password = bcrypt($validated['password']);
         $user->save();
-
-        return redirect()->route('users.index')->with('status', 'Contraseña restablecida correctamente. Nuevamente contraseña: ' . $validated['password']);
+        return redirect()->route('home');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(User $user)
     {
-        if (!$this->policy->delete(request()->user(), $user)) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
-        }
-        $user->deleted = true;
-        $user->save();
-        return redirect()->route('users.index')->with('status', 'Usuario eliminado correctamente.');
+        //
     }
 }

@@ -2,70 +2,60 @@
 
 namespace App\Models;
 
-use App\Enums\ActionEnum;
-use App\Enums\TableEnum;
-use App\Http\Controllers\AuditoryController;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
+use App\Policies\PatientPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
-#[Fillable(['first_name', 'last_name', 'nationality', 'gender', 'birth_date', 'id_card', 'id_card_file_path', 'email', 'phone'])]
+/**
+ * @property int $id
+ * @property Carbon $birth_date
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
+#[UsePolicy(PatientPolicy::class)]
 class Patient extends Model
 {
-    protected $casts = [
-        'birth_date' => 'date',
+    protected $fillable = [
+        'person_id',
     ];
 
-    public function certificates(): HasMany
+    use SoftDeletes;
+
+    public function agreement()
     {
-        return $this->hasMany(Certificate::class);
+        return $this->belongsTo(Agreement::class);
     }
 
-    public function metadata(): HasMany
+    public function laboratoryOrders()
     {
-        return $this->hasMany(Metadata::class, 'meta_id')->where('meta_type', 'patient');
+        return $this->hasMany(LaboratoryOrder::class);
     }
 
-    public function setMeta(string $key, mixed $value): void
+    public function medicalDates()
     {
-        $this->metadata()->updateOrCreate(
-            ['meta_type' => 'patient', 'meta_key' => $key],
-            ['meta_value' => $value]
-        );
+        return $this->hasMany(MedicalDate::class);
     }
 
-    public function getMeta(string $key, mixed $default = null): mixed
+    public function prescriptions()
     {
-        $metadata = $this->metadata()->where('meta_key', $key)->first();
-        return $metadata ? $metadata->meta_value : $default;
+        return $this->hasMany(Prescription::class);
     }
 
-    protected static function booted()
+    public function person()
     {
-        static::created(function ($patient) {
-            AuditoryController::info(
-                TableEnum::PATIENTS,
-                ActionEnum::INSERT,
-                $patient->id,
-                new_data: $patient->toArray()
-            );
-        });
-        static::updating(function ($patient) {
-            AuditoryController::info(
-                TableEnum::PATIENTS,
-                ActionEnum::UPDATE,
-                $patient->id,
-                old_data: $patient->getOriginal(),
-                new_data: $patient->getDirty()
-            );
-        });
-        static::deleted(function ($patient) {
-            AuditoryController::info(
-                TableEnum::PATIENTS,
-                ActionEnum::DELETE,
-                $patient->id,
-                old_data: $patient->toArray()
-            );
-        });
+        return $this->belongsTo(Person::class);
+    }
+
+    public function vitalSigns()
+    {
+        return $this->hasMany(VitalSign::class);
+    }
+
+    public function metadata()
+    {
+        return $this->morphMany(Metadata::class, 'model');
     }
 }

@@ -2,76 +2,45 @@
 
 namespace App\Models;
 
-use App\Enums\ActionEnum;
-use App\Enums\TableEnum;
-use App\Http\Controllers\AuditoryController;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['title', 'type', 'order_id', 'doctor_id', 'certificate_number', 'content'])]
+/**
+ * @property int $id
+ * @property string $timezone
+ * @property string $sha256
+ * @property string $file
+ * @property int $parent_id
+ * @property Certificate|null $parent
+ * @property array $snapshot
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Certificate extends Model
 {
-    protected function casts(): array
+    use SoftDeletes;
+
+    protected $fillable = [
+        'parent_id',
+        'timezone',
+        'sha256',
+        'file',
+        'snapshot',
+    ];
+
+    protected $casts = [
+        'snapshot' => 'json',
+    ];
+
+    public function parent()
     {
-        return [
-            'content' => 'array',
-        ];
+        return $this->belongsTo(Certificate::class, 'parent_id');
     }
 
-    public function order(): BelongsTo
+    public function childs()
     {
-        return $this->belongsTo(Order::class);
-    }
-
-    public function doctor(): BelongsTo
-    {
-        return $this->belongsTo(Doctor::class);
-    }
-
-    public function metadata(): HasMany
-    {
-        return $this->hasMany(Metadata::class, 'meta_id')->where('meta_type', 'certificate');
-    }
-
-    protected static function booted()
-    {
-        static::created(function ($certificate) {
-            AuditoryController::info(
-                TableEnum::CERTIFICATES,
-                ActionEnum::INSERT,
-                $certificate->id,
-                new_data: $certificate->toArray()
-            );
-        });
-        static::updating(function ($certificate) {
-            AuditoryController::info(
-                TableEnum::CERTIFICATES,
-                ActionEnum::UPDATE,
-                $certificate->id,
-                old_data: $certificate->getOriginal(),
-                new_data: $certificate->getDirty()
-            );
-        });
-        static::deleted(function ($certificate) {
-            AuditoryController::info(
-                TableEnum::CERTIFICATES,
-                ActionEnum::DELETE,
-                $certificate->id,
-                old_data: $certificate->toArray()
-            );
-        });
-    }
-
-    public static function generate_number()
-    {
-        $number = str_pad((string) mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-
-        $exists = Certificate::where('certificate_number', $number)->exists();
-        if ($exists) {
-            return self::generate_number();
-        }
-        return $number;
+        return self::where('parent_id', $this->id)->get();
     }
 }

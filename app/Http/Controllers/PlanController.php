@@ -3,19 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlanRequest;
-use App\Http\Services\PlanStoreService;
 use App\Models\Plan;
-use App\Models\PlanDetail;
-use App\Policies\PlanPolicy;
-use Illuminate\Http\Request;
+use App\Http\Services\PlanService;
 
 class PlanController extends Controller
 {
-    private PlanPolicy $policy;
-
-    public function __construct()
+    public function __construct(private PlanService $planService)
     {
-        $this->policy = new PlanPolicy();
     }
 
     /**
@@ -23,15 +17,14 @@ class PlanController extends Controller
      */
     public function index()
     {
-        if (!$this->policy->viewAny(request()->user())) {
-            abort(403, 'No tienes permiso para acceder a los planes.');
-        }
-        $sort = request('sort', 'name');
-        $direction = request('direction', 'asc');
-        $data = Plan::orderBy($sort, $direction)
-            ->paginate(get_setting('pagination_per_page', 10))
-            ->withQueryString();
-        return view('pages.plans', compact('data', 'sort', 'direction'));
+        $data = Plan::paginate(10);
+        return view('plans.index', compact('data'));
+    }
+
+    public function json()
+    {
+        $data = Plan::select('id', 'name', 'periodicity', 'description', 'features')->get();
+        return response()->json($data);
     }
 
     /**
@@ -39,15 +32,7 @@ class PlanController extends Controller
      */
     public function create()
     {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para crear planes.');
-        }
-        return view('forms.plans', ['plan' => null]);
-    }
-
-    public function json()
-    {
-        return response()->json(Plan::with('details')->get());
+        return view('plans.create');
     }
 
     /**
@@ -55,19 +40,8 @@ class PlanController extends Controller
      */
     public function store(PlanRequest $request)
     {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para crear planes.');
-        }
-        $data = $request->validated();
-        $items = explode("\n", $request->input('items', ''));
-        $plan = Plan::create($data);
-        foreach ($items as $item) {
-            $detail = new PlanDetail();
-            $detail->plan_id = $plan->id;
-            $detail->detail = trim($item);
-            $detail->save();
-        }
-        return redirect()->route('plans.index')->with('status', 'Plan registrado correctamente.');
+        $plan = $this->planService->store($request);
+        return redirect()->route('plans.show', $plan);
     }
 
     /**
@@ -75,7 +49,7 @@ class PlanController extends Controller
      */
     public function show(Plan $plan)
     {
-        //
+        return view('plans.show', compact('plan'));
     }
 
     /**
@@ -83,10 +57,7 @@ class PlanController extends Controller
      */
     public function edit(Plan $plan)
     {
-        if (!$this->policy->update(request()->user(), $plan)) {
-            abort(403, 'No tienes permiso para actualizar planes.');
-        }
-        return view('forms.plans', ['plan' => $plan]);
+        return view('plans.edit', compact('plan'));
     }
 
     /**
@@ -94,12 +65,8 @@ class PlanController extends Controller
      */
     public function update(PlanRequest $request, Plan $plan)
     {
-        if (!$this->policy->update(request()->user(), $plan)) {
-            abort(403, 'No tienes permiso para actualizar planes.');
-        }
-        $data = $request->validated();
-        (new PlanStoreService)->store($data);
-        return redirect()->route('plans.index')->with('status', 'Plan actualizado correctamente.');
+        $plan = $this->planService->update($request, $plan);
+        return redirect()->route('plans.show', $plan);
     }
 
     /**
@@ -107,10 +74,7 @@ class PlanController extends Controller
      */
     public function destroy(Plan $plan)
     {
-        if (!$this->policy->delete(request()->user(), $plan)) {
-            abort(403, 'No tienes permiso para eliminar planes.');
-        }
         $plan->delete();
-        return redirect()->route('plans.index')->with('status', 'Plan eliminado correctamente.');
+        return redirect()->route('plans.index');
     }
 }

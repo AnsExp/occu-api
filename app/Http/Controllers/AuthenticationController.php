@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
 {
-    public function login()
+    public function index()
     {
-        return view('pages.login');
+        return view('authentication.login');
     }
 
     public function logout(Request $request)
@@ -21,29 +21,37 @@ class AuthenticationController extends Controller
         return redirect()->route('login');
     }
 
-    public function authenticate(Request $request)
+    public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        $exists = User::where('email', $credentials['email'])->where('deleted', true)->exists();
+        $email_hash = occu_hash($credentials['email']);
 
-        if ($exists) {
-            return back()
-                ->withErrors(['email' => 'Este usuario ha sido eliminado.'])
-                ->onlyInput('email');
+        $exists = User::where('email_hash', $email_hash)->exists();
+
+        if (!$exists) {
+            return back()->withErrors(['email' => 'El usuario no existe.'])->onlyInput('email');
         }
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()
-                ->withErrors(['email' => 'Las credenciales no son correctas.'])
-                ->onlyInput('email');
+        if (!Auth::attempt(['email_hash' => $email_hash, 'password' => $credentials['password']], $request->boolean('remember'))) {
+            return back()->withErrors(['email' => 'Las credenciales no son correctas.'])->onlyInput('email');
         }
 
         $request->session()->regenerate();
 
         return redirect()->intended(route('home'));
+    }
+
+    public function changePassword(Request $request, User $user)
+    {
+        $credentials = $request->validate(['password' => ['required', 'string', 'confirmed', 'min:8']]);
+
+        $user->password = bcrypt($credentials['password']);
+        $user->save();
+
+        return redirect()->back()->with('status', 'Contraseña actualizada correctamente.');
     }
 }

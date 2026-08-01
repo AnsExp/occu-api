@@ -2,8 +2,6 @@
 
 return [
 
-    'tax_rate' => env('TAX_RATE', 0.15),
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -16,6 +14,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+
+    'tax_rate' => env('TAX_RATE', 0),
 
     /*
     |--------------------------------------------------------------------------
@@ -103,7 +103,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+            explode(',', (string) env('APP_PREVIOUS_KEYS', '')),
         ),
     ],
 
@@ -124,5 +124,4 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
 ];

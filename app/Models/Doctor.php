@@ -2,52 +2,58 @@
 
 namespace App\Models;
 
-use App\Enums\ActionEnum;
-use App\Enums\TableEnum;
-use App\Http\Controllers\AuditoryController;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['first_name', 'last_name', 'id_card', 'phone'])]
+/**
+ * @property int $id
+ * @property int $person_id
+ * @property int $specialty_id
+ * @property bool $is_occupational_doctor
+ * @property Person $person
+ * @property Specialty $specialty
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Doctor extends Model
 {
-    public function user(): BelongsTo
+    use SoftDeletes;
+
+    protected $fillable = [
+        'person_id',
+        'specialty_id',
+        'is_occupational_doctor',
+    ];
+
+    protected $casts = [
+        'is_occupational_doctor' => 'boolean',
+    ];
+
+    public static function findBySpecialty(string|Specialty $specialty)
     {
-        return $this->belongsTo(User::class);
+        if ($specialty instanceof Specialty) {
+            return $specialty->doctors();
+        }
+        return self::whereHas('specialty', function ($q) use ($specialty) {
+            $q->where('name', $specialty);
+        })->get();
     }
 
-    public function specialty(): BelongsTo
+    public function person()
     {
-        return $this->belongsTo(Specialty::class, 'specialty_id');
+        return $this->belongsTo(Person::class);
     }
 
-    protected static function booted()
+    public function specialty()
     {
-        static::created(function ($doctor) {
-            AuditoryController::info(
-                TableEnum::DOCTORS,
-                ActionEnum::INSERT,
-                $doctor->id,
-                new_data: $doctor->toArray()
-            );
-        });
-        static::updating(function ($doctor) {
-            AuditoryController::info(
-                TableEnum::DOCTORS,
-                ActionEnum::UPDATE,
-                $doctor->id,
-                old_data: $doctor->getOriginal(),
-                new_data: $doctor->getDirty()
-            );
-        });
-        static::deleted(function ($doctor) {
-            AuditoryController::info(
-                TableEnum::DOCTORS,
-                ActionEnum::DELETE,
-                $doctor->id,
-                old_data: $doctor->toArray()
-            );
-        });
+        return $this->belongsTo(Specialty::class);
+    }
+
+    public function metadata(): MorphMany
+    {
+        return $this->morphMany(Metadata::class, 'model');
     }
 }

@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "laravel/blank-livewire-starter-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "The official Laravel starter kit for Livewire.",
     "keywords": [
         "laravel",
         "framework"
@@ -11,20 +11,25 @@
     "require": {
         "php": "^8.3",
         "barryvdh/laravel-dompdf": "*",
-        "laravel/framework": "13.4.0",
-        "laravel/tinker": "3.0.0",
-        "livewire/livewire": "4.3",
-        "setasign/fpdf": "1.8",
-        "setasign/fpdi": "2.6",
-        "spatie/laravel-permission": "^7.4"
+        "blade-ui-kit/blade-heroicons": "^2.7",
+        "laravel/framework": "^13.7",
+        "laravel/tinker": "^3.0",
+        "livewire/blaze": "^1.0",
+        "livewire/livewire": "^4.1",
+        "setasign/fpdf": "*",
+        "setasign/fpdi": "*",
+        "spatie/laravel-permission": "*"
     },
     "require-dev": {
-        "fakerphp/faker": "1.24.1",
-        "laravel/pail": "1.2.5",
-        "laravel/pint": "1.29.0",
-        "mockery/mockery": "1.6.12",
-        "nunomaduro/collision": "8.9.3",
-        "phpunit/phpunit": "12.5.17"
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.9",
+        "laravel/pail": "^1.2.5",
+        "laravel/pao": "^1.0.6",
+        "laravel/pint": "^1.27",
+        "laravel/sail": "^1.53",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.9.3",
+        "phpunit/phpunit": "^12.5.23"
     },
     "autoload": {
         "psr-4": {
@@ -47,15 +52,35 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm install --ignore-scripts",
+            "npm install",
             "npm run build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+        ],
+        "dev:ssr": [
+            "npm run build:ssr",
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve --host=localhost\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr --kill-others"
+        ],
+        "lint": [
+            "pint --parallel"
+        ],
+        "lint:check": [
+            "pint --parallel --test"
+        ],
+        "ci:check": [
+            "Composer\\Config::disableProcessTimeout",
+            "@test"
+        ],
+        "types:check": [
+            "phpstan analyse"
         ],
         "test": [
             "@php artisan config:clear --ansi",
+            "@lint:check",
+            "@types:check",
             "@php artisan test"
         ],
         "post-autoload-dump": [

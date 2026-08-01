@@ -27,25 +27,19 @@ class PlanRequest extends FormRequest
             'price' => ['required', 'string', 'max:255'],
             'periodicity' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'items' => ['string'],
+            'features' => ['nullable', 'array'],
+            'features.*' => ['required', 'string', 'max:255'],
         ];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'El nombre del plan es obligatorio.',
-            'name.string' => 'El nombre del plan debe ser una cadena de texto.',
-            'name.max' => 'El nombre del plan no debe exceder los 255 caracteres.',
-            'price.required' => 'El precio del plan es obligatorio.',
-            'price.string' => 'El precio del plan debe ser una cadena de texto.',
-            'price.max' => 'El precio del plan no debe exceder los 255 caracteres.',
-            'periodicity.required' => 'La periodicidad del plan es obligatoria.',
-            'periodicity.string' => 'La periodicidad del plan debe ser una cadena de texto.',
-            'periodicity.max' => 'La periodicidad del plan no debe exceder los 255 caracteres.',
-            'description.required' => 'La descripción del plan es obligatoria.',
-            'description.string' => 'La descripción del plan debe ser una cadena de texto.',
-            'items.string' => 'Los ítems del plan deben ser una cadena de texto.',
+            'name.required' => 'El nombre es obligatorio.',
+            'price.required' => 'El precio es obligatorio.',
+            'periodicity.required' => 'La periodicidad es obligatoria.',
+            'description.required' => 'La descripción es obligatoria.',
+            'features.*.required' => 'Cada característica es obligatoria.',
         ];
     }
 }

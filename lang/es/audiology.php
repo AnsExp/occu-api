@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'create' => 'Crear Certificado de Audiología',
+    'error' => 'Ha ocurrido un error al intentar crear el certificado de audiología. Por favor, verifica los datos e intenta nuevamente.',
+    'index' => [
+        'title' => 'Audiología',
+        'create' => 'Crear',
+        'create_success' => 'Certificado de audiología creado exitosamente',
+        'show' => 'Ver',
+        'edit' => 'Editar',
+        'description' => 'Listado general de certificados de audiología registrados en el sistema.',
+    ],
+    'title' => 'Crear Certificado de Audiología',
+    'contact_data' => 'Datos de contacto',
+    'personal_data' => 'Datos personales',
+    'personal_data_description' => 'Información básica del paciente.',
+    'description' => 'Formulario para registrar un nuevo paciente en el sistema.',
+    'nationality' => 'Nacionalidad',
+    'patient_data' => 'Datos del paciente',
+    'test_responsible_doctor' => 'Médico responsable de la prueba',
+    'audition' => 'Audición',
+    'hearing' => 'Audición',
+    'right_ear' => 'Oído derecho',
+    'left_ear' => 'Oído izquierdo',
+    'three_meter_speech_whisper_test' => 'Prueba del habla y del susurro (3 metros)',
+    'speech_whisper_test' => 'Prueba del habla y del susurro',
+    'normal' => 'Normal',
+    'whisper' => 'Susurro',
+    'medical_exam' => 'Examen médico',
+    'certificate_key' => [
+        'required' => 'Debe ingresar la clave del certificado para continuar con este pedido.',
+        'invalid' => 'La clave del certificado no es válida o ya expiró.',
+    ],
+];

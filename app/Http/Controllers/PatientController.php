@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PatientRequest;
+use App\Http\Requests\PatientUpdateRequest;
+use App\Http\Services\PatientService;
 use App\Models\Patient;
 use App\Policies\PatientPolicy;
-use Illuminate\Support\Facades\Storage;
 
 class PatientController extends Controller
 {
-    private PatientPolicy $policy;
-
-    public function __construct()
-    {
-        $this->policy = new PatientPolicy();
+    public function __construct(
+        private PatientService $patientService,
+        private PatientPolicy $policy
+    ) {
+        $this->authorizeResource(Patient::class, 'patient');
     }
 
     /**
@@ -21,15 +22,8 @@ class PatientController extends Controller
      */
     public function index()
     {
-        if (!$this->policy->viewAny(request()->user())) {
-            abort(403, 'No tienes permiso para acceder a los pacientes.');
-        }
-        $sort = request('sort', 'first_name');
-        $direction = request('direction', 'asc');
-        $data = Patient::orderBy($sort, $direction)
-            ->paginate(get_setting('pagination_per_page', 10))
-            ->withQueryString();
-        return view('pages.patients', compact('data', 'sort', 'direction'));
+        $data = Patient::paginate(10);
+        return view('patients.index', compact('data'));
     }
 
     /**
@@ -37,10 +31,7 @@ class PatientController extends Controller
      */
     public function create()
     {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para crear pacientes.');
-        }
-        return view('forms.patients', ['patient' => null]);
+        return view('patients.create');
     }
 
     /**
@@ -48,19 +39,9 @@ class PatientController extends Controller
      */
     public function store(PatientRequest $request)
     {
-        if (!$this->policy->create(request()->user())) {
-            abort(403, 'No tienes permiso para crear pacientes.');
-        }
-        $validated = $request->validated();
-
-        $patient = new Patient($validated);
-
-        if ($request->hasFile('id_card_file')) {
-            $patient->id_card_file_path = $request->file('id_card_file')->store('patients/id-cards', 'public');
-        }
-
-        $patient->save();
-        return redirect()->route('patients.edit', ['patient' => $patient])->with('status', 'Paciente creado correctamente.');
+        // return response()->json($request->all());
+        $patient = $this->patientService->store($request);
+        return redirect()->route('patients.show', $patient);
     }
 
     /**
@@ -68,7 +49,7 @@ class PatientController extends Controller
      */
     public function show(Patient $patient)
     {
-        //
+        return view('patients.show', compact('patient'));
     }
 
     /**
@@ -76,34 +57,17 @@ class PatientController extends Controller
      */
     public function edit(Patient $patient)
     {
-        if (!$this->policy->update(request()->user(), $patient)) {
-            abort(403, 'No tienes permiso para editar pacientes.');
-        }
-        $patient->load('metadata');
-        return view('forms.patients', ['patient' => $patient]);
+        return view('patients.edit', compact('patient'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PatientRequest $request, Patient $patient)
+    public function update(PatientUpdateRequest $request, Patient $patient)
     {
-        if (!$this->policy->update(request()->user(), $patient)) {
-            abort(403, 'No tienes permiso para editar pacientes.');
-        }
-        $validated = $request->validated();
-
-        if ($request->hasFile('id_card_file')) {
-            if ($patient->id_card_file_path) {
-                Storage::disk('public')->delete($patient->id_card_file_path);
-            }
-
-            $id_card_file_path = $request->file('id_card_file')->store('patients/id-cards', 'public');
-            $patient->setMeta('id_card_file_path', $id_card_file_path);
-        }
-
-        $patient->update($validated);
-        return redirect()->route('patients.index')->with('status', 'Paciente actualizado correctamente.');
+        // return response()->json($request->validated());
+        $patient = $this->patientService->update($request, $patient);
+        return redirect()->route('patients.show', $patient);
     }
 
     /**
@@ -111,10 +75,6 @@ class PatientController extends Controller
      */
     public function destroy(Patient $patient)
     {
-        if (!$this->policy->delete(request()->user(), $patient)) {
-            abort(403, 'No tienes permiso para eliminar pacientes.');
-        }
-        $patient->delete();
-        return redirect()->route('patients.index')->with('status', 'Paciente eliminado correctamente.');
+        abort(403, 'Unauthorized action.');
     }
 }
