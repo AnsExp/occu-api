@@ -82,6 +82,7 @@ Route::middleware(['auth', AllowedIp::class])->group(function () {
     Route::get('/occupational_medicine/{medicalDate:code}/edit', [OccupationalMedicineController::class, 'edit'])->name('occupational_medicine.edit');
 
     Route::get('/system', [SystemDashboard::class, 'index'])->name('dashboard.system');
+    Route::post('/system/allowed_ips', [SystemDashboard::class, 'allowed_ips'])->name('system.allowed_ips');
     Route::get('/logout', [AuthenticationController::class, 'logout'])->name('auth.logout');
 
 });

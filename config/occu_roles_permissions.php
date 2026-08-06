@@ -18,6 +18,8 @@ return [
     ],
 
     'nurse' => [
+        'read.medical_dates',
+
         'read.vital_signs',
         'create.vital_signs',
     ],

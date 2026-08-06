@@ -14,9 +14,8 @@ class UserService
     {
         return DB::transaction(function () use ($request) {
             $user = User::create([
-                'name' => $request->input('name'),
+                'name' => $request->input('first_name'),
                 'email' => $request->input('email'),
-                'email_hash' => $request->input('email_hash'),
                 'password' => bcrypt($request->input('password')),
             ]);
 
@@ -24,10 +23,9 @@ class UserService
 
             if ($request->input('role') === 'doctor') {
                 $doctor = new Doctor([
-                    'first_name' => $request->input('name'),
+                    'first_name' => $request->input('first_name'),
                     'last_name' => $request->input('last_name'),
                     'id_card' => $request->input('id_card'),
-                    'id_card_hash' => $request->input('id_card_hash'),
                     'phone' => $request->input('phone'),
                 ]);
 
@@ -37,9 +35,8 @@ class UserService
                     throw new \Exception('Specialty not found');
                 }
 
-                $doctor->user()->associate($user);
+                $doctor->person->user()->associate($user);
                 $doctor->specialty()->associate($specialty);
-                $user->givePermissionTo(config('occu_specialties_permissions')[$specialty->name] ?? []);
                 $doctor->save();
             }
             return $user;

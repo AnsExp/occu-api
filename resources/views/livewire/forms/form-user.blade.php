@@ -5,15 +5,15 @@
         <input type="hidden" name="user[id]" value="{{ $user->id }}">
     @endif
     <x-person-fieldset :person="$user?->person" />
-    <x-select-control name="role" wire:model.lazy="role_selected" :label="__('attributes.role')" required>
+    <x-select-control name="role[name]" wire:model.lazy="role_selected" :label="__('attributes.role')" required>
         @foreach ($roles as $role)
-            <option value="{{ $role->id }}" @selected(old('role', $user?->hasRole($role) ?? false))>
+            <option value="{{ $role->name }}" @selected(old('role.name', $user?->hasRole($role) ?? false))>
                 @lang('role.' . $role->name)
             </option>
         @endforeach
     </x-select-control>
     @if($roles->filter(fn($role) => $role->id == $role_selected)->first?->name?->name === 'doctor')
-        <x-select-control name="specialty" :label="__('attributes.specialty')" wire:model.lazy="specialty_selected"
+        <x-select-control name="specialty[id]" :label="__('attributes.specialty')" wire:model.lazy="specialty_selected"
             required>
             @foreach ($specialties as $specialty)
                 <option value="{{ $specialty->id }}" @selected(old('specialty', $specialty_selected === $specialty))>

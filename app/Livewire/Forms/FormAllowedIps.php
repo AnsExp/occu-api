@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\AllowedIp;
+use Illuminate\Http\Request;
 use Livewire\Component;
 
 class FormAllowedIps extends Component

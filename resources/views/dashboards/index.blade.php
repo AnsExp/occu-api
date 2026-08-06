@@ -77,22 +77,28 @@
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-2/12">
                                         <div class="flex justify-end gap-2">
-                                            @if (!$medicalDate->vitalSigns)
-                                                <x-button-link :href="route('dashboard.vital_signs', [$specialty, $medicalDate])"
-                                                    variant="badge">
-                                                    Tomar SV
-                                                </x-button-link>
-                                            @endif
+                                            @can('create.vital_signs')
+                                                @if (!$medicalDate->vitalSigns)
+                                                    <x-button-link :href="route('dashboard.vital_signs', [$specialty, $medicalDate])"
+                                                        variant="badge">
+                                                        Tomar SV
+                                                    </x-button-link>
+                                                @endif
+                                            @endcan
                                             @if ($medicalDate->certificates->isNotEmpty())
-                                                <x-button-link :href="route('dashboard.show', [$specialty, $medicalDate])"
-                                                    variant="badge">
-                                                    Ver
-                                                </x-button-link>
+                                                @can('read.certificates')
+                                                    <x-button-link :href="route('dashboard.show', [$specialty, $medicalDate])"
+                                                        variant="badge">
+                                                        Ver
+                                                    </x-button-link>
+                                                @endcan
                                             @else
-                                                <x-button-link :href="route('dashboard.create', [$specialty, $medicalDate])"
-                                                    variant="badge">
-                                                    Atender
-                                                </x-button-link>
+                                                @can('create.certificates')
+                                                    <x-button-link :href="route('dashboard.create', [$specialty, $medicalDate])"
+                                                        variant="badge">
+                                                        Atender
+                                                    </x-button-link>
+                                                @endcan
                                             @endif
                                         </div>
                                     </td>
