@@ -32,16 +32,6 @@ class Doctor extends Model
         'is_occupational_doctor' => 'boolean',
     ];
 
-    public static function findBySpecialty(string|Specialty $specialty)
-    {
-        if ($specialty instanceof Specialty) {
-            return $specialty->doctors();
-        }
-        return self::whereHas('specialty', function ($q) use ($specialty) {
-            $q->where('name', $specialty);
-        })->get();
-    }
-
     public function person()
     {
         return $this->belongsTo(Person::class);

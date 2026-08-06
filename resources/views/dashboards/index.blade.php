@@ -62,14 +62,14 @@
                                         {{ $medicalDate->patient->person->fullname }}
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-1/12">
-                                        @if ($medicalDate->vital_signs_id)
+                                        @if ($medicalDate->vitalSigns)
                                             <x-heroicon-o-check-circle class="size-5 text-emerald-500" />
                                         @else
                                             <x-heroicon-o-exclamation-circle class="size-5 text-amber-500" />
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-1/12">
-                                        @if ($medicalDate->certificate_id)
+                                        @if ($medicalDate->certificates->isNotEmpty())
                                             <x-heroicon-o-check-circle class="size-5 text-emerald-500" />
                                         @else
                                             <x-heroicon-o-exclamation-circle class="size-5 text-amber-500" />
@@ -77,23 +77,21 @@
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-2/12">
                                         <div class="flex justify-end gap-2">
-                                            @if (!$medicalDate->vital_signs_id)
-                                                <x-button-link :href="route('dashboard.vital_signs', [$specialty, $medicalDate])" variant="badge">
+                                            @if (!$medicalDate->vitalSigns)
+                                                <x-button-link :href="route('dashboard.vital_signs', [$specialty, $medicalDate])"
+                                                    variant="badge">
                                                     Tomar SV
                                                 </x-button-link>
                                             @endif
-                                            @if (!$medicalDate->certificate_id)
-                                                <x-button-link :href="route('dashboard.create', [$specialty, $medicalDate])" variant="badge">
-                                                    Atender
-                                                </x-button-link>
-                                            @else
-                                                <x-button-link :href="route('dashboard.show', [$specialty, $medicalDate])" variant="badge">
+                                            @if ($medicalDate->certificates->isNotEmpty())
+                                                <x-button-link :href="route('dashboard.show', [$specialty, $medicalDate])"
+                                                    variant="badge">
                                                     Ver
                                                 </x-button-link>
-                                            @endif
-                                            @if ($medicalDate->certificate?->editable ?? false)
-                                                <x-button-link :href="route('dashboard.edit', [$specialty, $medicalDate])" variant="badge">
-                                                    Editar
+                                            @else
+                                                <x-button-link :href="route('dashboard.create', [$specialty, $medicalDate])"
+                                                    variant="badge">
+                                                    Atender
                                                 </x-button-link>
                                             @endif
                                         </div>

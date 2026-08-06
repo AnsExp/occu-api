@@ -86,7 +86,7 @@
             </table>
         </div>
     </section>
-    <x-button type="submit" variant="base">
+    <x-button class="w-full" type="submit" variant="base">
         @lang('button.create')
     </x-button>
 </form>

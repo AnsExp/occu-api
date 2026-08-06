@@ -12,7 +12,7 @@
                         Página no encontrada
                     </h1>
                     <p class="mt-4 text-base leading-7 text-gray-600">
-                        La ruta que intentas abrir no existe, fue movida o no tienes acceso a ella.
+                        {{ $exception?->getMessage() ?? 'La ruta que intentas abrir no existe, fue movida o no tienes acceso a ella.' }}
                         Revisa la dirección e intenta nuevamente.
                     </p>
 

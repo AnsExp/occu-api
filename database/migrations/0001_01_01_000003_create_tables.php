@@ -38,26 +38,13 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('certificates', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('parent_id')->nullable(true)->constrained('certificates')->nullOnDelete();
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->string('sha256')->nullable(false);
-            $table->boolean('editable')->nullable(false)->default(false);
-            $table->string('file')->nullable(false);
-            $table->json('snapshot')->nullable(false);
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
         Schema::create('people', function (Blueprint $table) {
             $table->id();
             $table->string('first_name')->nullable(false);
             $table->string('last_name')->nullable(false);
-            $table->text('phone')->nullable(true);
-            $table->text('id_card')->nullable(false);
-            $table->text('id_card_file')->nullable(true);
-            $table->string('id_card_hash')->unique()->nullable(false);
+            $table->string('phone')->nullable(true);
+            $table->string('id_card')->nullable(false);
+            $table->string('id_card_file')->nullable(true);
             $table->enum('gender', ['male', 'female', 'other'])->nullable(true);
             $table->date('birth_date')->nullable(true);
             $table->string('nationality')->nullable(true);
@@ -83,63 +70,80 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::create('occupational_medical_dates', function (Blueprint $table) {
-            $table->id();
-            $table->string('code')->unique(true)->nullable(false);
-            $table->foreignId('patient_id')->nullable(false)->constrained('patients')->cascadeOnDelete();
-            $table->foreignId('certificate_id')->nullable(true)->constrained('certificates')->nullOnDelete();
-            $table->foreignId('occupational_doctor_id')->nullable(false)->constrained('doctors')->cascadeOnDelete();
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->index('patient_id');
-        });
-
-        Schema::create('vital_signs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('patient_id')->nullable(true)->constrained('patients')->nullOnDelete();
-            $table->decimal('height', 5, 2)->nullable(false);
-            $table->decimal('weight', 5, 2)->nullable(false);
-            $table->decimal('pulse', 5, 2)->nullable(false);
-            $table->decimal('blood_pressure_systolic', 5, 2)->nullable(false);
-            $table->decimal('blood_pressure_diastolic', 5, 2)->nullable(false);
-            $table->string('emo')->nullable(false);
-            $table->decimal('glucose', 5, 2)->nullable(false);
-            $table->string('protein')->nullable(false);
-            $table->enum('blood_type', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])->nullable(false);
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->index('patient_id');
-        });
-
         Schema::create('medical_dates', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(true)->nullable(false);
             $table->foreignId('doctor_id')->nullable(false)->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('patient_id')->nullable(false)->constrained('patients')->cascadeOnDelete();
-            $table->foreignId('specialty_id')->nullable(false)->constrained('specialties')->cascadeOnDelete();
-            $table->foreignId('vital_signs_id')->nullable(true)->constrained('vital_signs')->nullOnDelete();
-            $table->foreignId('certificate_id')->nullable(true)->constrained('certificates')->nullOnDelete();
-            $table->foreignId('occupational_medical_date_id')->nullable(true)->constrained('occupational_medical_dates')->nullOnDelete();
-            $table->decimal('price', 10, 2)->nullable(false)->default(0.00);
+            $table->foreignId('specialty_id')->nullable(true)->constrained('specialties')->cascadeOnDelete();
             $table->date('date')->default(now())->nullable(false);
+            $table->enum('type', ['normal', 'occupational'])->nullable(false)->default('normal');
             $table->string('timezone')->nullable(false)->default('America/Guayaquil');
             $table->integer('order')->nullable(false)->default(1);
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index('occupational_medical_date_id');
+            $table->index('type');
+            $table->index('doctor_id');
+            $table->index('patient_id');
+            $table->index('specialty_id');
+        });
+
+        Schema::create('medical_date_relationships', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('principal_id')->nullable(false)->constrained('medical_dates')->cascadeOnDelete();
+            $table->foreignId('related_id')->nullable(false)->constrained('medical_dates')->cascadeOnDelete();
+            $table->timestamps();
+
+            $table->index('principal_id');
+            $table->unique(['principal_id', 'related_id']);
+        });
+
+        Schema::create('vital_signs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('patient_id')->nullable(true)->constrained('patients')->nullOnDelete();
+            $table->foreignId('medical_date_id')->unique(true)->nullable(true)->constrained('medical_dates')->nullOnDelete();
+            $table->decimal('height', 5, 2)->nullable(false);
+            $table->decimal('weight', 5, 2)->nullable(false);
+            $table->decimal('blood_pressure_systolic', 5, 2)->nullable(false);
+            $table->decimal('blood_pressure_diastolic', 5, 2)->nullable(false);
+            $table->decimal('temperature', 5, 2)->nullable(false);
+            $table->decimal('oxygen_saturation', 5, 2)->nullable(false);
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('patient_id');
+            $table->unique(['patient_id', 'medical_date_id']);
+        });
+
+        Schema::create('certificates', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('medical_date_id')->nullable(true)->constrained('medical_dates')->nullOnDelete();
+            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
+            $table->string('sha256')->nullable(false);
+            $table->string('file')->nullable(false);
+            $table->json('snapshot')->nullable(false);
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->index('medical_date_id');
         });
 
         Schema::create('prescriptions', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(true)->nullable(false);
+            $table->foreignId('doctor_id')->nullable(false)->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('patient_id')->nullable(false)->constrained('patients')->cascadeOnDelete();
-            $table->text('notes')->nullable(true);
             $table->string('timezone')->nullable(false)->default('America/Guayaquil');
+            $table->text('notes')->nullable(true);
+            $table->string('sha256')->nullable(false);
+            $table->string('file')->nullable(false);
+            $table->json('snapshot')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('doctor_id');
+            $table->index('patient_id');
         });
 
         Schema::create('medications', function (Blueprint $table) {
@@ -158,6 +162,9 @@ return new class extends Migration {
             $table->text('notes')->nullable(true);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('prescription_id');
+            $table->unique(['prescription_id', 'medication_id']);
         });
 
         Schema::create('plans', function (Blueprint $table) {
@@ -176,10 +183,13 @@ return new class extends Migration {
             $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->string('code')->unique();
             $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->string('sign')->nullable(false);
+            $table->string('sha256')->nullable(false);
             $table->string('file')->nullable(false);
+            $table->json('snapshot')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('patient_id');
         });
 
         Schema::create('laboratory_options', function (Blueprint $table) {
@@ -197,20 +207,9 @@ return new class extends Migration {
             $table->integer('quantity')->nullable(false)->default(1);
             $table->timestamps();
             $table->softDeletes();
-        });
 
-        Schema::create('certificate_keys', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('certificate_id')->nullable(false)->constrained('certificates')->cascadeOnDelete();
-            $table->foreignId('authorized_user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
-            $table->foreignId('generated_by_user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
-            $table->string('key')->nullable(false)->unique();
-            $table->enum('status', ['active', 'used', 'expired'])->default('active')->nullable(false);
-            $table->text('notes')->nullable(false);
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->timestamp('expires_at')->nullable(false);
-            $table->timestamps();
-            $table->softDeletes();
+            $table->index('laboratory_order_id');
+            $table->unique(['laboratory_order_id', 'laboratory_option_id']);
         });
 
         Schema::create('audit_logs', function (Blueprint $table) {
@@ -224,6 +223,12 @@ return new class extends Migration {
             $table->string('ip_address', 45)->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
+
+            $table->index('table');
+            $table->index(['table', 'table_id']);
+            $table->index(['table', 'table_id', 'action']);
+            $table->index(['table', 'table_id', 'level']);
+            $table->index(['user_id', 'action']);
         });
 
         Schema::create('allowed_ips', function (Blueprint $table) {
@@ -242,7 +247,7 @@ return new class extends Migration {
         });
 
         Schema::create('options', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable(true)->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
             $table->string('key')->nullable(false);
             $table->longText('value')->nullable(false);
         });
@@ -257,7 +262,6 @@ return new class extends Migration {
         Schema::dropIfExists('metadata');
         Schema::dropIfExists('allowed_ips');
         Schema::dropIfExists('audit_logs');
-        Schema::dropIfExists('certificate_keys');
         Schema::dropIfExists('laboratory_exams');
         Schema::dropIfExists('laboratory_options');
         Schema::dropIfExists('laboratory_orders');
@@ -265,13 +269,13 @@ return new class extends Migration {
         Schema::dropIfExists('prescription_medications');
         Schema::dropIfExists('medications');
         Schema::dropIfExists('prescriptions');
-        Schema::dropIfExists('medical_dates');
+        Schema::dropIfExists('certificates');
         Schema::dropIfExists('vital_signs');
+        Schema::dropIfExists('medical_date_relationships');
+        Schema::dropIfExists('medical_dates');
         Schema::dropIfExists('patients');
         Schema::dropIfExists('doctors');
         Schema::dropIfExists('people');
-        Schema::dropIfExists('group_medical_dates');
-        Schema::dropIfExists('certificates');
         Schema::dropIfExists('agreement_requirements');
         Schema::dropIfExists('agreements');
         Schema::dropIfExists('specialties');

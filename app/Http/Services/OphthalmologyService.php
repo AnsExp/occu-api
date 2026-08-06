@@ -27,30 +27,25 @@ class OphthalmologyService
     private function persistCertificate(Request $request, MedicalDate $medicalDate, ?Certificate $parentCertificate = null): Certificate
     {
         return DB::transaction(function () use ($request, $medicalDate, $parentCertificate) {
-
-            if ($parentCertificate) {
-                $parentCertificate->delete();
-            }
-
-            $certificate = new Certificate([
-                'parent_id' => $parentCertificate?->id ?? null,
-                'timezone' => $request->input('timezone'),
-                'sha256' => 'temp',
-                'file' => 'temp',
-                'snapshot' => $request->input('medical_exam', []),
-            ]);
-
-            [$file, $content] = $this->storePdf($medicalDate, $certificate);
+            [$file, $content] = $this->storePdf($medicalDate, $request->input('medical_exam'));
 
             if (!$file || !$content) {
                 throw new \RuntimeException("Error al generar PDF del certificado.");
             }
 
-            $certificate->file = $file;
-            $certificate->sha256 = occu_hash($content);
-            $certificate->save();
+            if ($parentCertificate) {
+                $parentCertificate->delete();
+            }
 
-            $medicalDate->certificate()->associate($certificate);
+            $certificate = Certificate::create([
+                'medical_date_id' => $medicalDate->id,
+                'parent_id' => $parentCertificate?->id ?? null,
+                'timezone' => $request->input('timezone'),
+                'sha256' => occu_hash($content),
+                'file' => $file,
+                'snapshot' => $request->input('medical_exam', []),
+            ]);
+
             $medicalDate->save();
 
             return $certificate;
@@ -60,9 +55,9 @@ class OphthalmologyService
     /**
      * Genera y guarda el PDF del certificado.
      */
-    private function storePdf(MedicalDate $medicalDate, Certificate $certificate): array
+    private function storePdf(MedicalDate $medicalDate, array $snapshot): array
     {
-        $pdf = Pdf::loadView($this->documentTemplate, compact('medicalDate', 'certificate'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
+        $pdf = Pdf::loadView($this->documentTemplate, compact('medicalDate', 'snapshot'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
         $filePath = "{$this->storageDiskPath}/{$medicalDate->code}.pdf";
         $content = $pdf->output();
         return Storage::disk('local')->put($filePath, $content) ? [$filePath, $content] : [false, false];

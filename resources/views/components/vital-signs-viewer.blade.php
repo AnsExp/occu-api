@@ -35,10 +35,6 @@
                         <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->weight }} kg</td>
                     </tr>
                     <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pulso</th>
-                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->pulse }}</td>
-                    </tr>
-                    <tr>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Presión Sistólica</th>
                         <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->blood_pressure_systolic }}</td>
                     </tr>
@@ -47,20 +43,12 @@
                         <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->blood_pressure_diastolic }}</td>
                     </tr>
                     <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Emo</th>
-                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->emo }}</td>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Temperatura C°</th>
+                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->temperature }} C°</td>
                     </tr>
                     <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Glucosa</th>
-                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->glucose }}</td>
-                    </tr>
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Proteína</th>
-                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->protein }}</td>
-                    </tr>
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tipo de sangre</th>
-                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->blood_type }}</td>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Saturación de oxígeno %</th>
+                        <td class="px-4 py-3 text-gray-900">{{ $vitalSigns->oxygen_saturation }}%</td>
                     </tr>
                 </tbody>
             </table>

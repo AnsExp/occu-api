@@ -10,10 +10,12 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property int $patient_id
  * @property string $code
  * @property string $timezone
- * @property string $file_path
- * @property string $sign
+ * @property string $file
+ * @property string $sha256
+ * @property Patient $patient
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -23,10 +25,16 @@ class LaboratoryOrder extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'patient_id',
         'code',
         'timezone',
-        'sign',
+        'sha256',
         'file',
+        'snapshot',
+    ];
+
+    protected $casts = [
+        'snapshot' => 'json',
     ];
 
     public function patient(): BelongsTo
@@ -47,17 +55,6 @@ class LaboratoryOrder extends Model
     public function hasCertificateType(string $type): bool
     {
         return $this->certificates()->where('type', $type)->exists();
-    }
-
-    public static function generateCode()
-    {
-        $offset = 0;
-        do {
-            $offset++;
-            $lastOrder = self::withTrashed(true)->latest('id')->first();
-            $code = 'LAB-' . Date('Ymd') . '-' . (($lastOrder?->id ?? 0) + 1 + $offset);
-        } while (self::withTrashed(true)->where('code', $code)->exists());
-        return $code;
     }
 
     public function getPrettyCreatedAtAttribute()

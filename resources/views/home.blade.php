@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', __('users.create.title'))
+@section('title', 'OccuMaster Health')
 
 @php
     $isLogged = auth()->check();

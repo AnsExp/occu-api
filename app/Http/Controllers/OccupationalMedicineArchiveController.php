@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OccupationalMedicalDate;
+use App\Models\MedicalDate;
 
 class OccupationalMedicineArchiveController extends Controller
 {
     /**
      * Handle the incoming request.
      */
-    public function __invoke(OccupationalMedicalDate $occupationalMedicalDate)
+    public function __invoke(MedicalDate $medicalDate)
     {
         if (!auth()->check()) {
             abort(403, 'No autorizado.');
@@ -17,14 +17,16 @@ class OccupationalMedicineArchiveController extends Controller
 
         $user = auth()->user();
 
-        if (!$user->hasRole(['administrator', 'doctor'])) {
+        if (!$user->can('read.certificates') && !$user->can('read.medical-dates')) {
             abort(403, 'No autorizado.');
         }
 
-        occu_storage()->makeDirectory('archives');
+        $storage = occu_storage();
 
-        $archiveRelative = "archives/{$occupationalMedicalDate->code}.zip";
-        $archivePath = occu_storage()->path($archiveRelative);
+        $storage->makeDirectory('archives');
+
+        $archiveRelative = "archives/{$medicalDate->code}.zip";
+        $archivePath = $storage->path($archiveRelative);
 
         $zip = new \ZipArchive();
         $opened = $zip->open($archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
@@ -33,17 +35,17 @@ class OccupationalMedicineArchiveController extends Controller
             throw new \RuntimeException('No se pudo generar el archivo ZIP.');
         }
 
-        foreach ($occupationalMedicalDate->medicalDates as $medicalDate) {
+        foreach ($medicalDate->relationship as $medicalDate) {
 
-            if (!$medicalDate->certificate_id) {
+            if (!$medicalDate->related->certificates()->first()?->id) {
                 continue;
             }
 
-            $relativeFile = $medicalDate->certificate->file;
+            $relativeFile = $medicalDate->related->certificates()->first()?->file;
 
-            if (occu_storage()->exists($relativeFile)) {
-                $absoluteFile = occu_storage()->path($relativeFile);
-                $zip->addFile($absoluteFile, $medicalDate->specialty->name . ' - ' . basename($absoluteFile));
+            if ($storage->exists($relativeFile)) {
+                $absoluteFile = $storage->path($relativeFile);
+                $zip->addFile($absoluteFile, $medicalDate->related->specialty->name . ' - ' . basename($absoluteFile));
             }
         }
 

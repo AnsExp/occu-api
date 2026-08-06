@@ -2,23 +2,30 @@
 
 return [
     'receptionist' => [
-        'read.medical_date',
-        'create.medical_date',
+        'read.patients',
 
-        'read.vital_signs',
-        'create.vital_signs',
+        'read.medical_dates',
+        'create.medical_dates',
+        'update.medical_dates',
 
         'read.laboratory_orders',
         'create.laboratory_orders',
+        'update.medical_dates',
 
         'read.prescriptions',
         'create.prescriptions',
+        'update.medical_dates',
+    ],
+
+    'nurse' => [
+        'read.vital_signs',
+        'create.vital_signs',
     ],
 
     'doctor' => [
-        'read.patient',
-        'create.patient',
-        'update.patient',
+        'read.patients',
+        'create.patients',
+        'update.patients',
 
         'read.vital_signs',
 
@@ -30,11 +37,41 @@ return [
     ],
 
     'patient' => [
-        'read.patient',
+        'read.patients',
 
         'read.agreements',
 
-        'read.medical_date',
+        'read.medical_dates',
+    ],
+
+    'partner' => [
+        "read.users",
+
+        "read.specialties",
+
+        "read.agreements",
+
+        "read.certificates",
+
+        "read.plans",
+
+        "read.patients",
+
+        "read.doctors",
+
+        "read.prescriptions",
+
+        "read.medications",
+
+        "read.laboratory_orders",
+
+        "read.laboratory_options",
+
+        "read.medical_dates",
+
+        "read.vital_signs",
+
+        "read.metrics"
     ],
 
     'administrator' => config('occu_permissions', []),

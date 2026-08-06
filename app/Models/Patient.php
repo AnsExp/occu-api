@@ -58,4 +58,10 @@ class Patient extends Model
     {
         return $this->morphMany(Metadata::class, 'model');
     }
+
+    public function getMeta(string $key, $default = null)
+    {
+        $meta = $this->metadata()->where('key', $key)->first();
+        return $meta ? $meta->value : $default;
+    }
 }

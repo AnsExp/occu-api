@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $user = User::updateOrCreate([
-            'email_hash' => occu_hash('admin@email.com')
+            'email' => 'admin@email.com'
         ], [
             'name' => 'Administrator',
             'email' => 'admin@email.com',

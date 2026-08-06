@@ -9,6 +9,10 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $quantity
+ * @property int $laboratory_order_id
+ * @property int $laboratory_option_id
+ * @property LaboratoryOrder $laboratory_order
+ * @property LaboratoryOption $laboratory_option
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -19,6 +23,8 @@ class LaboratoryExam extends Model
 
     protected $fillable = [
         'quantity',
+        'laboratory_order_id',
+        'laboratory_option_id',
     ];
 
     public function laboratoryOrder()

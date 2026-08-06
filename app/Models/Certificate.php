@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $timezone
  * @property string $sha256
  * @property string $file
- * @property int $parent_id
- * @property Certificate|null $parent
+ * @property int $medical_date_id
+ * @property MedicalDate|null $medicalDate
  * @property array $snapshot
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -23,7 +23,7 @@ class Certificate extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'parent_id',
+        'medical_date_id',
         'timezone',
         'sha256',
         'file',
@@ -34,13 +34,8 @@ class Certificate extends Model
         'snapshot' => 'json',
     ];
 
-    public function parent()
+    public function medicalDate()
     {
-        return $this->belongsTo(Certificate::class, 'parent_id');
-    }
-
-    public function childs()
-    {
-        return self::where('parent_id', $this->id)->get();
+        return $this->belongsTo(MedicalDate::class, 'medical_date_id');
     }
 }

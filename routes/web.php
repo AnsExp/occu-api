@@ -20,7 +20,8 @@ use App\Http\Controllers\SystemDashboard;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VitalSignController;
 
-use App\Http\Middleware\FormToken;
+use App\Http\Middleware\AllowedIp;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
@@ -29,12 +30,7 @@ Route::view('/home', 'home')->name('home');
 Route::get('/login', [AuthenticationController::class, 'index'])->name('login');
 Route::post('/login', [AuthenticationController::class, 'login'])->name('auth.login');
 
-Route::prefix('/api')->group(function () {
-    Route::get('/plans', [PlanController::class, 'json'])->name('plans.json');
-    Route::get('/medical_dates', [MedicalDateController::class, 'json'])->name('medical_dates.json');
-});
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', AllowedIp::class])->group(function () {
 
     Route::resource('/users', UserController::class)->except(['store', 'update', 'destroy']);
     Route::resource('/plans', PlanController::class)->except(['store', 'update', 'destroy']);
@@ -57,7 +53,7 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    Route::middleware(FormToken::class)->group(function () {
+    Route::middleware(PreventRequestForgery::class)->group(function () {
 
         Route::resource('/users', UserController::class)->only(['store', 'update', 'destroy']);
         Route::resource('/plans', PlanController::class)->only(['store', 'update', 'destroy']);
@@ -81,21 +77,20 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    Route::get('/archives/{occupationalMedicalDate:code}', OccupationalMedicineArchiveController::class)->name('occupational_medicine.archive');
-    Route::get('/occupational_medicine/{occupationalMedicalDate:code}', [OccupationalMedicineController::class, 'create'])->name('occupational_medicine.create');
-    Route::get('/occupational_medicine/{occupationalMedicalDate:code}/edit', [OccupationalMedicineController::class, 'edit'])->name('occupational_medicine.edit');
-    
+    Route::get('/archives/{medicalDate:code}', OccupationalMedicineArchiveController::class)->name('occupational_medicine.archive');
+    Route::get('/occupational_medicine/{medicalDate:code}', [OccupationalMedicineController::class, 'create'])->name('occupational_medicine.create');
+    Route::get('/occupational_medicine/{medicalDate:code}/edit', [OccupationalMedicineController::class, 'edit'])->name('occupational_medicine.edit');
+
     Route::get('/system', [SystemDashboard::class, 'index'])->name('dashboard.system');
     Route::get('/logout', [AuthenticationController::class, 'logout'])->name('auth.logout');
 
 });
 
-// use App\Models\OccupationalMedicalDate;
-// use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\LaboratoryOrder;
+use Barryvdh\DomPDF\Facade\Pdf;
 
-// Route::get('/test', function () {
-//     $medicalDate = OccupationalMedicalDate::find(1);
-//     $snapshot = $medicalDate->certificate->snapshot ?? [];
-//     $pdf = Pdf::loadView('documents.occupational_medicine', compact('medicalDate', 'snapshot'));
-//     return $pdf->stream();
-// });
+Route::get('/test', function () {
+    $order = LaboratoryOrder::find(10);
+    $pdf = Pdf::loadView('documents.laboratory_order', compact('order'));
+    return $pdf->stream();
+});

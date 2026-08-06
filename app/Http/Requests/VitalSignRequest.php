@@ -24,13 +24,10 @@ class VitalSignRequest extends FormRequest
             'medical_date.id' => ['required', 'exists:medical_dates,id'],
             'height' => ['required', 'numeric', 'min:0'],
             'weight' => ['required', 'numeric', 'min:0'],
-            'pulse' => ['required', 'numeric', 'min:0'],
-            'glucose' => ['required', 'numeric', 'min:0'],
             'blood_pressure_systolic' => ['required', 'numeric', 'min:0'],
             'blood_pressure_diastolic' => ['required', 'numeric', 'min:0'],
-            'emo' => ['required', 'string', 'max:255'],
-            'protein' => ['required', 'string', 'max:255'],
-            'blood_type' => ['required', 'in:A+,A-,B+,B-,AB+.AB-,O+,O-'],
+            'temperature' => ['required', 'numeric', 'min:0'],
+            'oxygen_saturation' => ['required', 'numeric', 'min:0'],
         ];
     }
 

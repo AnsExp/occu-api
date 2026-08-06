@@ -9,42 +9,27 @@
                     value="{{ old('height', $data['height'] ?? '') }}" label="Altura (m)" required />
             </div>
             <div>
-                <x-input-control type="number" min="0" name="weight" value="{{ old('height', $data['weight'] ?? '') }}"
+                <x-input-control type="number" min="0" name="weight" value="{{ old('weight', $data['weight'] ?? '') }}"
                     label="Peso (kg)" required />
             </div>
             <div>
-                <x-input-control type="number" min="0" name="pulse" value="{{ old('height', $data['pulse'] ?? '') }}"
-                    label="Pulso" required />
+                <x-input-control type="number" min="0" name="temperature"
+                    value="{{ old('temperature', $data['temperature'] ?? '') }}" label="Temperatura (°C)" required />
             </div>
             <div>
                 <x-input-control type="number" min="0" name="blood_pressure_systolic"
-                    value="{{ old('height', $data['blood_pressure_systolic'] ?? '') }}"
+                    value="{{ old('blood_pressure_systolic', $data['blood_pressure_systolic'] ?? '') }}"
                     label="Presión arterial sistólica" required />
             </div>
             <div>
                 <x-input-control type="number" min="0" name="blood_pressure_diastolic"
-                    value="{{ old('height', $data['blood_pressure_diastolic'] ?? '') }}"
-                    label="Presión arterial diastólica (mmHg)" required />
+                    value="{{ old('blood_pressure_diastolic', $data['blood_pressure_diastolic'] ?? '') }}"
+                    label="Presión arterial diastólica" required />
             </div>
             <div>
-                <x-input-control name="emo" value="{{ old('height', $data['emo'] ?? '') }}" label="EMO" required />
-            </div>
-            <div>
-                <x-input-control type="number" min="0" name="glucose"
-                    value="{{ old('height', $data['glucose'] ?? '') }}" label="Glucosa" required />
-            </div>
-            <div>
-                <x-input-control name="protein" value="{{ old('height', $data['protein'] ?? '') }}" label="Proteína"
-                    required />
-            </div>
-            <div>
-                <x-select-control name="blood_type" label="Tipo de sangre" required>
-                    @foreach (['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bloodType)
-                        <option value="{{ $bloodType }}" @selected(old('height', $data['blood_type'] ?? '') === $bloodType)>
-                            {{ $bloodType }}
-                        </option>
-                    @endforeach
-                </x-select-control>
+                <x-input-control type="number" min="0" name="oxygen_saturation"
+                    value="{{ old('oxygen_saturation', $data['oxygen_saturation'] ?? '') }}"
+                    label="Saturación de oxígeno (%)" required />
             </div>
         </div>
     </x-card>

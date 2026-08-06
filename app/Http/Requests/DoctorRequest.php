@@ -9,16 +9,6 @@ class DoctorRequest extends FormRequest
 {
     protected function prepareForValidation()
     {
-        if ($this->has('id_card')) {
-            $this->merge([
-                'id_card_hash' => occu_hash($this->input('id_card')),
-            ]);
-        }
-        if ($this->has('email')) {
-            $this->merge([
-                'email_hash' => occu_hash($this->input('email')),
-            ]);
-        }
         $this->merge(['is_occupational_doctor' => $this->has('is_occupational_doctor')]);
     }
 
@@ -42,10 +32,8 @@ class DoctorRequest extends FormRequest
             'last_name' => ['required', 'string'],
             'email' => ['required', 'email'],
             'is_occupational_doctor' => ['required', 'boolean'],
-            'email_hash' => ['required', 'string'],
             'phone' => ['nullable', 'string'],
             'id_card' => ['required', 'string'],
-            'id_card_hash' => ['required', 'string'],
             'id_card_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
             'specialty.id' => ['required', 'exists:specialties,id'],
             'metadata' => ['nullable', 'array'],

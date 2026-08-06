@@ -21,20 +21,15 @@ return [
     'update.certificates',
     'delete.certificates',
 
-    'read.occupational_medical_dates',
-    'create.occupational_medical_dates',
-    'update.occupational_medical_dates',
-    'delete.occupational_medical_dates',
-
     'read.plans',
     'create.plans',
     'update.plans',
     'delete.plans',
 
-    'read.patient',
-    'create.patient',
-    'update.patient',
-    'delete.patient',
+    'read.patients',
+    'create.patients',
+    'update.patients',
+    'delete.patients',
 
     'read.doctors',
     'create.doctors',
@@ -61,23 +56,15 @@ return [
     'update.laboratory_options',
     'delete.laboratory_options',
 
-    'read.medical_date',
-    'create.medical_date',
-    'update.medical_date',
-    'delete.medical_date',
+    'read.medical_dates',
+    'create.medical_dates',
+    'update.medical_dates',
+    'delete.medical_dates',
 
     'read.vital_signs',
     'create.vital_signs',
     'update.vital_signs',
     'delete.vital_signs',
 
-    'read.allowed_ips',
-    'create.allowed_ips',
-    'update.allowed_ips',
-    'delete.allowed_ips',
-
-    'read.certificate_key',
-    'create.certificate_key',
-    'update.certificate_key',
-    'delete.certificate_key',
+    'read.metrics',
 ];

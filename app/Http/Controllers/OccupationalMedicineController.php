@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OccupationalMedicalDate;
+use App\Models\MedicalDate;
 use Illuminate\Http\Request;
 use App\Http\Services\OccupationalMedicineService;
 
@@ -12,14 +12,14 @@ class OccupationalMedicineController extends Controller
     {
     }
 
-    public function create(OccupationalMedicalDate $occupationalMedicalDate)
+    public function create(MedicalDate $medicalDate)
     {
-        return view('occupational_medicine.create', compact('occupationalMedicalDate'));
+        return view('occupational_medicine.create', compact('medicalDate'));
     }
 
-    public function edit(OccupationalMedicalDate $occupationalMedicalDate)
+    public function edit(MedicalDate $medicalDate)
     {
-        // return view('occupational_medicine.create', compact('occupationalMedicalDate'));
+        // return view('occupational_medicine.create', compact('medicalDate'));
     }
 
     public function store(Request $request)

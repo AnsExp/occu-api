@@ -4,12 +4,10 @@ namespace App\Http\Services;
 
 use App\Models\LaboratoryOrder;
 use App\Models\LaboratoryOption;
-use App\Models\Patient;
 use App\Models\Person;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class LaboratoryOrderService
 {
@@ -17,21 +15,16 @@ class LaboratoryOrderService
     {
         return DB::transaction(function () use ($request) {
             $person = Person::find($request->input('person.id'));
-            $patient = Patient::where('person_id', $person->id)->first();
+            $patient =  PatientService::preparePerson($person);
 
-            if (!$patient) {
-                $patient = $person->patient()->create();
-            }
-
-            $order = new LaboratoryOrder([
-                'code' => LaboratoryOrder::generateCode(),
+            $order = LaboratoryOrder::create([
+                'patient_id' => $patient->id,
+                'code' => $this->generateCode(),
                 'timezone' => $request->input('timezone'),
-                'sign' => 'temp',
+                'sha256' => 'temp',
                 'file' => 'temp',
+                'snapshot' => $request->all(),
             ]);
-
-            $order->patient()->associate($patient);
-            $order->save();
 
             foreach ($request->input('items', []) as $item) {
                 $laboratoryOption = LaboratoryOption::find($item['option']);
@@ -51,7 +44,7 @@ class LaboratoryOrderService
 
             if ($path = $this->storePdf($order)) {
                 $order->file = $path;
-                $order->sign = occu_hash(Storage::disk('local')->get($order->file));
+                $order->sha256 = occu_hash(occu_storage()->get($order->file));
                 $order->save();
 
                 return $order;
@@ -61,14 +54,32 @@ class LaboratoryOrderService
         });
     }
 
-    private function storePdf(LaboratoryOrder $laboratoryOrder)
+    public function update(Request $request, LaboratoryOrder $order)
+    {
+        return DB::transaction(function () use ($request, $order) {
+            return null;
+        });
+    }
+
+    private function generateCode()
+    {
+        $offset = 0;
+        do {
+            $offset++;
+            $lastOrder = LaboratoryOrder::withTrashed(true)->latest('id')->first();
+            $code = 'LAB-' . Date('Ymd') . '-' . (($lastOrder?->id ?? 0) + 1 + $offset);
+        } while (LaboratoryOrder::withTrashed(true)->where('code', $code)->exists());
+        return $code;
+    }
+
+    private function storePdf(LaboratoryOrder $order)
     {
         try {
-            $pdf = Pdf::loadView('documents.laboratory_order', compact('laboratoryOrder'));
+            $pdf = Pdf::loadView('documents.laboratory_order', compact('order'));
             $pdf->setPaper('A4', 'portrait');
             $pdf->setOption('isRemoteEnabled', true);
-            $filePath = 'laboratory_orders/' . $laboratoryOrder->code . '.pdf';
-            $saved = Storage::disk('local')->put($filePath, $pdf->output());
+            $filePath = 'laboratory_orders/' . $order->code . '.pdf';
+            $saved = occu_storage()->put($filePath, $pdf->output());
             return $saved ? $filePath : false;
         } catch (\Exception $e) {
             return false;

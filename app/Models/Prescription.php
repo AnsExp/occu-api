@@ -24,8 +24,15 @@ class Prescription extends Model
         'code',
         'doctor_id',
         'patient_id',
-        'notes',
         'timezone',
+        'notes',
+        'sha256',
+        'file',
+        'snapshot',
+    ];
+
+    protected $casts = [
+        'snapshot' => 'json',
     ];
 
     public function medications()
@@ -41,11 +48,6 @@ class Prescription extends Model
     public function patient()
     {
         return $this->belongsTo(Patient::class);
-    }
-
-    public function vitalSigns()
-    {
-        return $this->hasMany(VitalSign::class);
     }
 
     public function getPrettyCreatedAtAttribute()

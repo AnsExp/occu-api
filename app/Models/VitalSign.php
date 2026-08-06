@@ -12,13 +12,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $patient_id
  * @property float $height
  * @property float $weight
- * @property float $pulse
  * @property float $blood_pressure_systolic
  * @property float $blood_pressure_diastolic
- * @property string $emo
- * @property float $glucose
- * @property string $protein
- * @property string $blood_type
+ * @property float $temperature
+ * @property float $oxygen_saturation
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -29,20 +26,23 @@ class VitalSign extends Model
 
     protected $fillable = [
         'patient_id',
+        'medical_date_id',
         'height',
         'weight',
-        'pulse',
         'blood_pressure_systolic',
         'blood_pressure_diastolic',
-        'emo',
-        'glucose',
-        'protein',
-        'blood_type',
+        'temperature',
+        'oxygen_saturation',
     ];
 
     public function patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function medicalDate()
+    {
+        return $this->belongsTo(MedicalDate::class);
     }
 
     public function getPrettyCreatedAtAttribute()

@@ -3,12 +3,11 @@
 namespace App\Livewire\Forms;
 
 use App\Models\MedicalDate;
-use App\Models\OccupationalMedicalDate;
 use Livewire\Component;
 
 class FormOccupationalMedicine extends Component
 {
-    public OccupationalMedicalDate $occupationalMedicalDate;
+    public MedicalDate $medicalDate;
     public $declarationQuestionsPart1 = [
         'eye_problems',
         'high_blood_pressure',
@@ -45,6 +44,8 @@ class FormOccupationalMedicine extends Component
         'fractures_dislocations',
     ];
     public $declarationResultsPart1 = [];
+    public $declarationAcclarationsPart1 = null;
+
     public $declarationQuestionsPart2 = [
         'sick_leave?',
         'hospitalized?',
@@ -55,10 +56,14 @@ class FormOccupationalMedicine extends Component
         'allergic_to_medicine?',
     ];
     public $declarationResultsPart2 = [];
+    public $declarationAcclarationsPart2 = null;
+
     public $declarationQuestionsPart3 = [
         'taking_medicine?',
     ];
     public $declarationResultsPart3 = [];
+    public $declarationAcclarationsPart3 = null;
+
     public $clinicalChecks = [
         'head',
         'sinuses',
@@ -102,9 +107,9 @@ class FormOccupationalMedicine extends Component
     public $has_restrictions = null;
     public $do_torax_radiography = null;
 
-    public function mount(OccupationalMedicalDate $occupationalMedicalDate)
+    public function mount(MedicalDate $medicalDate)
     {
-        $this->occupationalMedicalDate = $occupationalMedicalDate;
+        $this->medicalDate = $medicalDate;
     }
 
     public function render()

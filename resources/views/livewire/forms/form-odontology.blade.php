@@ -38,7 +38,7 @@
                                 @lang('odontology.' . $ear) <span class="text-red-600">*</span>
                             </td>
                             <td class="border border-gray-200 text-center">
-                                <input type="radio" name="medical_exam[{{ $ear }}]" value="normal" checked required />
+                                <input type="radio" name="medical_exam[{{ $ear }}]" value="normal" required />
                             </td>
                             <td class="border border-gray-200 text-center">
                                 <input type="radio" name="medical_exam[{{ $ear }}]" value="alteration" required />

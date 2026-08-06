@@ -11,21 +11,18 @@ use Illuminate\Support\Carbon;
  * @property string $code
  * @property Carbon $date
  * @property int $order
- * @property float $price
- * @property bool $editable
+ * @property string $type
  * @property string $timezone
  * @property int $doctor_id
  * @property int $patient_id
- * @property int $specialty_id
+ * @property int|null $specialty_id
  * @property int|null $certificate_id
  * @property int|null $vital_signs_id
- * @property int|null $occupational_medical_date_id
  * @property Doctor $doctor
  * @property Patient $patient
- * @property Specialty $specialty
- * @property VitalSign $vital_signs
- * @property Certificate $certificate
- * @property OccupationalMedicalDate|null $occupational_medical_date
+ * @property Specialty|null $specialty
+ * @property VitalSign|null $vital_signs
+ * @property Certificate|null $certificate
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -37,16 +34,12 @@ class MedicalDate extends Model
     protected $fillable = [
         'code',
         'date',
+        'type',
         'order',
-        'price',
-        'editable',
         'timezone',
         'doctor_id',
         'patient_id',
         'specialty_id',
-        'certificate_id',
-        'vital_signs_id',
-        'occupational_medical_date_id',
     ];
 
     protected $casts = [
@@ -85,14 +78,9 @@ class MedicalDate extends Model
         return $this->date->setTimezone($this->timezone)->translatedFormat('F j, Y');
     }
 
-    public function occupationalMedicalDate()
+    public function relationship()
     {
-        return $this->belongsTo(OccupationalMedicalDate::class);
-    }
-
-    public function certificate()
-    {
-        return $this->belongsTo(Certificate::class);
+        return $this->hasMany(MedicalDateRelationship::class, 'principal_id');
     }
 
     public function specialty()
@@ -112,7 +100,12 @@ class MedicalDate extends Model
 
     public function vitalSigns()
     {
-        return $this->belongsTo(VitalSign::class);
+        return $this->hasOne(VitalSign::class);
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
     }
 
     public function metadata()

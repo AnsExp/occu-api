@@ -15,7 +15,6 @@ class FormVitalSigns extends Component
 
     public function mount(Specialty $specialty, MedicalDate $medicalDate)
     {
-        // $this->specialty = $specialty;
         if ($medicalDate->patient_id) {
             $last = VitalSign::where('patient_id', $medicalDate->patient_id)->latest()->first();
             $this->data = $last?->toArray() ?? [];

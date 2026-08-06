@@ -14,7 +14,7 @@ class PersonSeeder extends Seeder
     public function run(): void
     {
         $user = User::updateOrCreate(
-            ['email_hash' => occu_hash('rooseveltabrigo@gmail.com')],
+            ['email' => 'rooseveltabrigo@gmail.com'],
             [
                 'name' => 'Roosevelt Stalin Remache Abrigo',
                 'email' => 'rooseveltabrigo@gmail.com',
@@ -22,7 +22,7 @@ class PersonSeeder extends Seeder
             ]
         );
         Person::updateOrCreate(
-            ['id_card_hash' => occu_hash('0751057027')],
+            ['id_card' => '0751057027'],
             [
                 'first_name' => 'Roosevelt Stalin',
                 'last_name' => 'Remache Abrigo',

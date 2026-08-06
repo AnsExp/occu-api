@@ -38,6 +38,7 @@ class OdontologyService
             }
 
             $certificate = Certificate::create([
+                'medical_date_id' => $medicalDate->id,
                 'parent_id' => $parentCertificate?->id ?? null,
                 'timezone' => $request->input('timezone'),
                 'sha256' => occu_hash($content),
@@ -45,7 +46,6 @@ class OdontologyService
                 'snapshot' => $request->input('medical_exam', []),
             ]);
 
-            $medicalDate->certificate()->associate($certificate);
             $medicalDate->save();
 
             return $certificate;

@@ -44,18 +44,18 @@
 							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->order }}</td>
 							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->code }}</td>
 							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->patient->person->fullname }}</td>
-							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->specialty->name }}</td>
+							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->specialty?->name ?? 'Medicina Ocupacional' }}</td>
 							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->doctor->person->fullname }}</td>
 							<td class="px-4 py-3 align-top text-gray-700">{{ $medicalDate->pretty_date }}</td>
 							<td class="px-4 py-3 align-top text-gray-700">
-								@if ($medicalDate->vital_signs_id)
+								@if ($medicalDate->vitalSigns)
 									<x-heroicon-o-check-circle class="size-5 text-emerald-500" />
 								@else
 									<x-heroicon-o-exclamation-circle class="size-5 text-amber-500" />
 								@endif
 							</td>
 							<td class="px-4 py-3 align-top text-gray-700">
-								@if ($medicalDate->certificate_id)
+								@if ($medicalDate->certificates->isNotEmpty())
 									<x-heroicon-o-check-circle class="size-5 text-emerald-500" />
 								@else
 									<x-heroicon-o-exclamation-circle class="size-5 text-amber-500" />
@@ -63,11 +63,6 @@
 							</td>
 							<td class="px-4 py-3 align-top text-right text-gray-700">
 								<div class="flex justify-end gap-2">
-									@if (!$medicalDate->vital_signs_id)
-										<x-button-link :href="route('dashboard.vital_signs', [$medicalDate->specialty, $medicalDate])" variant="badge">
-											Tomar SV
-										</x-button-link>
-									@endif
 									<x-button-link :href="route('medical_dates.show', $medicalDate)" variant="badge">
 										Ver
 									</x-button-link>

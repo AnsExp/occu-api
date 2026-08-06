@@ -48,8 +48,8 @@ class DashboardController extends Controller
      */
     public function create(Specialty $specialty, MedicalDate $medicalDate)
     {
-        if ($medicalDate->certificate_id) {
-            abort(403, 'Acceso denegado. Esta especialidad no tiene un formulario asociado.');
+        if ($medicalDate->certificates->isNotEmpty()) {
+            abort(403, 'Acceso denegado. Esta especialidad ya tiene un certificado asociado.');
         }
         return view('dashboards.create', compact('specialty', 'medicalDate'));
     }
@@ -67,10 +67,10 @@ class DashboardController extends Controller
      */
     public function show(Specialty $specialty, MedicalDate $medicalDate)
     {
-        if (!$medicalDate->certificate) {
+        if ($medicalDate->certificates->isEmpty()) {
             abort(404, 'Certificado no encontrado.');
         }
-        $filePath = $this->getFilePath($medicalDate->certificate);
+        $filePath = $this->getFilePath($medicalDate->certificates->first());
         if (!$filePath) {
             abort(404, 'PDF file not found.');
         }

@@ -1,9 +1,9 @@
 <form method="post" action="{{ route('occupational_medicine.store') }}" class="space-y-6">
     @csrf
     <x-input-timezone />
-    <input type="hidden" name="occupational_medical_date[id]" value="{{ $occupationalMedicalDate->id }}">
-    <x-badge :text="'Paciente: ' . $occupationalMedicalDate?->patient?->person->fullname" />
-    <x-section-header :title="__('occupational_medicine.declaration_questions_part1')" />
+    <input type="hidden" name="medical_date[id]" value="{{ $medicalDate->id }}">
+    <x-badge :text="'Paciente: ' . $medicalDate?->patient?->person->fullname" />
+    <x-section-header title="Declaración jurada del paciente" />
     <x-card>
         <div class="space-y-6">
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -33,6 +33,7 @@
             </div>
             @if (in_array(1, $declarationResultsPart1))
                 <x-textarea-control name="medical_exam[declarations][0][aclarations]"
+                    wire:model.lazy="declarationAcclarationsPart1"
                     label="Si respondió 'Sí' a alguna de las preguntas, indique detalles" rows="5" required />
             @endif
         </div>
@@ -61,6 +62,7 @@
         </div>
         @if (in_array(1, $declarationResultsPart2))
             <x-textarea-control name="medical_exam[declarations][1][aclarations]"
+                wire:model.lazy="declarationAcclarationsPart2"
                 label="Si respondió 'Sí' a alguna de las preguntas, indique detalles" rows="5" required />
         @endif
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -88,6 +90,7 @@
         </div>
         @if (in_array(1, $declarationResultsPart3))
             <x-textarea-control name="medical_exam[declarations][2][aclarations]"
+                wire:model.lazy="declarationAcclarationsPart3"
                 label="Si respondió 'Sí' a alguna de las preguntas, indique detalles" rows="5" required />
         @endif
     </x-card>
@@ -183,13 +186,15 @@
                         No se hizo
                     </label>
                 </div>
-                @if ($do_torax_radiography === 'was_done')
+            </div>
+            @if ($do_torax_radiography === 'was_done')
+                <div wire:ignore>
                     <x-input-control type="date" name="medical_exam[clinical_data][chest_xray][date]"
                         label="Fecha en que se realizó" required />
-                    <x-textarea-control name="medical_exam[clinical_data][chest_xray][result]"
-                        :label="__('attributes.result')" rows="4" required />
-                @endif
-            </div>
+                    <x-textarea-control name="medical_exam[clinical_data][chest_xray][result]" label="Resultado" rows="4"
+                        required />
+                </div>
+            @endif
         </div>
     </x-card>
     <x-section-header title="Otras pruebas de diagnóstico y resultados" />
@@ -336,7 +341,7 @@
                     </label>
                 </div>
             </div>
-            <div class="space-y-3" wire:ignore>
+            <div class="space-y-3">
                 @if ($has_restrictions === '1')
                     <div>
                         <x-textarea-control name="medical_exam[aptitude_eval][restriction_description]"

@@ -5,7 +5,7 @@
 @php
     $doctor = $medicalDate->doctor;
     $patient = $medicalDate->patient;
-    $medicalExam = $certificate->snapshot ?? [];
+    $medicalExam = $snapshot ?? [];
 
     $hearingRight = $medicalExam['hearing']['right'] ?? 'N/D';
     $hearingLeft = $medicalExam['hearing']['left'] ?? 'N/D';
@@ -22,12 +22,12 @@
                         <h2 class="fw-bold mb-1">Certificado de Audiometria</h2>
                         <p class="mb-0 text-muted">Informe medico ocupacional de evaluacion auditiva</p>
                     </td>
-                    <td class="text-end align-top" style="width: 30%;">
+                    {{-- <td class="text-end align-top" style="width: 30%;">
                         <div class="small text-muted mt-2">Fecha de emision</div>
                         <div class="fw-semibold">
                             {{ $certificate->created_at ? $certificate->created_at->translatedFormat('j \\d\\e F, Y H:i') : 'N/D' }}
                         </div>
-                    </td>
+                    </td> --}}
                 </tr>
             </table>
         </div>

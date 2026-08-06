@@ -15,6 +15,10 @@ class AllowedIp
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (config('app.debug', false)) {
+            return $next($request);
+        }
+
         $user = auth()->user();
 
         if (!$user) {

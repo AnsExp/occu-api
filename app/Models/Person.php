@@ -31,7 +31,6 @@ class Person extends Model
         'last_name',
         'phone',
         'id_card',
-        'id_card_hash',
         'id_card_file',
         'gender',
         'user_id',
@@ -39,20 +38,13 @@ class Person extends Model
         'nationality',
     ];
 
-    protected $hidden = [
-        'id_card_hash',
-    ];
-
     protected $casts = [
         'birth_date' => 'datetime',
-        'phone' => CryptCast::class,
-        'id_card' => CryptCast::class,
     ];
 
     public static function findByIdCard(string $id_card): ?self
     {
-        $hash = occu_hash($id_card);
-        return self::where('id_card_hash', $hash)->first();
+        return self::where('id_card', $id_card)->first();
     }
 
     public function user()

@@ -2,15 +2,14 @@
 
 @section('title', 'Order Document')
 
-{{-- @use(Carbon\Carbon) --}}
+@use(Carbon\Carbon)
+
+@php
+    $patient = $order->patient;
+@endphp
 
 @section('content')
-    <p>
-        lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam tincidunt, nunc nisl aliquam
-        nisl, eget aliquam nunc nisl eget nunc. Sed euismod, nunc ut aliquam tincidunt, nunc nisl aliquam nisl, eget aliquam
-        nunc nisl eget nunc.
-    </p>
-    {{-- <table class="header">
+    <table class="header">
         <tr>
             <td>
                 <p class="brand-title">{{ config('app.name') }}</p>
@@ -27,11 +26,11 @@
     </table>
 
     <div class="section-title">@lang('patients.patient_data')</div>
-    <table class="info-table">
+    <table class="table">
         <tr>
             <td>
                 <span class="label">@lang('attributes.first_name')</span>
-                <span class="value">{{ $patient->first_name . ' ' . $patient->last_name }}</span>
+                <span class="value">{{ $patient->person->fullname }}</span>
             </td>
             <td>
                 <span class="label">@lang('attributes.id_card')</span>
@@ -67,7 +66,7 @@
     </table>
 
     <div class="section-title">@lang('orders.order_details')</div>
-    <table class="items-table">
+    <table class="table">
         <thead>
             <tr>
                 <th style="width: 7%;"></th>
@@ -78,13 +77,13 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($snapshot['items'] as $index => $item)
+            @forelse ($order->laboratoryExams as $index => $exam)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $item['name'] }}</td>
-                <td class="text-center">{{ $item['quantity'] }}</td>
-                <td class="text-right">${{ number_format($item['price'], 2) }}</td>
-                <td class="text-right">${{ number_format($item['price'] * $item['quantity'], 2) }}</td>
+                <td>{{ $exam->laboratoryOption->name }}</td>
+                <td class="text-center">{{ $exam->quantity }}</td>
+                <td class="text-right">${{ number_format($exam->laboratoryOption->price, 2) }}</td>
+                <td class="text-right">${{ number_format($exam->laboratoryOption->price * $exam->quantity, 2) }}</td>
             </tr>
             @empty
             <tr>
@@ -94,7 +93,7 @@
         </tbody>
     </table>
 
-    <div class="totals-wrapper">
+    {{-- <div class="totals-wrapper">
         <table class="totals-table">
             <tr>
                 <td class="name">@lang('orders.subtotal')</td>
@@ -109,7 +108,5 @@
                 <td class="text-right grand-total">${{ number_format($snapshot['total'], 2) }}</td>
             </tr>
         </table>
-    </div>
-    <img src="https://images.wallpapersden.com/image/download/jurassic-world-fallen-kingdom-dinosaurs_a2dsZmeUmZqaraWkpJRpa2ZorWdqbWw.jpg"
-        alt="Watermark"> --}}
+    </div> --}}
 @endsection

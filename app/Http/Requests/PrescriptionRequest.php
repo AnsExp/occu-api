@@ -7,6 +7,19 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PrescriptionRequest extends FormRequest
 {
+    protected function prepareForValidation()
+    {
+        $user = auth()->user();
+
+        if (!$this->has('doctor.id')) {
+            if ($user->hasRole('doctor')) {
+                $this->merge([
+                    'doctor.id' => $user->person?->doctor?->id,
+                ]);
+            }
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */

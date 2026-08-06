@@ -4,7 +4,7 @@
 
 @section('content')
     <section class="mx-auto max-w-6xl py-6">
-        <x-page-header title="Cita Médica" :description="$medicalDate->specialty->name . ' ' . $medicalDate->code" />
+        <x-page-header title="Cita Médica" :description="($medicalDate->specialty->name ?? 'Medicina Ocupacional') . ' ' . $medicalDate->code" />
         <div class="space-y-6">
             <x-button-link class="mb-4" :href="route('medical_dates.index')">
                 Volver a la lista de citas médicas
@@ -26,7 +26,7 @@
                         Especialidad
                     </th>
                     <td class="w-8/12 px-4 py-3 align-top text-gray-700">
-                        {{ $medicalDate->specialty->name }}
+                        {{ $medicalDate->specialty?->name ?? 'Medicina Ocupacional' }}
                     </td>
                 </tr>
                 <tr>

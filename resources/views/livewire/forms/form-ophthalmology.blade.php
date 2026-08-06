@@ -35,7 +35,7 @@
         <h4 class="text-sm font-semibold tracking-wide text-gray-800">@lang('ophthalmology.vision') <span
                 class="text-red-600">*</span></h4>
         <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table class="w-full min-w-[760px] border-collapse text-xs text-gray-800 sm:text-sm">
+            <table class="w-full min-w-[760px] border-collapse text-xs text-gray-800 sm:text-sm" wire:ignore>
                 <thead>
                     <tr>
                         <th class="border border-gray-200 bg-gray-50 px-2 py-2"></th>

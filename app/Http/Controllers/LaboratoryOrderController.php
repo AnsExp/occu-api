@@ -6,7 +6,6 @@ use App\Http\Requests\OrderOptionRequest;
 use App\Http\Requests\LaboratoryOrderRequest;
 use App\Http\Services\LaboratoryOrderService;
 use App\Models\LaboratoryOrder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class LaboratoryOrderController extends Controller
@@ -40,7 +39,6 @@ class LaboratoryOrderController extends Controller
      */
     public function store(LaboratoryOrderRequest $request)
     {
-        // return response()->json($request->all());
         $laboratoryOrder = $this->service->store($request);
         return redirect()->route('laboratory_orders.show', $laboratoryOrder);
     }
@@ -75,7 +73,7 @@ class LaboratoryOrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, LaboratoryOrder $order)
+    public function update(LaboratoryOrderRequest $request, LaboratoryOrder $order)
     {
         abort(403, 'Unauthorized action.');
     }

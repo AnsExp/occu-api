@@ -54,7 +54,7 @@ class DoctorSeeder extends Seeder
             }
             $doctor = $this->doctors[$index];
             $user = User::updateOrCreate(
-                ['email_hash' => occu_hash($doctor['email'])],
+                ['email' => $doctor['email']],
                 [
                     'name' => $doctor['first_name'] . ' ' . $doctor['last_name'],
                     'email' => $doctor['email'],
@@ -63,7 +63,7 @@ class DoctorSeeder extends Seeder
             );
             $user->assignRole('doctor');
             $person = Person::updateOrCreate(
-                ['id_card_hash' => occu_hash($doctor['id_card'])],
+                ['id_card' => $doctor['id_card']],
                 [
                     'first_name' => $doctor['first_name'],
                     'last_name' => $doctor['last_name'],

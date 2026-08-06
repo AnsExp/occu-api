@@ -18,20 +18,14 @@ class VitalSignService
 
             $vitalSigns = VitalSign::create([
                 'patient_id' => $medicalDate->patient_id,
-                'emo' => $request->input('emo'),
-                'pulse' => $request->input('pulse'),
+                'medical_date_id' => $medicalDate->id,
                 'weight' => $request->input('weight'),
                 'height' => $request->input('height'),
-                'glucose' => $request->input('glucose'),
-                'protein' => $request->input('protein'),
-                'blood_type' => $request->input('blood_type'),
                 'blood_pressure_systolic' => $request->input('blood_pressure_systolic'),
                 'blood_pressure_diastolic' => $request->input('blood_pressure_diastolic'),
+                'temperature' => $request->input('temperature'),
+                'oxygen_saturation' => $request->input('oxygen_saturation'),
             ]);
-
-            // $medicalDate->vital_signs_id = $vitalSigns->id;
-            $medicalDate->vitalSigns()->associate($vitalSigns);
-            $medicalDate->save();
 
             return $vitalSigns;
         });

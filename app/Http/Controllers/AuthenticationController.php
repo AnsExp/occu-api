@@ -28,15 +28,7 @@ class AuthenticationController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $email_hash = occu_hash($credentials['email']);
-
-        $exists = User::where('email_hash', $email_hash)->exists();
-
-        if (!$exists) {
-            return back()->withErrors(['email' => 'El usuario no existe.'])->onlyInput('email');
-        }
-
-        if (!Auth::attempt(['email_hash' => $email_hash, 'password' => $credentials['password']], $request->boolean('remember'))) {
+        if (!Auth::attempt($credentials)) {
             return back()->withErrors(['email' => 'Las credenciales no son correctas.'])->onlyInput('email');
         }
 
