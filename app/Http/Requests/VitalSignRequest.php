@@ -20,7 +20,6 @@ class VitalSignRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'specialty.id' => ['required', 'exists:specialties,id'],
             'medical_date.id' => ['required', 'exists:medical_dates,id'],
             'height' => ['required', 'numeric', 'min:0'],
             'weight' => ['required', 'numeric', 'min:0'],

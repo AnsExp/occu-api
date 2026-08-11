@@ -4,17 +4,21 @@ return [
     'receptionist' => [
         'read.patients',
 
+        'read.occupational_medical_dates',
+        'create.occupational_medical_dates',
+        'update.occupational_medical_dates',
+
         'read.medical_dates',
         'create.medical_dates',
         'update.medical_dates',
 
         'read.laboratory_orders',
         'create.laboratory_orders',
-        'update.medical_dates',
+        'update.laboratory_orders',
 
         'read.prescriptions',
         'create.prescriptions',
-        'update.medical_dates',
+        'update.prescriptions',
     ],
 
     'nurse' => [

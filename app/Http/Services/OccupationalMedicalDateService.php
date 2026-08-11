@@ -19,10 +19,10 @@ class OccupationalMedicalDateService
             $occupationalDate = MedicalDate::create([
                 'code' => MedicalDate::generateCode(),
                 'timezone' => $request->input('timezone'),
-                'order' => 1,
+                'order' => $this->currentOrder($request->input('doctor.id'), $request->input('date')),
                 'patient_id' => $patient->id,
-                'date' => date('Y-m-d'),
-                'doctor_id' => $request->input('occupational_doctor.id'),
+                'date' => $request->input('date'),
+                'doctor_id' => $request->input('doctor.id'),
                 'type' => 'occupational',
             ]);
 
@@ -31,7 +31,7 @@ class OccupationalMedicalDateService
                 $medicalDate = MedicalDate::create([
                     'code' => MedicalDate::generateCode(),
                     'timezone' => $request->input('timezone'),
-                    'order' => 1,
+                    'order' => $this->currentOrder($medicalDate['doctor']['id'], $medicalDate['date']),
                     'patient_id' => $patient->id,
                     'date' => $medicalDate['date'],
                     'doctor_id' => $medicalDate['doctor']['id'],
@@ -47,6 +47,16 @@ class OccupationalMedicalDateService
 
             return $occupationalDate;
         });
+    }
+
+    private function currentOrder(int $doctorId, string $date): int
+    {
+        $lastOrder = MedicalDate::where('doctor_id', $doctorId)
+            ->where('date', $date)
+            ->orderByDesc('order')
+            ->first();
+
+        return $lastOrder ? $lastOrder->order + 1 : 1;
     }
 
     public function update(Request $request, MedicalDate $medicalDate)

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\MedicalDateRequest;
+use App\Http\Requests\OccupationalMedicalDateRequest;
 use App\Models\MedicalDate;
-use App\Http\Services\MedicalDateService;
+use App\Http\Services\OccupationalMedicalDateService;
 use App\Http\Resources\MedicalDateResource;
 use Illuminate\Http\Request;
 use App\Http\Filters\MedicalDateFilter;
 
-class MedicalDateController extends Controller
+class OccupationalMedicalDateController extends Controller
 {
-    public function __construct(private MedicalDateService $medicalDateService)
+    public function __construct(private OccupationalMedicalDateService $medicalDateService)
     {
     }
 
@@ -20,7 +20,19 @@ class MedicalDateController extends Controller
      */
     public function index(Request $request, MedicalDateFilter $filter)
     {
-        $request->merge(['type' => 'normal']);
+        $user = $request->user();
+        $request->merge(['type' => 'occupational']);
+        if ($user->hasRole('doctor')) {
+            if ($user->person?->doctor?->is_occupational_doctor) {
+                $request->merge([
+                    'doctor_id' => $user->person->doctor->id,
+                ]);
+            }
+        } else if ($user->hasRole('patient')) {
+            $request->merge([
+                'patient_id' => $user->person->patient->id,
+            ]);
+        }
         $perPage = $request->input('per_page', 10);
         $data = $filter->query($request)->paginate($perPage);
         return MedicalDateResource::collection($data);
@@ -29,7 +41,7 @@ class MedicalDateController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(MedicalDateRequest $request)
+    public function store(OccupationalMedicalDateRequest $request)
     {
         $medicalDate = $this->medicalDateService->store($request);
         return MedicalDateResource::make($medicalDate);
@@ -46,7 +58,7 @@ class MedicalDateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(MedicalDateRequest $request, MedicalDate $medicalDate)
+    public function update(OccupationalMedicalDateRequest $request, MedicalDate $medicalDate)
     {
         $medicalDate = $this->medicalDateService->update($request, $medicalDate);
         return MedicalDateResource::make($medicalDate);

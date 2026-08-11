@@ -61,6 +61,11 @@ return [
     'update.medical_dates',
     'delete.medical_dates',
 
+    'read.occupational_medical_dates',
+    'create.occupational_medical_dates',
+    'update.occupational_medical_dates',
+    'delete.occupational_medical_dates',
+
     'read.vital_signs',
     'create.vital_signs',
     'update.vital_signs',

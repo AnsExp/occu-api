@@ -21,7 +21,10 @@ class AgreementResource extends JsonResource
             'description' => $this->description,
             'discount_type' => $this->discount_type,
             'discount_amount' => (float) $this->discount_amount,
-            'requirements' => array_map(fn($requirement) => $requirement->specialty->name, $this->requirements->all()),
+            'requirements' => array_map(fn($requirement) => [
+                'id' => $requirement->specialty->id,
+                'name' => $requirement->specialty->name,
+            ], $this->requirements->all()),
         ];
     }
 }

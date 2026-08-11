@@ -9,7 +9,9 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property Patient $patient
- * @property int|null $patient_id
+ * @property int $patient_id
+ * @property MedicalDate $medicalDate
+ * @property int $medical_date_id
  * @property float $height
  * @property float $weight
  * @property float $blood_pressure_systolic

@@ -31,9 +31,9 @@ class VitalSignService
         });
     }
 
-    public function update(Request $request, Agreement $agreement)
+    public function update(Request $request, VitalSign $vitalSign)
     {
-        return DB::transaction(function () use ($request, $agreement) {
+        return DB::transaction(function () use ($request, $vitalSign) {
             return null;
         });
     }

@@ -1,8 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\AgreementController;
+use App\Http\Controllers\Api\AudiologyController;
+use App\Http\Controllers\Api\OdontologyController;
+use App\Http\Controllers\Api\OphthalmologyController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\PersonController;
+use App\Http\Controllers\Api\OccupationalMedicalDateController;
+use App\Http\Controllers\Api\VitalSignController;
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\PatientController;
@@ -17,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthenticationController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     Route::get('/persons', [PersonController::class, 'index']);
 
     Route::get('/users', [UserController::class, 'index'])->middleware('ability:read.users');
@@ -26,7 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/plans', [PlanController::class, 'index'])->middleware('ability:read.plans');
     Route::get('/plans/{plan}', [PlanController::class, 'show'])->middleware('ability:read.plans');
 
-    Route::get('/certificates', [CertificateController::class, 'index'])->middleware('ability:read.certificates');
     Route::get('/certificates/{certificate}', [CertificateController::class, 'show'])->middleware('ability:read.certificates')->name('certificate.show');
 
     Route::get('/patients', [PatientController::class, 'index'])->middleware('ability:read.patients');
@@ -44,8 +48,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medical_dates', [MedicalDateController::class, 'index'])->middleware('ability:read.medical_dates');
     Route::get('/medical_dates/{medicalDate}', [MedicalDateController::class, 'show'])->middleware('ability:read.medical_dates');
 
+    Route::get('/occupational_medical_dates', [OccupationalMedicalDateController::class, 'index'])->middleware('ability:read.occupational_medical_dates');
+    Route::get('/occupational_medical_dates/{occupationalMedicalDate}', [OccupationalMedicalDateController::class, 'show'])->middleware('ability:read.occupational_medical_dates');
+
     Route::get('/prescriptions', [PrescriptionController::class, 'index'])->middleware('ability:read.prescriptions');
     Route::get('/prescriptions/{prescription}', [PrescriptionController::class, 'show'])->middleware('ability:read.prescriptions');
+
+    Route::get('/vital_signs', [VitalSignController::class, 'index'])->middleware('ability:read.vital_signs');
+    Route::get('/vital_signs/{vitalSign}', [VitalSignController::class, 'show'])->middleware('ability:read.vital_signs');
 
     Route::get('/laboratory_orders', [LaboratoryOrderController::class, 'index'])->middleware('ability:read.laboratory_orders');
     Route::get('/laboratory_orders/{laboratoryOrder}', [LaboratoryOrderController::class, 'show'])->middleware('ability:read.laboratory_orders');
@@ -84,9 +94,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/prescriptions/{prescription}', [PrescriptionController::class, 'update'])->middleware('ability:update.prescriptions');
         Route::delete('/prescriptions/{prescription}', [PrescriptionController::class, 'destroy'])->middleware('ability:delete.prescriptions');
 
+        Route::post('/vital_signs', [VitalSignController::class, 'store'])->middleware('ability:create.vital_signs');
+        Route::put('/vital_signs/{vitalSign}', [VitalSignController::class, 'update'])->middleware('ability:update.vital_signs');
+        Route::delete('/vital_signs/{vitalSign}', [VitalSignController::class, 'destroy'])->middleware('ability:delete.vital_signs');
+
         Route::post('/laboratory_orders', [LaboratoryOrderController::class, 'store'])->middleware('ability:create.laboratory_orders');
         Route::put('/laboratory_orders/{laboratoryOrder}', [LaboratoryOrderController::class, 'update'])->middleware('ability:update.laboratory_orders');
         Route::delete('/laboratory_orders/{laboratoryOrder}', [LaboratoryOrderController::class, 'destroy'])->middleware('ability:delete.laboratory_orders');
+
+        Route::post('/occupational_medical_dates', [OccupationalMedicalDateController::class, 'store'])->middleware('ability:create.occupational_medical_dates');
+
+        Route::post('/audiology', [AudiologyController::class, 'store'])->middleware('ability:create.certificates');
+
+        Route::post('/odontology', [OdontologyController::class, 'store'])->middleware('ability:create.certificates');
+
+        Route::post('/ophthalmology', [OphthalmologyController::class, 'store'])->middleware('ability:create.certificates');
 
     });
 

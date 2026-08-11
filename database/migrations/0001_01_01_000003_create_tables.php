@@ -102,7 +102,7 @@ return new class extends Migration {
         Schema::create('vital_signs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('patient_id')->nullable(true)->constrained('patients')->nullOnDelete();
-            $table->foreignId('medical_date_id')->unique(true)->nullable(true)->constrained('medical_dates')->nullOnDelete();
+            $table->foreignId('medical_date_id')->unique(true)->nullable(false)->constrained('medical_dates')->cascadeOnDelete();
             $table->decimal('height', 5, 2)->nullable(false);
             $table->decimal('weight', 5, 2)->nullable(false);
             $table->decimal('blood_pressure_systolic', 5, 2)->nullable(false);

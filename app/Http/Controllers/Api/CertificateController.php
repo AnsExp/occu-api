@@ -20,22 +20,22 @@ class CertificateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MedicalDate $medicalDate)
+    public function show(Certificate $certificate)
     {
-        if ($path = $this->getFilePath($medicalDate->certificates()->first())) {
+        if ($path = $this->getFilePath($certificate)) {
 
             $user = auth()->user();
 
             if ($user->hasRole('administrator')) {
-                return $this->response($path, $medicalDate->code);
+                return $this->response($path, $certificate->medicalDate->code);
             }
 
-            if ($user->hasRole('doctor') && $user->person?->doctor?->id === $medicalDate->doctor_id) {
-                return $this->response($path, $medicalDate->code);
+            if ($user->hasRole('doctor') && $user->person?->doctor?->id === $certificate->doctor_id) {
+                return $this->response($path, $certificate->medicalDate->code);
             }
 
-            if ($user->hasRole('patient') && $user->person?->patient?->id === $medicalDate->patient_id) {
-                return $this->response($path, $medicalDate->code);
+            if ($user->hasRole('patient') && $user->person?->patient?->id === $certificate->patient_id) {
+                return $this->response($path, $certificate->medicalDate->code);
             }
 
             return response()->json(['message' => 'No tiene permiso para acceder a este recurso.'], 403);

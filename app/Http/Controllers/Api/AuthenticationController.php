@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Http\Controllers\Controller;
+
 class AuthenticationController extends Controller
 {
     public function login(Request $request)
@@ -22,8 +24,9 @@ class AuthenticationController extends Controller
         }
 
         $user = Auth::user();
+        $user->tokens()->delete();
         $abilities = $user->getAllPermissions()->pluck('name')->toArray();
-
+        $role = $user->roles()->first()?->name;
         $token = $user->createToken('auth_token', $abilities)->plainTextToken;
 
         return response()
@@ -33,6 +36,7 @@ class AuthenticationController extends Controller
                 'token' => $token,
                 'abilities' => $abilities,
                 'user' => [
+                    'role' => $role,
                     'name' => $user->name,
                     'email' => $user->email,
                 ],

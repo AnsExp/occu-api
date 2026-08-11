@@ -46,9 +46,7 @@ class OccupationalMedicineRequest extends FormRequest
     {
         $rules = [
             'timezone' => ['required', 'string'],
-            'doctor.id' => ['required', 'numeric', 'exists:doctors,id'],
-            'order.order_number' => ['required', 'numeric', 'exists:orders,order_number'],
-            'certificate_key' => ['nullable', 'string'],
+            'medical_date.id' => ['required', 'numeric', 'exists:medical_dates,id'],
             'medical_exam' => ['required', 'array'],
             'medical_exam.koh' => ['required', 'string'],
             'medical_exam.ecg' => ['required', 'string'],
@@ -84,7 +82,7 @@ class OccupationalMedicineRequest extends FormRequest
             'medical_exam.clinical_data.checks' => ['required', 'array'],
             'medical_exam.clinical_data.checks.*' => ['required', 'in:normal,abnormal'],
             'medical_exam.declarations' => ['required', 'array'],
-            'medical_exam.declarations.*.questions.*' => ['required', 'in:0,1'],
+            'medical_exam.declarations.*.questions.*' => ['required', 'boolean'],
             'medical_exam.declarations.*.aclarations' => ['nullable', 'string'],
             'medical_exam.observations' => ['nullable', 'string'],
         ];

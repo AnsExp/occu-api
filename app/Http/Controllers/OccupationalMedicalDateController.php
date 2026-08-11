@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OccupationalMedicalDateRequest;
 use App\Http\Services\OccupationalMedicalDateService;
 use App\Models\MedicalDate;
-use App\Models\OccupationalMedicalDate;
 use Illuminate\Http\RedirectResponse;
 
 class OccupationalMedicalDateController extends Controller

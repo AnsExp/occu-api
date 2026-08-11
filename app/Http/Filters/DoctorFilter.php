@@ -11,11 +11,9 @@ class DoctorFilter
     {
         $query = Doctor::query();
 
-        // if ($request->has('email')) {
-        //     $query->whereHas('person.user', function ($q) use ($request) {
-        //         $q->where('email', $request->input('email'));
-        //     });
-        // }
+        if ($request->has('is_occupational_doctor')) {
+            $query->where('is_occupational_doctor', filter_var($request->input('is_occupational_doctor'), FILTER_VALIDATE_BOOLEAN));
+        }
 
         if ($request->has('id_card')) {
             $query->whereHas('person', function ($q) use ($request) {

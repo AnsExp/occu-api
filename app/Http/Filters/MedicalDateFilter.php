@@ -10,6 +10,13 @@ class MedicalDateFilter
     public function query(Request $request)
     {
         $query = MedicalDate::query();
+        $user = $request->user();
+
+        if ($user->hasRole('doctor')) {
+            $query->where('doctor_id', $user->person->doctor->id);
+        } else if ($user->hasRole('patient')) {
+            $query->where('patient_id', $user->person->patient->id);
+        }
 
         if ($request->has('date')) {
             $query->where('date', $request->input('date'));
@@ -21,6 +28,10 @@ class MedicalDateFilter
 
         if ($request->has('doctor_id')) {
             $query->where('doctor_id', $request->input('doctor_id'));
+        }
+
+        if ($request->has('specialty_id')) {
+            $query->where('specialty_id', $request->input('specialty_id'));
         }
 
         if ($request->has('doctor_id_card')) {

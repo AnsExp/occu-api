@@ -24,12 +24,14 @@ class OccupationalMedicalDateRequest extends FormRequest
     {
         return [
             'timezone' => ['required', 'string'],
+            'date' => ['required', 'date'],
             'person.id' => ['required', 'exists:people,id'],
+            'doctor.id' => ['required', 'exists:doctors,id'],
             'medical_dates' => ['required', 'array'],
             'medical_dates.*.date' => ['required', 'date'],
             'medical_dates.*.doctor.id' => ['required', 'exists:doctors,id'],
             'medical_dates.*.specialty.id' => ['required', 'exists:specialties,id'],
-            'master_medical_date' => ['nullable', 'numeric', 'min:0'],
+            // 'master_medical_date' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 
