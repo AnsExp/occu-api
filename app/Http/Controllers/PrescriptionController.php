@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\PrescriptionFilter;
 use App\Http\Requests\PrescriptionRequest;
-use App\Http\Services\PrescriptionService;
 use App\Models\Prescription;
+use App\Http\Services\PrescriptionService;
+use App\Http\Resources\PrescriptionResource;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PrescriptionController extends Controller
 {
@@ -16,18 +19,11 @@ class PrescriptionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, PrescriptionFilter $filter)
     {
-        $data = Prescription::paginate(10);
-        return view('prescriptions.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('prescriptions.create');
+        $perPage = $request->input('per_page', 10);
+        $data = $filter->query($request)->paginate($perPage);
+        return PrescriptionResource::collection($data);
     }
 
     /**
@@ -36,7 +32,7 @@ class PrescriptionController extends Controller
     public function store(PrescriptionRequest $request)
     {
         $prescription = $this->prescriptionService->store($request);
-        return redirect()->route('prescriptions.show', compact('prescription'));
+        return PrescriptionResource::make($prescription);
     }
 
     /**
@@ -44,23 +40,25 @@ class PrescriptionController extends Controller
      */
     public function show(Prescription $prescription)
     {
-        return view('prescriptions.show', compact('prescription'));
+        return PrescriptionResource::make($prescription);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display the specified resource file.
      */
-    public function edit(Prescription $prescription)
+    public function file(Prescription $prescription)
     {
-        //
+        $pdf = Pdf::loadView('documents.prescription', compact('prescription'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
+        return $pdf->stream();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Prescription $prescription)
+    public function update(PrescriptionRequest $request, Prescription $prescription)
     {
-        //
+        $prescription = $this->prescriptionService->update($request, $prescription);
+        return PrescriptionResource::make($prescription);
     }
 
     /**
@@ -68,6 +66,7 @@ class PrescriptionController extends Controller
      */
     public function destroy(Prescription $prescription)
     {
-        //
+        $prescription->delete();
+        return response()->json(['message' => 'Prescription deleted successfully']);
     }
 }

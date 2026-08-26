@@ -1,37 +1,28 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Http\Requests\OrderOptionRequest;
+use App\Http\Filters\LaboratoryOrderFilter;
 use App\Http\Requests\LaboratoryOrderRequest;
-use App\Http\Services\LaboratoryOrderService;
 use App\Models\LaboratoryOrder;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Services\LaboratoryOrderService;
+use App\Http\Resources\LaboratoryOrderResource;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class LaboratoryOrderController extends Controller
 {
-    public function __construct(private LaboratoryOrderService $service)
+    public function __construct(private LaboratoryOrderService $laboratoryOrderService)
     {
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, LaboratoryOrderFilter $filter)
     {
-        $data = LaboratoryOrder::orderBy(
-            request('sort', 'created_at'),
-            request('direction', 'desc')
-        )->paginate(10);
-        return view('laboratory_order.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('laboratory_order.create');
+        $perPage = $request->input('per_page', 10);
+        $data = $filter->query($request)->paginate($perPage);
+        return LaboratoryOrderResource::collection($data);
     }
 
     /**
@@ -39,8 +30,8 @@ class LaboratoryOrderController extends Controller
      */
     public function store(LaboratoryOrderRequest $request)
     {
-        $laboratoryOrder = $this->service->store($request);
-        return redirect()->route('laboratory_orders.show', $laboratoryOrder);
+        $laboratoryOrder = $this->laboratoryOrderService->store($request);
+        return LaboratoryOrderResource::make($laboratoryOrder);
     }
 
     /**
@@ -48,41 +39,33 @@ class LaboratoryOrderController extends Controller
      */
     public function show(LaboratoryOrder $laboratoryOrder)
     {
-        $filePath = $laboratoryOrder->file;
-        if (!Storage::disk('local')->exists($filePath)) {
-            abort(404, 'PDF file not found.');
-        }
-        return response()->file(storage_path('app/private/' . $filePath), [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $laboratoryOrder->code . '.pdf"',
-        ]);
-    }
-
-    public function updateOptions(OrderOptionRequest $request)
-    {
+        return LaboratoryOrderResource::make($laboratoryOrder);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display the specified resource file.
      */
-    public function edit(LaboratoryOrder $order)
+    public function file(LaboratoryOrder $laboratoryOrder)
     {
-        abort(403, 'Unauthorized action.');
+        $pdf = Pdf::loadView('documents.laboratory_order', ['order' => $laboratoryOrder])->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
+        return $pdf->stream();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(LaboratoryOrderRequest $request, LaboratoryOrder $order)
+    public function update(LaboratoryOrderRequest $request, LaboratoryOrder $laboratoryOrder)
     {
-        abort(403, 'Unauthorized action.');
+        $laboratoryOrder = $this->laboratoryOrderService->update($request, $laboratoryOrder);
+        return LaboratoryOrderResource::make($laboratoryOrder);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LaboratoryOrder $order)
+    public function destroy(LaboratoryOrder $laboratoryOrder)
     {
-        abort(403, 'Unauthorized action.');
+        $laboratoryOrder->delete();
+        return response()->json(['message' => 'Laboratory order deleted successfully']);
     }
 }

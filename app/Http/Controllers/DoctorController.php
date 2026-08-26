@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\DoctorFilter;
 use App\Http\Requests\DoctorRequest;
 use App\Models\Doctor;
 use App\Http\Services\DoctorService;
+use App\Http\Resources\DoctorResource;
+use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
@@ -15,18 +18,11 @@ class DoctorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, DoctorFilter $filter)
     {
-        $data = Doctor::paginate(10);
-        return view('doctors.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('doctors.create');
+        $perPage = $request->input('per_page', 15);
+        $data = $filter->query($request)->paginate($perPage);
+        return DoctorResource::collection($data);
     }
 
     /**
@@ -35,7 +31,7 @@ class DoctorController extends Controller
     public function store(DoctorRequest $request)
     {
         $doctor = $this->doctorService->store($request);
-        return redirect()->route('doctors.show', $doctor);
+        return DoctorResource::make($doctor);
     }
 
     /**
@@ -43,15 +39,7 @@ class DoctorController extends Controller
      */
     public function show(Doctor $doctor)
     {
-        return view('doctors.show', compact('doctor'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Doctor $doctor)
-    {
-        return view('doctors.edit', compact('doctor'));
+        return DoctorResource::make($doctor);
     }
 
     /**
@@ -59,9 +47,8 @@ class DoctorController extends Controller
      */
     public function update(DoctorRequest $request, Doctor $doctor)
     {
-        // return response()->json($request->all());
         $doctor = $this->doctorService->update($request, $doctor);
-        return redirect()->route('doctors.show', $doctor);
+        return DoctorResource::make($doctor);
     }
 
     /**
@@ -69,6 +56,7 @@ class DoctorController extends Controller
      */
     public function destroy(Doctor $doctor)
     {
-        //
+        $doctor->delete();
+        return response()->json(['message' => 'Doctor deleted successfully']);
     }
 }

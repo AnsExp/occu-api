@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\SpecialtyFilter;
 use App\Http\Requests\SpecialtyRequest;
-use App\Http\Services\SpecialtyService;
 use App\Models\Specialty;
+use App\Http\Services\SpecialtyService;
+use App\Http\Resources\SpecialtyResource;
 use Illuminate\Http\Request;
 
 class SpecialtyController extends Controller
@@ -16,18 +18,11 @@ class SpecialtyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, SpecialtyFilter $filter)
     {
-        $data = Specialty::orderBy('name')->paginate(10);
-        return view('specialties.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('specialties.create');
+        $perPage = $request->input('per_page', 15);
+        $data = $filter->query($request)->paginate($perPage);
+        return SpecialtyResource::collection($data);
     }
 
     /**
@@ -36,7 +31,7 @@ class SpecialtyController extends Controller
     public function store(SpecialtyRequest $request)
     {
         $specialty = $this->specialtyService->store($request);
-        return redirect()->route('specialties.show', $specialty);
+        return SpecialtyResource::make($specialty);
     }
 
     /**
@@ -44,15 +39,7 @@ class SpecialtyController extends Controller
      */
     public function show(Specialty $specialty)
     {
-        return view('specialties.show', compact('specialty'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Specialty $specialty)
-    {
-        return view('specialties.edit', compact('specialty'));
+        return SpecialtyResource::make($specialty);
     }
 
     /**
@@ -61,7 +48,7 @@ class SpecialtyController extends Controller
     public function update(SpecialtyRequest $request, Specialty $specialty)
     {
         $specialty = $this->specialtyService->update($request, $specialty);
-        return redirect()->route('specialties.show', $specialty);
+        return SpecialtyResource::make($specialty);
     }
 
     /**
@@ -70,6 +57,6 @@ class SpecialtyController extends Controller
     public function destroy(Specialty $specialty)
     {
         $specialty->delete();
-        return redirect()->route('specialties.index');
+        return response()->json(['message' => 'Specialty deleted successfully']);
     }
 }

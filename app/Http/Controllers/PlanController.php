@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
 use App\Http\Requests\PlanRequest;
 use App\Models\Plan;
 use App\Http\Services\PlanService;
+use App\Http\Resources\PlanResource;
 
 class PlanController extends Controller
 {
@@ -15,24 +18,11 @@ class PlanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Plan::paginate(10);
-        return view('plans.index', compact('data'));
-    }
-
-    public function json()
-    {
-        $data = Plan::select('id', 'name', 'periodicity', 'description', 'features')->get();
-        return response()->json($data);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('plans.create');
+        $perPage = $request->query('per_page', 15);
+        $data = Plan::paginate($perPage);
+        return PlanResource::collection($data);
     }
 
     /**
@@ -41,7 +31,7 @@ class PlanController extends Controller
     public function store(PlanRequest $request)
     {
         $plan = $this->planService->store($request);
-        return redirect()->route('plans.show', $plan);
+        return PlanResource::make($plan);
     }
 
     /**
@@ -49,15 +39,7 @@ class PlanController extends Controller
      */
     public function show(Plan $plan)
     {
-        return view('plans.show', compact('plan'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Plan $plan)
-    {
-        return view('plans.edit', compact('plan'));
+        return PlanResource::make($plan);
     }
 
     /**
@@ -66,7 +48,7 @@ class PlanController extends Controller
     public function update(PlanRequest $request, Plan $plan)
     {
         $plan = $this->planService->update($request, $plan);
-        return redirect()->route('plans.show', $plan);
+        return PlanResource::make($plan);
     }
 
     /**
@@ -75,6 +57,6 @@ class PlanController extends Controller
     public function destroy(Plan $plan)
     {
         $plan->delete();
-        return redirect()->route('plans.index');
+        return response()->json(['message' => 'Plan deleted successfully']);
     }
 }

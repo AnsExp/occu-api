@@ -1,26 +1,26 @@
 <?php
 
-use App\Http\Controllers\Api\AgreementController;
-use App\Http\Controllers\Api\AllowedIpController;
-use App\Http\Controllers\Api\AudiologyController;
-use App\Http\Controllers\Api\AuditLogController;
-use App\Http\Controllers\Api\OdontologyController;
-use App\Http\Controllers\Api\OphthalmologyController;
-use App\Http\Controllers\Api\PersonalDataController;
-use App\Http\Controllers\Api\DoctorController;
-use App\Http\Controllers\Api\OccupationalMedicalDateController;
-use App\Http\Controllers\Api\PlanController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\VitalSignController;
-use App\Http\Controllers\Api\AuthenticationController;
-use App\Http\Controllers\Api\CertificateController;
-use App\Http\Controllers\Api\PatientController;
-use App\Http\Controllers\Api\PrescriptionController;
-use App\Http\Controllers\Api\LaboratoryOptionController;
-use App\Http\Controllers\Api\LaboratoryOrderController;
-use App\Http\Controllers\Api\MedicalDateController;
-use App\Http\Controllers\Api\SpecialtyController;
-use App\Http\Controllers\Api\MedicationController;
+use App\Http\Controllers\AgreementController;
+use App\Http\Controllers\AllowedIpController;
+use App\Http\Controllers\AudiologyController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\OdontologyController;
+use App\Http\Controllers\OphthalmologyController;
+use App\Http\Controllers\PersonalDataController;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\OccupationalMedicalDateController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VitalSignController;
+use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PrescriptionController;
+use App\Http\Controllers\LaboratoryOptionController;
+use App\Http\Controllers\LaboratoryOrderController;
+use App\Http\Controllers\MedicalDateController;
+use App\Http\Controllers\SpecialtyController;
+use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\CheckIPController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,13 +78,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/audit_logs', [AuditLogController::class, 'index'])->middleware('ability:read.audit_logs');
     Route::get('/audit_logs/{auditLog}', [AuditLogController::class, 'show'])->middleware('ability:read.audit_logs');
-    
+
     Route::get('/allowed_ips', [AllowedIpController::class, 'index'])->middleware('ability:read.allowed_ips');
     Route::get('/allowed_ips/{allowedIp}', [AllowedIpController::class, 'show'])->middleware('ability:read.allowed_ips');
 
     Route::get('/check_ip', CheckIPController::class);
 
     Route::middleware('allowed_ip')->group(function () {
+
+        Route::post('/allowed_ips', [AllowedIpController::class, 'store'])->middleware('ability:create.allowed_ips');
+        Route::put('/allowed_ips/{allowedIp}', [AllowedIpController::class, 'update'])->middleware('ability:update.allowed_ips');
+        Route::delete('/allowed_ips/{allowedIp}', [AllowedIpController::class, 'destroy'])->middleware('ability:delete.allowed_ips');
 
         Route::post('/patients', [PatientController::class, 'store'])->middleware('ability:create.patients');
         Route::put('/patients/{patient}', [PatientController::class, 'update'])->middleware('ability:update.patients');

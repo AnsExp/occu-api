@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\Doctor;
-use App\Rules\UniqueCertificateTypePerOrder;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -36,7 +35,6 @@ class RadiologyRequest extends FormRequest
     {
         return [
             'timezone' => ['required', 'string'],
-            'order.order_number' => ['required', 'numeric', 'exists:orders,order_number', new UniqueCertificateTypePerOrder('radiology')],
             'medical_exam' => ['required', 'array'],
             'medical_exam.technique' => ['required', 'string'],
             'medical_exam.report' => ['required', 'string'],

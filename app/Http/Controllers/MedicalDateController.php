@@ -5,68 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\MedicalDateRequest;
 use App\Models\MedicalDate;
 use App\Http\Services\MedicalDateService;
+use App\Http\Resources\MedicalDateResource;
+use Illuminate\Http\Request;
+use App\Http\Filters\MedicalDateFilter;
 
 class MedicalDateController extends Controller
 {
     public function __construct(private MedicalDateService $medicalDateService)
     {
-        $this->authorizeResource(MedicalDate::class, 'medicalDate');
-    }
-
-    public function json()
-    {
-        $data = MedicalDate::with(['doctor.person', 'specialty'])->paginate(2);
-
-        $custom = [
-            'meta' => [
-                'current_page' => $data->currentPage(),
-                'previous_page' => $data->previousPageUrl(),
-                'last_page' => $data->lastPage(),
-                'next_page' => $data->nextPageUrl(),
-                'total' => $data->total(),
-                'per_page' => $data->perPage(),
-            ],
-            'data' => $data->map(fn($date) => [
-                'code' => $date->code,
-                'date' => $date->date,
-                'doctor' => $date->doctor?->person?->fullname,
-                'specialty' => $date->specialty?->name,
-                'certificate_url' => route('dashboard.show', ['specialty' => $date->specialty?->slug, 'medicalDate' => $date->code]),
-            ]),
-        ];
-
-        return response()->json($custom);
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, MedicalDateFilter $filter)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403, 'No tiene permiso para acceder a este recurso.');
-        }
-
-        if ($user->hasRole('administrator')) {
-            $data = MedicalDate::orderBy('date', 'desc')->paginate(10);
-        } elseif ($user->hasRole('doctor')) {
-            $data = MedicalDate::where('doctor_id', $user->person->doctor->id)->orderBy('date', 'desc')->paginate(10);
-        } else {
-            abort(403, 'No tienes permiso para acceder a este recurso');
-        }
-
-        return view('medical_dates.index', compact('data'));
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('medical_dates.create');
+        // $request->merge(['type' => 'normal']);
+        $perPage = $request->input('per_page', 10);
+        $data = $filter->query($request)->paginate($perPage);
+        return MedicalDateResource::collection($data);
     }
 
     /**
@@ -74,8 +31,8 @@ class MedicalDateController extends Controller
      */
     public function store(MedicalDateRequest $request)
     {
-        $medical_date = $this->medicalDateService->store($request);
-        return redirect()->route('medical_dates.show', compact('medical_date'));
+        $medicalDate = $this->medicalDateService->store($request);
+        return MedicalDateResource::make($medicalDate);
     }
 
     /**
@@ -83,21 +40,16 @@ class MedicalDateController extends Controller
      */
     public function show(MedicalDate $medicalDate)
     {
-        $user = auth()->user();
-
-        if (!$user) {
-            abort(403, 'No tiene permiso para acceder a este recurso.');
-        }
-
-        return view('medical_dates.show', compact('medicalDate'));
+        return MedicalDateResource::make($medicalDate);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(MedicalDate $medicalDate)
+    public function file(MedicalDate $medicalDate)
     {
-        return view('medical_dates.edit', compact('medicalDate'));
+        $certificate = $medicalDate->certificate;
+        if (!$certificate || !$certificate->file || !occu_storage()->exists($certificate->file)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        return response()->file(occu_storage()->path($certificate->file));
     }
 
     /**
@@ -105,9 +57,8 @@ class MedicalDateController extends Controller
      */
     public function update(MedicalDateRequest $request, MedicalDate $medicalDate)
     {
-        // return response()->json($request->all());
-        $medical_date = $this->medicalDateService->update($request, $medicalDate);
-        return redirect()->route('medical_dates.show', compact('medical_date'));
+        $medicalDate = $this->medicalDateService->update($request, $medicalDate);
+        return MedicalDateResource::make($medicalDate);
     }
 
     /**
@@ -115,6 +66,7 @@ class MedicalDateController extends Controller
      */
     public function destroy(MedicalDate $medicalDate)
     {
-        abort(403, 'No tienes permitido realizar esta acción. Ponte en contacto con el equipo de sistemas.');
+        $medicalDate->delete();
+        return response()->json(['message' => 'Medical date deleted successfully']);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\VitalSignFilter;
 use App\Http\Requests\VitalSignRequest;
-use App\Http\Services\VitalSignService;
-use App\Models\MedicalDate;
-use App\Models\Specialty;
 use App\Models\VitalSign;
+use App\Http\Services\VitalSignService;
+use App\Http\Resources\VitalSignResource;
+use Illuminate\Http\Request;
 
 class VitalSignController extends Controller
 {
@@ -17,21 +18,11 @@ class VitalSignController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, VitalSignFilter $filter)
     {
-        abort(403, 'No tienes permiso para realizar esta acción.');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Specialty $specialty, MedicalDate $medicalDate)
-    {
-        if ($medicalDate->vital_signs_id) {
-            abort(403, 'Ya se han tomado los signos vitales para está cita médica');
-        }
-        $specialty = $medicalDate->doctor->specialty;
-        return view('vital_signs.create', compact('medicalDate', 'specialty'));
+        $perPage = $request->input('per_page', 10);
+        $data = $filter->query($request)->paginate($perPage);
+        return VitalSignResource::collection($data);
     }
 
     /**
@@ -39,19 +30,8 @@ class VitalSignController extends Controller
      */
     public function store(VitalSignRequest $request)
     {
-        if (!hash_equals($request->session()->token(), $request->input('_token', ''))) {
-            abort(419, 'Token CSRF inválido');
-        }
-
-        $medicalDate = MedicalDate::find($request->input('medical_date.id'));
-        $specialty = Specialty::find($request->input('specialty.id'));
-
-        if ($medicalDate?->vital_signs_id) {
-            abort(403, 'Ya se han tomado los signos vitales para está cita médica');
-        }
-
-        $this->vitalSignService->store($request);
-        return redirect()->route('dashboard.index', [$specialty, $medicalDate]);
+        $vitalSign = $this->vitalSignService->store($request);
+        return VitalSignResource::make($vitalSign);
     }
 
     /**
@@ -59,15 +39,7 @@ class VitalSignController extends Controller
      */
     public function show(VitalSign $vitalSign)
     {
-        abort(403, 'No tienes permiso para realizar esta acción.');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(VitalSign $vitalSign)
-    {
-        abort(403, 'No tienes permiso para realizar esta acción.');
+        return VitalSignResource::make($vitalSign);
     }
 
     /**
@@ -75,7 +47,8 @@ class VitalSignController extends Controller
      */
     public function update(VitalSignRequest $request, VitalSign $vitalSign)
     {
-        abort(403, 'No tienes permiso para realizar esta acción.');
+        $vitalSign = $this->vitalSignService->update($request, $vitalSign);
+        return VitalSignResource::make($vitalSign);
     }
 
     /**
@@ -83,6 +56,7 @@ class VitalSignController extends Controller
      */
     public function destroy(VitalSign $vitalSign)
     {
-        abort(403, 'No tienes permiso para realizar esta acción.');
+        $vitalSign->delete();
+        return response()->json(['message' => 'Vital sign deleted successfully']);
     }
 }

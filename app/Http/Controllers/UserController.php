@@ -2,36 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\UserFilter;
 use App\Http\Requests\UserRequest;
-use App\Http\Services\UserService;
 use App\Models\User;
-use App\Policies\UserPolicy;
+use App\Http\Services\UserService;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function __construct(
-        private UserService $userService,
-        private UserPolicy $policy
-    ) {
-        $this->authorizeResource(User::class, 'user');
+    public function __construct(private UserService $userService)
+    {
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, UserFilter $filter)
     {
-        $data = User::paginate(10);
-        return view('users.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('users.create');
+        $perPage = $request->query('per_page', 15);
+        $data = $filter->query($request)->paginate($perPage);
+        return UserResource::collection($data);
     }
 
     /**
@@ -39,8 +30,8 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $this->userService->store($request);
-        return redirect()->route('users.index')->with('status', __('users.create.success'));
+        $user = $this->userService->store($request);
+        return UserResource::make($user);
     }
 
     /**
@@ -48,15 +39,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        return view('users.edit', compact('user'));
+        return UserResource::make($user);
     }
 
     /**
@@ -64,21 +47,8 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
-        return response()->json($request->validated());
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function changePassword(Request $request, User $user)
-    {
-        $validated = $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'password_confirmation' => ['required', 'string', 'min:8', 'same:password'],
-        ]);
-        $user->password = bcrypt($validated['password']);
-        $user->save();
-        return redirect()->route('home');
+        $user = $this->userService->update($request, $user);
+        return UserResource::make($user);
     }
 
     /**
@@ -86,6 +56,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return response()->json(['message' => 'User deleted successfully']);
     }
 }

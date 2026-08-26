@@ -2,25 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Http\Controllers\Controller;
+
 class AuthenticationController extends Controller
 {
-    public function index()
-    {
-        return view('authentication.login');
-    }
-
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('login');
-    }
-
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -29,21 +17,54 @@ class AuthenticationController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return back()->withErrors(['email' => 'Las credenciales no son correctas.'])->onlyInput('email');
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
         }
 
-        $request->session()->regenerate();
+        $user = Auth::user();
+        // $user->tokens()->delete();
+        $abilities = $user->getAllPermissions()->pluck('name')->toArray();
+        $token = $user->createToken('auth_token', $abilities)->plainTextToken;
 
-        return redirect()->intended(route('home'));
+        return response()
+            ->json([
+                'success' => true,
+                'message' => 'Authorization complete.',
+                'token' => $token,
+                'abilities' => $abilities,
+                'user' => [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->roles()->pluck('name')->toArray(),
+                ],
+            ], 200);
     }
 
-    public function changePassword(Request $request, User $user)
+    public function logout(Request $request)
     {
-        $credentials = $request->validate(['password' => ['required', 'string', 'confirmed', 'min:8']]);
+        $user = Auth::user();
+        $user->tokens()->delete();
+        return response()->json(['message' => 'Logged out successfully.'], 200);
+    }
 
-        $user->password = bcrypt($credentials['password']);
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = Auth::user();
+
+        if (!\Hash::check($request->input('current_password', ''), $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect.'], 400);
+        }
+
+        $user->password = \Hash::make($request->input('new_password'));
         $user->save();
 
-        return redirect()->back()->with('status', 'Contraseña actualizada correctamente.');
+        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 }

@@ -2,36 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Filters\PatientFilter;
 use App\Http\Requests\PatientRequest;
-use App\Http\Requests\PatientUpdateRequest;
-use App\Http\Services\PatientService;
 use App\Models\Patient;
-use App\Policies\PatientPolicy;
+use App\Http\Services\PatientService;
+use App\Http\Resources\PatientResource;
+use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
-    public function __construct(
-        private PatientService $patientService,
-        private PatientPolicy $policy
-    ) {
-        $this->authorizeResource(Patient::class, 'patient');
+    public function __construct(private PatientService $patientService)
+    {
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, PatientFilter $filter)
     {
-        $data = Patient::paginate(10);
-        return view('patients.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('patients.create');
+        $perPage = $request->input('per_page', 15);
+        $data = $filter->query($request)->paginate($perPage);
+        return PatientResource::collection($data);
     }
 
     /**
@@ -39,9 +30,8 @@ class PatientController extends Controller
      */
     public function store(PatientRequest $request)
     {
-        // return response()->json($request->all());
         $patient = $this->patientService->store($request);
-        return redirect()->route('patients.show', $patient);
+        return PatientResource::make($patient);
     }
 
     /**
@@ -49,25 +39,16 @@ class PatientController extends Controller
      */
     public function show(Patient $patient)
     {
-        return view('patients.show', compact('patient'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Patient $patient)
-    {
-        return view('patients.edit', compact('patient'));
+        return PatientResource::make($patient);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PatientUpdateRequest $request, Patient $patient)
+    public function update(PatientRequest $request, Patient $patient)
     {
-        // return response()->json($request->validated());
         $patient = $this->patientService->update($request, $patient);
-        return redirect()->route('patients.show', $patient);
+        return PatientResource::make($patient);
     }
 
     /**
@@ -75,6 +56,7 @@ class PatientController extends Controller
      */
     public function destroy(Patient $patient)
     {
-        abort(403, 'Unauthorized action.');
+        $patient->delete();
+        return response()->json(['message' => 'Patient deleted successfully']);
     }
 }

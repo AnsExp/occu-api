@@ -6,7 +6,7 @@ use App\Http\Requests\AgreementRequest;
 use App\Models\Agreement;
 use Illuminate\Http\Request;
 use App\Http\Services\AgreementService;
-
+use App\Http\Resources\AgreementResource;
 class AgreementController extends Controller
 {
     public function __construct(private AgreementService $agreementService)
@@ -16,18 +16,11 @@ class AgreementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Agreement::paginate(10);
-        return view('agreements.index', compact('data'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('agreements.create');
+        $perPage = $request->input('per_page', 15);
+        $data = Agreement::paginate($perPage);
+        return AgreementResource::collection($data);
     }
 
     /**
@@ -36,7 +29,7 @@ class AgreementController extends Controller
     public function store(AgreementRequest $request)
     {
         $agreement = $this->agreementService->store($request);
-        return redirect()->route('agreements.show', $agreement);
+        return AgreementResource::make($agreement);
     }
 
     /**
@@ -44,15 +37,7 @@ class AgreementController extends Controller
      */
     public function show(Agreement $agreement)
     {
-        return view('agreements.show', compact('agreement'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Agreement $agreement)
-    {
-        return view('agreements.edit', compact('agreement'));
+        return AgreementResource::make($agreement);
     }
 
     /**
@@ -61,7 +46,7 @@ class AgreementController extends Controller
     public function update(Request $request, Agreement $agreement)
     {
         $agreement = $this->agreementService->update($request, $agreement);
-        return redirect()->route('agreements.show', $agreement);
+        return AgreementResource::make($agreement);
     }
 
     /**
@@ -69,6 +54,7 @@ class AgreementController extends Controller
      */
     public function destroy(Agreement $agreement)
     {
-        //
+        $agreement->delete();
+        return response()->json(['message' => 'Agreement deleted successfully.'], 200);
     }
 }

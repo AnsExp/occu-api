@@ -219,7 +219,7 @@ return new class extends Migration {
         Schema::create('allowed_ips', function (Blueprint $table) {
             $table->id();
             $table->string('ip_address', 15)->unique(true)->nullable(false);
-            $table->string('notes')->nullable(false);
+            $table->string('notes')->nullable(true);
             $table->timestamp('expires_at')->nullable(true);
             $table->timestamps();
         });

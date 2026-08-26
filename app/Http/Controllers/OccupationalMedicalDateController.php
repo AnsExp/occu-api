@@ -3,47 +3,73 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OccupationalMedicalDateRequest;
-use App\Http\Services\OccupationalMedicalDateService;
 use App\Models\MedicalDate;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Services\OccupationalMedicalDateService;
+use App\Http\Resources\MedicalDateResource;
+use Illuminate\Http\Request;
+use App\Http\Filters\MedicalDateFilter;
 
 class OccupationalMedicalDateController extends Controller
 {
-    public function __construct(private OccupationalMedicalDateService $groupMedicalDateService)
+    public function __construct(private OccupationalMedicalDateService $medicalDateService)
     {
     }
 
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request, MedicalDateFilter $filter)
     {
-        $user = auth()->user();
-        if (!$user) {
-            abort(403, 'No tienen permitido acceder a este recurso.');
-        }
-        if ($user->hasRole('administrator')) {
-            $data = MedicalDate::where('type', 'occupational')->paginate(10);
-        } else if ($user->hasRole('doctor')) {
-            if ($user?->person?->doctor?->is_occupational_doctor) {
-                $data = MedicalDate::where('type', 'occupational')->where('occupational_doctor_id', $user->person->doctor->id)->paginate(10);
-            } else {
-                abort(403, 'No tienen permitido acceder a este recurso.');
+        $user = $request->user();
+        $request->merge(['type' => 'occupational']);
+        if ($user->hasRole('doctor')) {
+            if ($user->person?->doctor?->is_occupational_doctor) {
+                $request->merge([
+                    'doctor_id' => $user->person->doctor->id,
+                ]);
             }
+        } else if ($user->hasRole('patient')) {
+            $request->merge([
+                'patient_id' => $user->person->patient->id,
+            ]);
         }
-        return view('occupational_medical_dates.index', compact('data'));
+        $perPage = $request->input('per_page', 10);
+        $data = $filter->query($request)->paginate($perPage);
+        return MedicalDateResource::collection($data);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(OccupationalMedicalDateRequest $request)
+    {
+        $medicalDate = $this->medicalDateService->store($request);
+        return MedicalDateResource::make($medicalDate);
+    }
+
+    /**
+     * Display the specified resource.
+     */
     public function show(MedicalDate $medicalDate)
     {
-        return view('occupational_medical_dates.show', compact('medicalDate'));
+        return MedicalDateResource::make($medicalDate);
     }
 
-    public function create()
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(OccupationalMedicalDateRequest $request, MedicalDate $medicalDate)
     {
-        return view('occupational_medical_dates.create');
+        $medicalDate = $this->medicalDateService->update($request, $medicalDate);
+        return MedicalDateResource::make($medicalDate);
     }
 
-    public function store(OccupationalMedicalDateRequest $request): RedirectResponse
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(MedicalDate $medicalDate)
     {
-        $this->groupMedicalDateService->store($request);
-        return redirect()->route('medical_dates.index')->with('success', 'Citas médicas ocupacionales registradas correctamente.');
+        $medicalDate->delete();
+        return response()->json(['message' => 'Medical date deleted successfully']);
     }
 }
