@@ -3,19 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Observers\PrescriptionObserver;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property int $doctor_id
+ * @property int|null $doctor_id
  * @property int $patient_id
- * @property Doctor $doctor
+ * @property Doctor|null $doctor
  * @property Patient $patient
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(PrescriptionObserver::class)]
 class Prescription extends Model
 {
     use SoftDeletes;
@@ -25,14 +28,6 @@ class Prescription extends Model
         'doctor_id',
         'patient_id',
         'timezone',
-        'notes',
-        'sha256',
-        'file',
-        'snapshot',
-    ];
-
-    protected $casts = [
-        'snapshot' => 'json',
     ];
 
     public function medications()
@@ -58,5 +53,10 @@ class Prescription extends Model
     public function getPrettyUpdatedAtAttribute()
     {
         return $this->updated_at->setTimezone($this->timezone)->translatedFormat('F j, Y H:i A');
+    }
+
+    public function document()
+    {
+        return $this->morphOne(Document::class, 'documentable');
     }
 }

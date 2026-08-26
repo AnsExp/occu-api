@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Doctor;
-use App\Models\Person;
+use App\Models\PersonalData;
 use App\Models\Specialty;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -49,10 +49,13 @@ class DoctorSeeder extends Seeder
     public function run(): void
     {
         foreach (Specialty::all() as $index => $specialty) {
+
             if (!isset($this->doctors[$index])) {
                 break;
             }
+
             $doctor = $this->doctors[$index];
+
             $user = User::updateOrCreate(
                 ['email' => $doctor['email']],
                 [
@@ -61,20 +64,24 @@ class DoctorSeeder extends Seeder
                     'password' => bcrypt($doctor['id_card']),
                 ]
             );
+
             $user->assignRole('doctor');
-            $person = Person::updateOrCreate(
+
+            $person = PersonalData::updateOrCreate(
                 ['id_card' => $doctor['id_card']],
                 [
                     'first_name' => $doctor['first_name'],
                     'last_name' => $doctor['last_name'],
                     'id_card' => $doctor['id_card'],
-                    'user_id' => $user->id,
+                    'email' => $doctor['email'],
                 ]
             );
+
             Doctor::updateOrCreate(
-                ['person_id' => $person->id],
+                ['personal_data_id' => $person->id],
                 [
                     'specialty_id' => $specialty->id,
+                    'user_id' => $user->id,
                 ]
             );
         }

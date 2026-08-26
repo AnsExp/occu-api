@@ -38,25 +38,26 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('people', function (Blueprint $table) {
+        Schema::create('personal_data', function (Blueprint $table) {
             $table->id();
             $table->string('first_name')->nullable(false);
             $table->string('last_name')->nullable(false);
             $table->string('phone')->nullable(true);
+            $table->string('email')->nullable(true);
             $table->string('id_card')->nullable(false);
             $table->string('id_card_file')->nullable(true);
             $table->enum('gender', ['male', 'female', 'other'])->nullable(true);
             $table->date('birth_date')->nullable(true);
             $table->string('nationality')->nullable(true);
-            $table->foreignId('user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
 
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('person_id')->nullable(false)->constrained('people')->cascadeOnDelete();
+            $table->foreignId('personal_data_id')->nullable(false)->constrained('personal_data')->cascadeOnDelete();
             $table->foreignId('specialty_id')->nullable(false)->constrained('specialties')->cascadeOnDelete();
+            $table->foreignId('user_id')->unique(true)->nullable(true)->constrained('users')->cascadeOnDelete();
             $table->boolean('is_occupational_doctor')->nullable(false)->default(false);
             $table->timestamps();
             $table->softDeletes();
@@ -64,8 +65,9 @@ return new class extends Migration {
 
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('person_id')->nullable(false)->constrained('people')->cascadeOnDelete();
+            $table->foreignId('personal_data_id')->nullable(false)->constrained('personal_data')->cascadeOnDelete();
             $table->foreignId('agreement_id')->nullable(true)->constrained('agreements')->cascadeOnDelete();
+            $table->foreignId('user_id')->unique(true)->nullable(true)->constrained('users')->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -73,13 +75,13 @@ return new class extends Migration {
         Schema::create('medical_dates', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(true)->nullable(false);
+            $table->enum('type', ['normal', 'occupational'])->nullable(false)->default('normal');
+            $table->date('date')->default(now())->nullable(false);
+            $table->integer('shift')->nullable(false)->default(1);
             $table->foreignId('doctor_id')->nullable(false)->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('patient_id')->nullable(false)->constrained('patients')->cascadeOnDelete();
             $table->foreignId('specialty_id')->nullable(true)->constrained('specialties')->cascadeOnDelete();
-            $table->date('date')->default(now())->nullable(false);
-            $table->enum('type', ['normal', 'occupational'])->nullable(false)->default('normal');
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->integer('order')->nullable(false)->default(1);
+            $table->string('timezone')->nullable(true)->default('America/Guayaquil');
             $table->timestamps();
             $table->softDeletes();
 
@@ -116,29 +118,12 @@ return new class extends Migration {
             $table->unique(['patient_id', 'medical_date_id']);
         });
 
-        Schema::create('certificates', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('medical_date_id')->nullable(true)->constrained('medical_dates')->nullOnDelete();
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->string('sha256')->nullable(false);
-            $table->string('file')->nullable(false);
-            $table->json('snapshot')->nullable(false);
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->index('medical_date_id');
-        });
-
         Schema::create('prescriptions', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique(true)->nullable(false);
-            $table->foreignId('doctor_id')->nullable(false)->constrained('doctors')->cascadeOnDelete();
+            $table->foreignId('doctor_id')->nullable(true)->constrained('doctors')->cascadeOnDelete();
             $table->foreignId('patient_id')->nullable(false)->constrained('patients')->cascadeOnDelete();
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->text('notes')->nullable(true);
-            $table->string('sha256')->nullable(false);
-            $table->string('file')->nullable(false);
-            $table->json('snapshot')->nullable(false);
+            $table->string('timezone')->nullable(true)->default('America/Guayaquil');
             $table->timestamps();
             $table->softDeletes();
 
@@ -158,6 +143,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('prescription_id')->nullable(false)->constrained('prescriptions')->cascadeOnDelete();
             $table->foreignId('medication_id')->nullable(false)->constrained('medications')->cascadeOnDelete();
+            $table->string('name')->nullable(false);
+            $table->decimal('price', 10, 2)->nullable(false)->default(0.00);
             $table->integer('quantity')->nullable(false)->default(1);
             $table->text('notes')->nullable(true);
             $table->timestamps();
@@ -180,12 +167,10 @@ return new class extends Migration {
 
         Schema::create('laboratory_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->string('code')->unique();
-            $table->string('timezone')->nullable(false)->default('America/Guayaquil');
-            $table->string('sha256')->nullable(false);
-            $table->string('file')->nullable(false);
-            $table->json('snapshot')->nullable(false);
+            $table->foreignId('doctor_id')->nullable(true)->constrained('doctors')->cascadeOnDelete();
+            $table->foreignId('patient_id')->constrained('patients')->cascadeOnDelete();
+            $table->string('timezone')->nullable(true)->default('America/Guayaquil');
             $table->timestamps();
             $table->softDeletes();
 
@@ -204,6 +189,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('laboratory_order_id')->nullable(false)->constrained('laboratory_orders')->cascadeOnDelete();
             $table->foreignId('laboratory_option_id')->nullable(false)->constrained('laboratory_options')->cascadeOnDelete();
+            $table->string('name')->nullable(false);
+            $table->decimal('price', 10, 2)->default(0.00);
             $table->integer('quantity')->nullable(false)->default(1);
             $table->timestamps();
             $table->softDeletes();
@@ -215,9 +202,8 @@ return new class extends Migration {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
             $table->string('table', 100);
-            $table->unsignedBigInteger('table_id');
-            $table->enum('level', ['info', 'warning', 'error', 'critical'])->default('info');
-            $table->enum('action', ['create', 'update', 'delete'])->nullable(false);
+            $table->unsignedBigInteger('record_id');
+            $table->enum('action', ['created', 'updated', 'deleted'])->nullable(false);
             $table->json('changes')->nullable(false);
             $table->foreignId('user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
             $table->string('ip_address', 45)->nullable();
@@ -225,15 +211,14 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->index('table');
-            $table->index(['table', 'table_id']);
-            $table->index(['table', 'table_id', 'action']);
-            $table->index(['table', 'table_id', 'level']);
+            $table->index(['table', 'record_id']);
+            $table->index(['table', 'record_id', 'action']);
             $table->index(['user_id', 'action']);
         });
 
         Schema::create('allowed_ips', function (Blueprint $table) {
             $table->id();
-            $table->string('ip', 15)->unique(true)->nullable(false);
+            $table->string('ip_address', 15)->unique(true)->nullable(false);
             $table->string('notes')->nullable(false);
             $table->timestamp('expires_at')->nullable(true);
             $table->timestamps();
@@ -241,9 +226,20 @@ return new class extends Migration {
 
         Schema::create('metadata', function (Blueprint $table) {
             $table->id();
-            $table->morphs('model');
+            $table->morphs('modelable');
             $table->string('key')->nullable(false);
             $table->text('value')->nullable(false);
+        });
+
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('documentable');
+            $table->string('timezone')->nullable(true);
+            $table->json('snapshot')->nullable(true);
+            $table->string('sha256')->unique(true)->nullable(false);
+            $table->string('file')->nullable(false);
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('options', function (Blueprint $table) {
@@ -259,6 +255,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('options');
+        Schema::dropIfExists('documents');
         Schema::dropIfExists('metadata');
         Schema::dropIfExists('allowed_ips');
         Schema::dropIfExists('audit_logs');
@@ -269,13 +266,12 @@ return new class extends Migration {
         Schema::dropIfExists('prescription_medications');
         Schema::dropIfExists('medications');
         Schema::dropIfExists('prescriptions');
-        Schema::dropIfExists('certificates');
         Schema::dropIfExists('vital_signs');
         Schema::dropIfExists('medical_date_relationships');
         Schema::dropIfExists('medical_dates');
         Schema::dropIfExists('patients');
         Schema::dropIfExists('doctors');
-        Schema::dropIfExists('people');
+        Schema::dropIfExists('personal_data');
         Schema::dropIfExists('agreement_requirements');
         Schema::dropIfExists('agreements');
         Schema::dropIfExists('specialties');

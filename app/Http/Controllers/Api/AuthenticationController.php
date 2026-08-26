@@ -24,9 +24,8 @@ class AuthenticationController extends Controller
         }
 
         $user = Auth::user();
-        $user->tokens()->delete();
+        // $user->tokens()->delete();
         $abilities = $user->getAllPermissions()->pluck('name')->toArray();
-        $role = $user->roles()->first()?->name;
         $token = $user->createToken('auth_token', $abilities)->plainTextToken;
 
         return response()
@@ -36,9 +35,9 @@ class AuthenticationController extends Controller
                 'token' => $token,
                 'abilities' => $abilities,
                 'user' => [
-                    'role' => $role,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'roles' => $user->roles()->pluck('name')->toArray(),
                 ],
             ], 200);
     }
@@ -48,5 +47,24 @@ class AuthenticationController extends Controller
         $user = Auth::user();
         $user->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully.'], 200);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = Auth::user();
+
+        if (!\Hash::check($request->input('current_password', ''), $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect.'], 400);
+        }
+
+        $user->password = \Hash::make($request->input('new_password'));
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 }

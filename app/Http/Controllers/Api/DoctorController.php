@@ -31,7 +31,7 @@ class DoctorController extends Controller
     public function store(DoctorRequest $request)
     {
         $doctor = $this->doctorService->store($request);
-        return new DoctorResource($doctor);
+        return DoctorResource::make($doctor);
     }
 
     /**
@@ -39,7 +39,7 @@ class DoctorController extends Controller
      */
     public function show(Doctor $doctor)
     {
-        return new DoctorResource($doctor);
+        return DoctorResource::make($doctor);
     }
 
     /**
@@ -48,7 +48,7 @@ class DoctorController extends Controller
     public function update(DoctorRequest $request, Doctor $doctor)
     {
         $doctor = $this->doctorService->update($request, $doctor);
-        return new DoctorResource($doctor);
+        return DoctorResource::make($doctor);
     }
 
     /**

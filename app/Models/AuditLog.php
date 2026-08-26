@@ -8,9 +8,8 @@ class AuditLog extends Model
 {
     protected $fillable = [
         'table',
-        'table_id',
+        'record_id',
         'action',
-        'level',
         'changes',
         'user_id',
         'ip_address',

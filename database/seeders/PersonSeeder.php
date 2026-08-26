@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Person;
-use App\Models\User;
+use App\Models\PersonalData;
 use Illuminate\Database\Seeder;
 
 class PersonSeeder extends Seeder
@@ -13,21 +12,13 @@ class PersonSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::updateOrCreate(
-            ['email' => 'rooseveltabrigo@gmail.com'],
-            [
-                'name' => 'Roosevelt Stalin Remache Abrigo',
-                'email' => 'rooseveltabrigo@gmail.com',
-                'password' => bcrypt('0751057027'),
-            ]
-        );
-        Person::updateOrCreate(
+        PersonalData::updateOrCreate(
             ['id_card' => '0751057027'],
             [
                 'first_name' => 'Roosevelt Stalin',
                 'last_name' => 'Remache Abrigo',
                 'id_card' => '0751057027',
-                'user_id' => $user->id,
+                'email' => 'rooseveltabrigo@gmail.com',
             ]
         );
     }

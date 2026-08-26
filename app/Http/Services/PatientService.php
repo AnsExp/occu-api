@@ -4,7 +4,8 @@ namespace App\Http\Services;
 
 use App\Models\Agreement;
 use App\Models\Patient;
-use App\Models\Person;
+use App\Models\PersonalData;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,9 +33,20 @@ class PatientService
                 throw new \Exception(json_encode($patient));
             }
 
+            $user = User::create([
+                'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
+                'email' => $request->input('email'),
+                'email_hash' => occu_hash($request->input('email')),
+                'password' => bcrypt($request->input('id_card')),
+            ]);
+
+            $patient->user()->associate($user);
+            $patient->save();
+
             $this->manageAgreement($request, $patient);
 
             $this->metadataService->store($patient, $request->input('metadata', []));
+            $this->handleIdCardFile($request, $patient);
 
             return $patient;
         });
@@ -44,25 +56,23 @@ class PatientService
     {
         return DB::transaction(function () use ($request, $patient) {
 
-            $this->personService->update($request, $patient->person);
+            $this->personService->update($request, $patient->personalData);
 
             $this->manageAgreement($request, $patient);
 
             $this->metadataService->store($patient, $request->input('metadata', []));
+            $this->handleIdCardFile($request, $patient);
 
             return $patient;
         });
     }
 
-    public static function preparePerson(Person $person)
+    public static function preparePerson(PersonalData $personalData)
     {
-        if ($person->patient) {
-            return $person->patient;
+        if ($personalData->patient) {
+            return $personalData->patient;
         }
-
-        $patient = $person->patient()->create();
-        $person->user->assignRole('patient');
-
+        $patient = $personalData->patient()->create();
         return $patient;
     }
 
@@ -77,40 +87,19 @@ class PatientService
         $patient->save();
     }
 
-    // private function handleIdCardFile(Request $request, Patient $patient): void
-    // {
-    //     if (!$request->hasFile('id_card_file')) {
-    //         return;
-    //     }
+    private function handleIdCardFile(Request $request, Patient $patient): void
+    {
+        if (!$request->hasFile('id_card_file')) {
+            return;
+        }
 
-    //     $idCardFile = $request->file('id_card_file');
-    //     $extension = $idCardFile->getClientOriginalExtension();
+        $file = $request->file('id_card_file');
+        $content = $file->getContent();
+        $path = 'patients/id_cards/' . $patient->personalData->id_card . '.pdf';
+        $saved = occu_storage()->put($path, $content);
 
-    //     $path = $idCardFile->storeAs(
-    //         'patients/id_cards',
-    //         $patient->id_card . '.' . $extension,
-    //         'local'
-    //     );
-
-    //     $patient->setIdCardFilePath($path);
-    //     $patient->saveMeta();
-    // }
-
-    /**
-     * Generate and store a PDF for the given patient.
-     * @param Patient $patient The patient for whom the PDF is to be generated.
-     * @return array<bool|string> Returns an array containing the file path and content of the generated PDF, or [false, false] if the operation fails.
-     */
-    // public function storePdf(Patient $patient)
-    // {
-    //     $pdf = Pdf::loadView('documents.patient', ['patient' => $patient]);
-    //     $pdf->setPaper('A4', 'portrait');
-    //     $pdf->setOption('isRemoteEnabled', true);
-    //     $filePath = 'patients/records/' . $patient->id_card . '.pdf';
-    //     $content = $pdf->output();
-    //     if (Storage::disk('local')->put($filePath, $content)) {
-    //         return [$filePath, $content];
-    //     }
-    //     return [false, false];
-    // }
+        if ($saved) {
+            $patient->personalData->update(['id_card_file' => $path]);
+        }
+    }
 }

@@ -42,7 +42,7 @@ class DoctorService
     {
         return DB::transaction(function () use ($request, $doctor) {
 
-            $this->personService->update($request, $doctor->person);
+            $this->personService->update($request, $doctor->personalData);
 
             $this->manageSpecialty($request, $doctor);
 
@@ -50,18 +50,6 @@ class DoctorService
 
             return $doctor;
         });
-    }
-
-    public static function preparePerson(Person $person, Specialty $specialty)
-    {
-        if ($person->doctor) {
-            return $person->doctor;
-        }
-
-        $person->doctor()->create(['specialty_id', $specialty->id]);
-        $person->user->assignRole('doctor');
-
-        return Doctor::where('person_id', $person->id)->first();
     }
 
     private function manageSpecialty(Request $request, Doctor $doctor)

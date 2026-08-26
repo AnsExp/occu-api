@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Filters\LaboratoryOrderFilter;
@@ -7,6 +6,7 @@ use App\Http\Requests\LaboratoryOrderRequest;
 use App\Models\LaboratoryOrder;
 use App\Http\Services\LaboratoryOrderService;
 use App\Http\Resources\LaboratoryOrderResource;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class LaboratoryOrderController extends Controller
@@ -40,6 +40,15 @@ class LaboratoryOrderController extends Controller
     public function show(LaboratoryOrder $laboratoryOrder)
     {
         return LaboratoryOrderResource::make($laboratoryOrder);
+    }
+
+    /**
+     * Display the specified resource file.
+     */
+    public function file(LaboratoryOrder $laboratoryOrder)
+    {
+        $pdf = Pdf::loadView('documents.laboratory_order', ['order' => $laboratoryOrder])->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
+        return $pdf->stream();
     }
 
     /**

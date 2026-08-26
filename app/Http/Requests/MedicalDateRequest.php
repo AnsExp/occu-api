@@ -26,7 +26,7 @@ class MedicalDateRequest extends FormRequest
             'timezone' => ['required', 'string'],
             'specialty.id' => ['required', 'exists:specialties,id'],
             'doctor.id' => ['required', 'exists:doctors,id'],
-            'person.id' => ['required', 'exists:people,id'],
+            'person.id' => ['required', 'exists:personal_data,id'],
             'date' => ['required', 'date'],
             'metadata' => ['nullable', 'array'],
             'metadata.*.key' => ['required', 'string'],

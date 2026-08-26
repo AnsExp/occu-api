@@ -11,15 +11,37 @@ class LaboratoryOrderFilter
     {
         $query = LaboratoryOrder::query();
 
-        // if ($request->has('id_card')) {
-        //     $query->whereHas('person', function ($q) use ($request) {
-        //         $q->where('id_card', $request->input('id_card'));
-        //     });
-        // }
+        if ($request->has('patient_id_card')) {
+            $query->whereHas('patient.personalData', function ($q) use ($request) {
+                $q->where('id_card', $request->input('patient_id_card'));
+            });
+        }
 
-        // if ($request->has('specialty_id')) {
-        //     $query->where('specialty_id', $request->input('specialty_id'));
-        // }
+        if ($request->has('patient_id')) {
+            $query->whereHas('patient.personalData', function ($q) use ($request) {
+                $q->where('id', $request->input('patient_id'));
+            });
+        }
+
+        if ($request->has('doctor_id_card')) {
+            $query->whereHas('doctor.personalData', function ($q) use ($request) {
+                $q->where('id_card', $request->input('doctor_id_card'));
+            });
+        }
+
+        if ($request->has('doctor_id')) {
+            $query->whereHas('doctor.personalData', function ($q) use ($request) {
+                $q->where('id', $request->input('doctor_id'));
+            });
+        }
+
+        if ($request->has('order_by')) {
+            $orderBy = $request->input('order_by');
+            $order = $request->input('order', 'asc');
+            $query->orderBy($orderBy, $order);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
 
         return $query;
     }

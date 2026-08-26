@@ -20,7 +20,7 @@ class PatientController extends Controller
      */
     public function index(Request $request, PatientFilter $filter)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 15);
         $data = $filter->query($request)->paginate($perPage);
         return PatientResource::collection($data);
     }

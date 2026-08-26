@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Casts\CryptCast;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Observers\PersonalDataObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -22,13 +21,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-class Person extends Model
+#[ObservedBy(PersonalDataObserver::class)]
+class PersonalData extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         'first_name',
         'last_name',
+        'email',
         'phone',
         'id_card',
         'id_card_file',
@@ -39,7 +40,7 @@ class Person extends Model
     ];
 
     protected $casts = [
-        'birth_date' => 'datetime',
+        'birth_date' => 'date',
     ];
 
     public static function findByIdCard(string $id_card): ?self

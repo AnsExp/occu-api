@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\PlanObserver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -17,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(PlanObserver::class)]
 class Plan extends Model
 {
     use SoftDeletes;

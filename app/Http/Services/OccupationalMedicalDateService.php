@@ -4,7 +4,7 @@ namespace App\Http\Services;
 
 use App\Models\MedicalDateRelationship;
 use App\Models\MedicalDate;
-use App\Models\Person;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,12 +14,12 @@ class OccupationalMedicalDateService
     {
         return DB::transaction(function () use ($request) {
 
-            $person = Person::find($request->input('person.id'));
+            $person = PersonalData::find($request->input('person.id'));
             $patient = PatientService::preparePerson($person);
             $occupationalDate = MedicalDate::create([
                 'code' => MedicalDate::generateCode(),
                 'timezone' => $request->input('timezone'),
-                'order' => $this->currentOrder($request->input('doctor.id'), $request->input('date')),
+                'shift' => $this->currentOrder($request->input('doctor.id'), $request->input('date')),
                 'patient_id' => $patient->id,
                 'date' => $request->input('date'),
                 'doctor_id' => $request->input('doctor.id'),
@@ -31,7 +31,7 @@ class OccupationalMedicalDateService
                 $medicalDate = MedicalDate::create([
                     'code' => MedicalDate::generateCode(),
                     'timezone' => $request->input('timezone'),
-                    'order' => $this->currentOrder($medicalDate['doctor']['id'], $medicalDate['date']),
+                    'shift' => $this->currentOrder($medicalDate['doctor']['id'], $medicalDate['date']),
                     'patient_id' => $patient->id,
                     'date' => $medicalDate['date'],
                     'doctor_id' => $medicalDate['doctor']['id'],
@@ -53,10 +53,10 @@ class OccupationalMedicalDateService
     {
         $lastOrder = MedicalDate::where('doctor_id', $doctorId)
             ->where('date', $date)
-            ->orderByDesc('order')
+            ->orderByDesc('shift')
             ->first();
 
-        return $lastOrder ? $lastOrder->order + 1 : 1;
+        return $lastOrder ? $lastOrder->shift + 1 : 1;
     }
 
     public function update(Request $request, MedicalDate $medicalDate)

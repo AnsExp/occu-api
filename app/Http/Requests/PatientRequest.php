@@ -7,20 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PatientRequest extends FormRequest
 {
-    protected function prepareForValidation()
-    {
-        if ($this->has('id_card')) {
-            $this->merge([
-                'id_card_hash' => occu_hash($this->input('id_card')),
-            ]);
-        }
-        if ($this->has('email')) {
-            $this->merge([
-                'email_hash' => occu_hash($this->input('email')),
-            ]);
-        }
-    }
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -42,12 +28,14 @@ class PatientRequest extends FormRequest
             'nationality' => ['nullable', 'string', 'max:255'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'birth_date' => ['nullable', 'date'],
-            'id_card' => ['nullable', 'string', 'max:255'],
-            'id_card_hash' => ['nullable', 'string', 'max:255'],
+            'id_card' => ['required', 'string', 'max:255'],
             'id_card_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
             'email' => ['required', 'email', 'max:255'],
-            'email_hash' => ['required', 'string', 'max:255'],
+            'agreement.id' => ['nullable', 'exists:agreements,id'],
             'phone' => ['nullable', 'string', 'max:255'],
+            'metadata' => ['nullable', 'array'],
+            'metadata.*.key' => ['required', 'string', 'max:255'],
+            'metadata.*.value' => ['required', 'string', 'max:255'],
         ];
     }
 

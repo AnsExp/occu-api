@@ -20,7 +20,7 @@ class MedicalDateController extends Controller
      */
     public function index(Request $request, MedicalDateFilter $filter)
     {
-        $request->merge(['type' => 'normal']);
+        // $request->merge(['type' => 'normal']);
         $perPage = $request->input('per_page', 10);
         $data = $filter->query($request)->paginate($perPage);
         return MedicalDateResource::collection($data);
@@ -41,6 +41,15 @@ class MedicalDateController extends Controller
     public function show(MedicalDate $medicalDate)
     {
         return MedicalDateResource::make($medicalDate);
+    }
+
+    public function file(MedicalDate $medicalDate)
+    {
+        $certificate = $medicalDate->certificate;
+        if (!$certificate || !$certificate->file || !occu_storage()->exists($certificate->file)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        return response()->file(occu_storage()->path($certificate->file));
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Specialty;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class SpecialtySeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class SpecialtySeeder extends Seeder
     {
         foreach ($this->items as $item) {
             Specialty::updateOrCreate(
-                ['slug' => Str::slug($item['name'])],
+                ['slug' => occu_slug($item['name'])],
                 [
                     'name' => $item['name'],
                     'price_base' => $item['price_base'],

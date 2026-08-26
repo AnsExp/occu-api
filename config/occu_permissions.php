@@ -71,5 +71,10 @@ return [
     'update.vital_signs',
     'delete.vital_signs',
 
-    'read.metrics',
+    'read.allowed_ips',
+    'create.allowed_ips',
+    'update.allowed_ips',
+    'delete.allowed_ips',
+
+    'read.audit_logs',
 ];

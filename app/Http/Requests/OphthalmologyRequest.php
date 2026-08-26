@@ -24,7 +24,6 @@ class OphthalmologyRequest extends FormRequest
     {
         $rules = [
             'timezone' => ['required', 'string'],
-            'specialty.id' => ['required', 'exists:specialties,id'],
             'medical_date.id' => ['required', 'exists:medical_dates,id'],
             'medical_exam' => ['required', 'array'],
             'medical_exam.corrective_lenses.usage' => ['required', 'string', 'in:no_usage,glasses,contact_lenses,both'],

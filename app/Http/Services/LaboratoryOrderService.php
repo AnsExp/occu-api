@@ -4,26 +4,27 @@ namespace App\Http\Services;
 
 use App\Models\LaboratoryOrder;
 use App\Models\LaboratoryOption;
-use App\Models\Person;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LaboratoryOrderService
 {
+    public function __construct(private DocumentService $documentService)
+    {
+    }
+
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $person = Person::find($request->input('person.id'));
-            $patient =  PatientService::preparePerson($person);
+            $person = PersonalData::find($request->input('person.id'));
+            $patient = PatientService::preparePerson($person);
 
             $order = LaboratoryOrder::create([
-                'patient_id' => $patient->id,
                 'code' => $this->generateCode(),
+                'patient_id' => $patient->id,
+                'doctor_id' => $request->input('doctor.id'),
                 'timezone' => $request->input('timezone'),
-                'sha256' => 'temp',
-                'file' => 'temp',
-                'snapshot' => $request->all(),
             ]);
 
             foreach ($request->input('items', []) as $item) {
@@ -34,6 +35,8 @@ class LaboratoryOrderService
 
                 $exam = $order->laboratoryExams()->make([
                     'quantity' => $item['quantity'] ?? 1,
+                    'price' => $laboratoryOption->price,
+                    'name' => $laboratoryOption->name,
                 ]);
 
                 $exam->laboratoryOption()->associate($laboratoryOption);
@@ -42,14 +45,20 @@ class LaboratoryOrderService
 
             $order->load('laboratoryExams.laboratoryOption');
 
-            if ($path = $this->storePdf($order)) {
-                $order->file = $path;
-                $order->sha256 = occu_hash(occu_storage()->get($order->file));
-                $order->save();
+            $filePath = 'laboratory_orders/' . $order->code . '.pdf';
+
+            if ($this->storePdf($order, $filePath)) {
+
+                $order->document()->create([
+                    'timezone' => $request->input('timezone'),
+                    'snapshot' => $request->all(),
+                    'sha256' => occu_hash(occu_storage()->get($filePath)),
+                    'file' => $filePath,
+                ]);
 
                 return $order;
             } else {
-                throw new \Exception(json_encode($path));
+                throw new \Exception();
             }
         });
     }
@@ -72,17 +81,8 @@ class LaboratoryOrderService
         return $code;
     }
 
-    private function storePdf(LaboratoryOrder $order)
+    private function storePdf(LaboratoryOrder $order, string $path)
     {
-        try {
-            $pdf = Pdf::loadView('documents.laboratory_order', compact('order'));
-            $pdf->setPaper('A4', 'portrait');
-            $pdf->setOption('isRemoteEnabled', true);
-            $filePath = 'laboratory_orders/' . $order->code . '.pdf';
-            $saved = occu_storage()->put($filePath, $pdf->output());
-            return $saved ? $filePath : false;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return $this->documentService->store('documents.laboratory_order', ['order' => $order], $path);
     }
 }

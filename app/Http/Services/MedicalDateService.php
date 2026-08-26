@@ -4,7 +4,7 @@ namespace App\Http\Services;
 
 use App\Models\Doctor;
 use App\Models\MedicalDate;
-use App\Models\Person;
+use App\Models\PersonalData;
 use App\Models\Specialty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ class MedicalDateService
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $person = Person::find($request->input('person.id'));
+            $person = PersonalData::find($request->input('person.id'));
             $doctor = Doctor::find($request->input('doctor.id'));
             $specialty = Specialty::find($request->input('specialty.id'));
 
@@ -29,7 +29,7 @@ class MedicalDateService
                 'timezone' => $request->input('timezone'),
                 'date' => $request->input('date'),
                 'price' => $specialty->price_base,
-                'order' => $this->generateOrder($request->input('date'), $doctor),
+                'shift' => $this->generateOrder($request->input('date'), $doctor),
             ]);
 
             $medicalDate->doctor()->associate($doctor);
@@ -44,7 +44,7 @@ class MedicalDateService
     public function update(Request $request, MedicalDate $medicalDate)
     {
         return DB::transaction(function () use ($request, $medicalDate) {
-            $person = Person::find($request->input('person.id'));
+            $person = PersonalData::find($request->input('person.id'));
             $doctor = Doctor::find($request->input('doctor.id'));
             $specialty = Specialty::find($request->input('specialty.id'));
 
@@ -56,7 +56,7 @@ class MedicalDateService
             $medicalDate->order = $this->generateOrder($request->input('date'), $doctor);
             $medicalDate->doctor()->associate($doctor);
             $medicalDate->specialty()->associate($specialty);
-            $medicalDate->patient()->associate($person->patient);
+            $medicalDate->patient()->associate(PatientService::preparePerson($person));
 
             $this->metadataService->store($medicalDate, $request->input('metadata', []));
 
@@ -68,7 +68,7 @@ class MedicalDateService
 
     private function generateOrder(string $date, Doctor $doctor)
     {
-        $lastMedicalDate = MedicalDate::where('date', $date)->where('doctor_id', $doctor->id)->orderBy('order', 'desc')->pluck('order')->first();
+        $lastMedicalDate = MedicalDate::where('date', $date)->where('doctor_id', $doctor->id)->orderBy('shift', 'desc')->pluck('shift')->first();
         return $lastMedicalDate + 1;
     }
 }

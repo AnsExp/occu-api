@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AudiologyRequest;
 use App\Http\Services\AudiologyService;
-use App\Models\Certificate;
+use App\Models\Document;
 use App\Models\MedicalDate;
 
 class AudiologyController extends Controller
 {
     public function __construct(private AudiologyService $audiologyService)
     {
-        $this->authorizeResource(Certificate::class, 'certificate');
     }
 
     /**
@@ -28,19 +27,20 @@ class AudiologyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AudiologyRequest $request, Certificate $audiology)
+    public function update(AudiologyRequest $request, Document $audiology)
     {
-        $this->audiologyService->update($request, $audiology);
-        $medicalDate = MedicalDate::find($request->input('medical_date.id'));
-        $specialty = $medicalDate->specialty;
-        return redirect()->route('dashboard.show', [$specialty, $medicalDate]);
+        // $this->audiologyService->update($request, $audiology);
+        // $medicalDate = MedicalDate::find($request->input('medical_date.id'));
+        // $specialty = $medicalDate->specialty;
+        // return redirect()->route('dashboard.show', [$specialty, $medicalDate]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Certificate $audiology)
+    public function destroy(Document $audiology)
     {
+        $audiology->delete();
         abort(403, 'Acceso denegado. Comuníquese con el area de sistemas.');
     }
 }

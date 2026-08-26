@@ -2,64 +2,46 @@
 
 namespace App\Http\Services;
 
-use App\Models\Person;
-use App\Models\User;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 
 class PersonService
 {
     public function store(Request $request)
     {
-        $person = Person::findByIdCard($request->input('id_card'));
+        $personalData = PersonalData::findByIdCard($request->input('id_card'));
 
-        if ($person) {
-            return $this->update($request, $person);
+        if ($personalData) {
+            return $this->update($request, $personalData);
         }
 
-        $user = User::create([
-            'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
-            'email' => $request->input('email'),
-            'email_hash' => $request->input('email_hash'),
-            'password' => bcrypt($request->input('id_card')),
-        ]);
-
-        if (!$user) {
-            throw new \Exception('Failed to create user');
-        }
-
-        $person = $user->person()->create([
+        $personalData = PersonalData::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
             'phone' => $request->input('phone'),
             'id_card' => $request->input('id_card'),
-            'id_card_hash' => $request->input('id_card_hash'),
+            'email' => $request->input('email'),
             'gender' => $request->input('gender'),
             'birth_date' => $request->input('birth_date'),
             'nationality' => $request->input('nationality'),
         ]);
 
-        return $person;
+        return $personalData;
     }
 
-    public function update(Request $request, Person $person)
+    public function update(Request $request, PersonalData $personalData)
     {
-        $person->user->fill([
-            'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
-            'email' => $request->input('email'),
-            'email_hash' => $request->input('email_hash'),
-        ])->save();
-
-        $person->fill([
+        $personalData->fill([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
-            'phone' => $request->input('phone') ?? $person->phone,
+            'phone' => $request->input('phone') ?? $personalData->phone,
             'id_card' => $request->input('id_card'),
-            'id_card_hash' => $request->input('id_card_hash'),
-            'gender' => $request->input('gender') ?? $person->gender,
-            'birth_date' => $request->input('birth_date') ?? $person->birth_date,
-            'nationality' => $request->input('nationality') ?? $person->nationality,
+            'email' => $request->input('email') ?? $personalData->email,
+            'gender' => $request->input('gender') ?? $personalData->gender,
+            'birth_date' => $request->input('birth_date') ?? $personalData->birth_date,
+            'nationality' => $request->input('nationality') ?? $personalData->nationality,
         ])->save();
 
-        return $person;
+        return $personalData;
     }
 }

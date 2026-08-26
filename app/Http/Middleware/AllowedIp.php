@@ -19,20 +19,21 @@ class AllowedIp
             return $next($request);
         }
 
-        $user = auth()->user();
-
-        if (!$user) {
+        if (!auth()->check()) {
             abort(403, 'Por favor, inicia sesión.');
         }
 
-        if ($user->hasRole('administrator')) {
-            return $next($request);
+        $ip = $request->ip();
+        $allowedIp = \App\Models\AllowedIp::where('ip', $ip)->first();
+
+        if (!$allowedIp) {
+            abort(403, 'Tu IP no está autorizada. Si lo crees un error, contacta al área de sistemas.');
         }
 
-        if (\App\Models\AllowedIp::where('ip', $request->ip())->exists()) {
-            return $next($request);
+        if ($allowedIp->expires_at && now()->greaterThan($allowedIp->expires_at)) {
+            abort(403, 'Tu IP estaba autorizada, pero el periodo ha expirado.');
         }
 
-        abort(403, 'Tu IP no está autorizada. Si lo crees un error, contacta al area de sistemas');
+        return $next($request);
     }
 }

@@ -18,7 +18,8 @@ return [
 
         'read.prescriptions',
         'create.prescriptions',
-        'update.prescriptions',
+
+        'read.medications',
     ],
 
     'nurse' => [
@@ -40,14 +41,12 @@ return [
 
         'read.prescriptions',
         'create.prescriptions',
+
+        'read.medications',
     ],
 
-    'patient' => [
-        'read.patients',
-
-        'read.agreements',
-
-        'read.medical_dates',
+    'auditor' => [
+        'read.audit_logs',
     ],
 
     'partner' => [
@@ -76,8 +75,6 @@ return [
         "read.medical_dates",
 
         "read.vital_signs",
-
-        "read.metrics"
     ],
 
     'administrator' => config('occu_permissions', []),

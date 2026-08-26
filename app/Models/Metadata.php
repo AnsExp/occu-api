@@ -8,8 +8,8 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property string $table
- * @property int $table_id
+ * @property string $modelable_type
+ * @property int $modelable_id
  * @property string $key
  * @property string $value
  * @property Carbon|null $created_at
@@ -17,12 +17,11 @@ use Illuminate\Support\Carbon;
  */
 class Metadata extends Model
 {
-    public $idIncrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
-        'model_type',
-        'model_id',
+        'modelable_type',
+        'modelable_id',
         'key',
         'value'
     ];
@@ -32,11 +31,11 @@ class Metadata extends Model
     ];
 
     protected $hidden = [
-        'model',
-        'model_id',
+        'modelable',
+        'modelable_id',
     ];
 
-    public function model()
+    public function modelable()
     {
         return $this->morphTo();
     }

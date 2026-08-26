@@ -5,6 +5,7 @@ return [
     'doctor',
     'patient',
     'partner',
+    'auditor',
     'receptionist',
     'administrator',
 ];

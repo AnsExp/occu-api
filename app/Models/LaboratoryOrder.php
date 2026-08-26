@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Observers\LaboratoryOrderObserver;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
@@ -20,45 +20,45 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(LaboratoryOrderObserver::class)]
 class LaboratoryOrder extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'patient_id',
         'code',
+        'doctor_id',
+        'patient_id',
         'timezone',
-        'sha256',
-        'file',
-        'snapshot',
     ];
 
-    protected $casts = [
-        'snapshot' => 'json',
-    ];
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
 
-    public function patient(): BelongsTo
+    public function patient()
     {
         return $this->belongsTo(Patient::class);
     }
 
-    public function laboratoryExams(): HasMany
+    public function laboratoryExams()
     {
         return $this->hasMany(LaboratoryExam::class);
     }
 
-    public static function findByCode(string $code): ?self
+    public static function findByCode(string $code)
     {
         return static::where('code', $code)->first();
-    }
-
-    public function hasCertificateType(string $type): bool
-    {
-        return $this->certificates()->where('type', $type)->exists();
     }
 
     public function getPrettyCreatedAtAttribute()
     {
         return $this->created_at->translatedFormat('F j, Y g:i A');
+    }
+
+    public function document()
+    {
+        return $this->morphOne(Document::class, 'documentable');
     }
 }

@@ -2,14 +2,14 @@
 
 namespace App\Http\Filters;
 
-use App\Models\Person;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 
 class PersonFilter
 {
     public function query(Request $request)
     {
-        $query = Person::query();
+        $query = PersonalData::query();
 
         if ($request->has('first_name')) {
             $query->where('first_name', 'like', "%{$request->input('first_name')}%");
@@ -37,6 +37,14 @@ class PersonFilter
 
         if ($request->has('nationality')) {
             $query->where('nationality', 'like', "%{$request->input('nationality')}%");
+        }
+
+        if ($request->has('order_by')) {
+            $orderBy = $request->input('order_by');
+            $order = $request->input('order', 'asc');
+            $query->orderBy($orderBy, $order);
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
         return $query;

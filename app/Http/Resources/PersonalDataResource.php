@@ -2,11 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Person;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PersonResource extends JsonResource
+class PersonalDataResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -23,7 +23,7 @@ class PersonResource extends JsonResource
             'phone' => $this->phone,
             'id_card' => $this->id_card,
             'gender' => $this->gender,
-            'email' => $this->user?->email,
+            'email' => $this->email,
             'birth_date' => $this->birth_date,
             'nationality' => $this->nationality,
         ];

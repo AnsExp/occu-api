@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Filters\PersonFilter;
-use App\Http\Resources\PersonResource;
+use App\Http\Resources\PersonalDataResource;
 use Illuminate\Http\Request;
 
-class PersonController extends Controller
+class PersonalDataController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,6 +15,6 @@ class PersonController extends Controller
     {
         $perPage = $request->input('per_page', 15);
         $data = $filter->query($request)->paginate($perPage);
-        return PersonResource::collection($data);
+        return PersonalDataResource::collection($data);
     }
 }

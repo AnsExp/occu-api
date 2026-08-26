@@ -16,25 +16,33 @@ class DoctorFilter
         }
 
         if ($request->has('id_card')) {
-            $query->whereHas('person', function ($q) use ($request) {
+            $query->whereHas('personalData', function ($q) use ($request) {
                 $q->where('id_card', $request->input('id_card'));
             });
         }
 
         if ($request->has('first_name')) {
-            $query->whereHas('person', function ($q) use ($request) {
+            $query->whereHas('personalData', function ($q) use ($request) {
                 $q->where('first_name', 'like', "%{$request->input('first_name')}%");
             });
         }
 
         if ($request->has('last_name')) {
-            $query->whereHas('person', function ($q) use ($request) {
+            $query->whereHas('personalData', function ($q) use ($request) {
                 $q->where('last_name', 'like', "%{$request->input('last_name')}%");
             });
         }
 
         if ($request->has('specialty_id')) {
             $query->where('specialty_id', $request->input('specialty_id'));
+        }
+
+        if ($request->has('order_by')) {
+            $orderBy = $request->input('order_by');
+            $order = $request->input('order', 'asc');
+            $query->orderBy($orderBy, $order);
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
         return $query;

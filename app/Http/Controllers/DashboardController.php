@@ -49,7 +49,7 @@ class DashboardController extends Controller
     public function create(Specialty $specialty, MedicalDate $medicalDate)
     {
         $user = auth()->user();
-        if ($user->can('create.certificates') && $medicalDate->certificates->isNotEmpty()) {
+        if ($user->can('create.certificates') && $medicalDate->certificate) {
             abort(403, 'Acceso denegado. Esta especialidad ya tiene un certificado asociado o usted no tiene permiso para crear uno.');
         }
         return view('dashboards.create', compact('specialty', 'medicalDate'));

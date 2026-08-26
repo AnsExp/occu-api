@@ -87,11 +87,11 @@ Route::middleware(['auth', AllowedIp::class])->group(function () {
 
 });
 
-use App\Models\LaboratoryOrder;
+use App\Models\Prescription;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 Route::get('/test', function () {
-    $order = LaboratoryOrder::find(10);
-    $pdf = Pdf::loadView('documents.laboratory_order', compact('order'));
+    $prescription = Prescription::find(2);
+    $pdf = Pdf::loadView('documents.prescription', compact('prescription'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
     return $pdf->stream();
 });

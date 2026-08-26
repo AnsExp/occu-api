@@ -21,23 +21,26 @@ class PrescriptionResource extends JsonResource
             'doctor' => $this->doctor ? [
                 'id' => $this->doctor->id,
                 'personal_data' => [
-                    'fullname' => $this->doctor->person->fullname,
+                    'fullname' => $this->doctor->personalData->fullname,
                 ]
             ] : null,
             'patient' => $this->patient ? [
                 'id' => $this->patient->id,
                 'personal_data' => [
-                    'fullname' => $this->patient->person->fullname,
+                    'fullname' => $this->patient->personalData->fullname,
                 ]
             ] : null,
             'notes' => $this->notes,
             'medications' => array_map(fn($medication) => [
                 'id' => $medication->medication->id,
-                'name' => $medication->medication->name,
+                'name' => $medication->name,
+                'price' => $medication->price,
                 'quantity' => $medication->quantity,
                 'notes' => $medication->notes,
             ], $this->medications->all()),
-            'created_at' => $this->created_at->setTimezone($this->timezone)->translatedFormat('Y-m-d H:i:s'),
+            'has_file' => $this->document?->exists() ?? false,
+            'timezone' => $this->timezone,
+            'created_at' => $this->created_at,
         ];
     }
 }

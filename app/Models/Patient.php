@@ -2,27 +2,39 @@
 
 namespace App\Models;
 
-use App\Policies\PatientPolicy;
-use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+use App\Observers\PatientObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property Carbon $birth_date
+ * @property int $user_id
+ * @property int $agreement_id
+ * @property int $personal_data_id
+ * @property User $user
+ * @property Agreement $agreement
+ * @property PersonalData $personalData
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-#[UsePolicy(PatientPolicy::class)]
+#[ObservedBy(PatientObserver::class)]
 class Patient extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
-        'person_id',
+        'user_id',
+        'agreement_id',
+        'personal_data_id',
     ];
 
-    use SoftDeletes;
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function agreement()
     {
@@ -44,9 +56,9 @@ class Patient extends Model
         return $this->hasMany(Prescription::class);
     }
 
-    public function person()
+    public function personalData()
     {
-        return $this->belongsTo(Person::class);
+        return $this->belongsTo(PersonalData::class);
     }
 
     public function vitalSigns()
@@ -56,7 +68,7 @@ class Patient extends Model
 
     public function metadata()
     {
-        return $this->morphMany(Metadata::class, 'model');
+        return $this->morphMany(Metadata::class, 'modelable');
     }
 
     public function getMeta(string $key, $default = null)

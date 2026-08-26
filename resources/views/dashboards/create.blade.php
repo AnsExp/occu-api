@@ -11,7 +11,6 @@
         </x-button-link>
         <x-errors-viewer message="Error al crear el certificado" />
         <x-vital-signs-viewer :medicalDate="$medicalDate" />
-        {{-- {{ $specialty->form }} --}}
         @livewire($specialty->form, compact('medicalDate'))
     </section>
 @endsection

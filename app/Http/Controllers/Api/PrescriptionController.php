@@ -8,6 +8,7 @@ use App\Models\Prescription;
 use App\Http\Services\PrescriptionService;
 use App\Http\Resources\PrescriptionResource;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PrescriptionController extends Controller
 {
@@ -40,6 +41,15 @@ class PrescriptionController extends Controller
     public function show(Prescription $prescription)
     {
         return PrescriptionResource::make($prescription);
+    }
+
+    /**
+     * Display the specified resource file.
+     */
+    public function file(Prescription $prescription)
+    {
+        $pdf = Pdf::loadView('documents.prescription', compact('prescription'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
+        return $pdf->stream();
     }
 
     /**

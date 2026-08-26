@@ -8,7 +8,7 @@
     <x-input-timezone />
     <input type="hidden" name="medical_date[id]" value="{{ $medicalDate->id }}">
     <input type="hidden" name="specialty[id]" value="{{ $medicalDate->specialty->id }}">
-    <x-badge :text="'Paciente: ' . $medicalDate->patient->person->fullname" />
+    <x-badge :text="'Paciente: ' . $medicalDate->patient->personalData->fullname" />
     <div class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
         <div class="grid gap-4 lg:grid-cols-2">
             <div>

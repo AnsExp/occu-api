@@ -6,6 +6,11 @@
 
 @php
     $patient = $order->patient;
+    $tax_rate = config('app.tax_rate', 0);
+    $subtotal = 0;
+    foreach ($order->laboratoryExams as $exam) {
+        $subtotal += $exam->laboratoryOption->price * $exam->quantity;
+    }
 @endphp
 
 @section('content')
@@ -19,7 +24,8 @@
                 <p class="document-title">ORDEN DE PAGO: {{ $order->order_number }}</p>
                 <div class="document-meta">
                     <div><strong>@lang('attributes.date'):</strong>
-                        {{ Carbon::now()->timezone($order->timezone)->translatedFormat('j \\d\\e F, Y') }}</div>
+                        {{ Carbon::now()->timezone($order->timezone)->translatedFormat('j \\d\\e F, Y') }}
+                    </div>
                 </div>
             </td>
         </tr>
@@ -30,21 +36,21 @@
         <tr>
             <td>
                 <span class="label">@lang('attributes.first_name')</span>
-                <span class="value">{{ $patient->person->fullname }}</span>
+                <span class="value">{{ $patient->personalData->fullname }}</span>
             </td>
             <td>
                 <span class="label">@lang('attributes.id_card')</span>
-                <span class="value">{{ $patient->id_card }}</span>
+                <span class="value">{{ $patient->personalData->id_card }}</span>
             </td>
         </tr>
         <tr>
             <td>
                 <span class="label">@lang('attributes.email')</span>
-                <span class="value">{{ $patient->email }}</span>
+                <span class="value">{{ $patient->personalData->user?->email }}</span>
             </td>
             <td>
                 <span class="label">@lang('attributes.phone')</span>
-                <span class="value">{{ $patient->phone ?? '-' }}</span>
+                <span class="value">{{ $patient->personalData->phone ?? '-' }}</span>
             </td>
         </tr>
         <tr>
@@ -78,35 +84,35 @@
         </thead>
         <tbody>
             @forelse ($order->laboratoryExams as $index => $exam)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $exam->laboratoryOption->name }}</td>
-                <td class="text-center">{{ $exam->quantity }}</td>
-                <td class="text-right">${{ number_format($exam->laboratoryOption->price, 2) }}</td>
-                <td class="text-right">${{ number_format($exam->laboratoryOption->price * $exam->quantity, 2) }}</td>
-            </tr>
+                <tr>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $exam->laboratoryOption->name }}</td>
+                    <td class="text-center">{{ $exam->quantity }}</td>
+                    <td class="text-right">${{ number_format($exam->laboratoryOption->price, 2) }}</td>
+                    <td class="text-right">${{ number_format($exam->laboratoryOption->price * $exam->quantity, 2) }}</td>
+                </tr>
             @empty
-            <tr>
-                <td colspan="5" class="text-center">No hay detalles registrados en esta orden.</td>
-            </tr>
+                <tr>
+                    <td colspan="5" class="text-center">No hay detalles registrados en esta orden.</td>
+                </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- <div class="totals-wrapper">
+    <div class="totals-wrapper">
         <table class="totals-table">
             <tr>
                 <td class="name">@lang('orders.subtotal')</td>
-                <td class="text-right">${{ number_format($snapshot['subtotal'], 2) }}</td>
+                <td class="text-right">${{ number_format($subtotal, 2) }}</td>
             </tr>
             <tr>
-                <td class="name">@lang('orders.tax', ['rate' => number_format($snapshot['taxRate'] * 100, 0)])</td>
-                <td class="text-right">${{ number_format($snapshot['subtotal'] * $snapshot['taxRate'], 2) }}</td>
+                <td class="name">@lang('orders.tax', ['rate' => ($tax_rate * 100)])</td>
+                <td class="text-right">${{ number_format($subtotal * $tax_rate, 2) }}</td>
             </tr>
             <tr>
                 <td class="name grand-total">@lang('orders.total')</td>
-                <td class="text-right grand-total">${{ number_format($snapshot['total'], 2) }}</td>
+                <td class="text-right grand-total">${{ number_format($subtotal * (1 + $tax_rate), 2) }}</td>
             </tr>
         </table>
-    </div> --}}
+    </div>
 @endsection

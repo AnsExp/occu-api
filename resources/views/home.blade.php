@@ -116,12 +116,6 @@
                                             {{ \App\Models\LaboratoryOrder::count() }}
                                         </td>
                                     </tr>
-                                    <tr class="bg-gray-50">
-                                        <td class="px-4 py-3 text-slate-500">Certificados</td>
-                                        <td class="px-4 py-3 text-right text-2xl font-bold text-slate-900">
-                                            {{ \App\Models\Certificate::count() }}
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>

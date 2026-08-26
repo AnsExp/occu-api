@@ -19,6 +19,14 @@ class UserFilter
             $query->where('email', 'like', "%{$request->input('email')}%");
         }
 
+        if ($request->has('order_by')) {
+            $orderBy = $request->input('order_by');
+            $order = $request->input('order', 'asc');
+            $query->orderBy($orderBy, $order);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
         return $query;
     }
 }

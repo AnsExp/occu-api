@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\MedicalDate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,17 +20,17 @@ class MedicalDateResource extends JsonResource
             'code' => $this->code,
             'date' => $this->date->format('Y-m-d'),
             'timezone' => $this->timezone,
-            'order' => $this->order,
+            'shift' => $this->shift,
             'type' => $this->type,
             'doctor' => [
                 'id' => $this->doctor->id,
-                'fullname' => $this->doctor->person->fullname,
-                'email' => $this->doctor->person->user->email,
+                'fullname' => $this->doctor->personalData->fullname,
+                'email' => $this->doctor->personalData->email,
             ],
             'patient' => [
                 'id' => $this->patient->id,
-                'fullname' => $this->patient->person->fullname,
-                'email' => $this->patient->person->user->email,
+                'fullname' => $this->patient->personalData->fullname,
+                'email' => $this->patient->personalData->email,
             ],
             'specialty' => $this->specialty ? [
                 'id' => $this->specialty->id,
@@ -45,10 +46,7 @@ class MedicalDateResource extends JsonResource
                 'temperature' => (float) $this->vitalSigns->temperature,
                 'oxygen_saturation' => (float) $this->vitalSigns->oxygen_saturation,
             ] : null,
-            'certificate' => $this->certificates()->first() ? [
-                'id' => $this->certificates()->first()->id,
-                'url' => route('certificate.show', ['certificate' => $this->certificates()->first()]),
-            ] : null,
+            'has_certificate' => $this->certificate?->exists() ?? false,
             'created_at' => $this->created_at->setTimezone($this->timezone)->format('Y-m-d H:i:s'),
         ];
     }

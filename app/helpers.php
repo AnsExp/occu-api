@@ -79,3 +79,10 @@ if (!function_exists('occu_storage')) {
         return Illuminate\Support\Facades\Storage::disk('local');
     }
 }
+
+if (!function_exists('occu_slug')) {
+    function occu_slug(string $value): string
+    {
+        return Illuminate\Support\Str::slug($value);
+    }
+}

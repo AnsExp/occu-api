@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\MedicalDateObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
@@ -10,7 +12,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $code
  * @property Carbon $date
- * @property int $order
+ * @property int $shift
  * @property string $type
  * @property string $timezone
  * @property int $doctor_id
@@ -27,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(MedicalDateObserver::class)]
 class MedicalDate extends Model
 {
     use SoftDeletes;
@@ -35,7 +38,7 @@ class MedicalDate extends Model
         'code',
         'date',
         'type',
-        'order',
+        'shift',
         'timezone',
         'doctor_id',
         'patient_id',
@@ -103,9 +106,9 @@ class MedicalDate extends Model
         return $this->hasOne(VitalSign::class);
     }
 
-    public function certificates()
+    public function certificate()
     {
-        return $this->hasMany(Certificate::class);
+        return $this->morphOne(Document::class, 'documentable');
     }
 
     public function metadata()

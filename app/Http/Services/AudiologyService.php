@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Models\Certificate;
+use App\Models\Document;
 use App\Models\MedicalDate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -18,34 +18,28 @@ class AudiologyService
         return $this->persistCertificate($request, MedicalDate::findOrFail($request->input('medical_date.id')));
     }
 
-    public function update(Request $request, Certificate $certificate)
+    public function update(Request $request)
     {
         return $this->persistCertificate($request, MedicalDate::findOrFail($request->input('medical_date.id')));
     }
 
-    private function persistCertificate(Request $request, MedicalDate $medicalDate): Certificate
+    private function persistCertificate(Request $request, MedicalDate $medicalDate): Document
     {
         return DB::transaction(function () use ($request, $medicalDate) {
-
             [$file, $content] = $this->storePdf($medicalDate, $request->input('medical_exam', []));
 
             if (!$file || !$content) {
                 throw new \RuntimeException("Error al generar PDF del certificado.");
             }
 
-            if ($certificate = $medicalDate->certificate) {
-                $certificate->delete();
-            }
-
-            $certificate = Certificate::create([
-                'medical_date_id' => $medicalDate->id ?? null,
+            $medicalDate->certificate()->create([
                 'timezone' => $request->input('timezone'),
+                'snapshot' => $request->input('medical_exam', []),
                 'sha256' => occu_hash($content),
                 'file' => $file,
-                'snapshot' => $request->input('medical_exam', []),
             ]);
 
-            return $certificate;
+            return $medicalDate->certificate()->first();
         });
     }
 

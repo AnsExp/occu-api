@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\MedicalDateRelationshipObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -12,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[ObservedBy(MedicalDateRelationshipObserver::class)]
 class MedicalDateRelationship extends Model
 {
     protected $fillable = [

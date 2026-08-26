@@ -16,12 +16,12 @@ use Illuminate\Database\Eloquent\Model;
 class AllowedIp extends Model
 {
     protected $fillable = [
-        'ip',
+        'ip_address',
         'notes',
         'expires_at',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'expires_at' => 'date',
     ];
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Casts\CryptCast;
+use App\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,6 +25,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(UserObserver::class)]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -63,9 +64,9 @@ class User extends Authenticatable
         return $this->where('email', $email)->first();
     }
 
-    public function person()
+    public function personalData()
     {
-        return $this->hasOne(Person::class);
+        return $this->hasOne(PersonalData::class);
     }
 
     public function options()

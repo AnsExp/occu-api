@@ -59,7 +59,7 @@
                                         {{ $medicalDate->code }}
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-5/12">
-                                        {{ $medicalDate->patient->person->fullname }}
+                                        {{ $medicalDate->patient->personalData->fullname }}
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-1/12">
                                         @if ($medicalDate->vitalSigns)
@@ -69,7 +69,7 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 align-top text-gray-700 w-1/12">
-                                        @if ($medicalDate->certificates->isNotEmpty())
+                                        @if ($medicalDate->certificate)
                                             <x-heroicon-o-check-circle class="size-5 text-emerald-500" />
                                         @else
                                             <x-heroicon-o-exclamation-circle class="size-5 text-amber-500" />
@@ -85,7 +85,7 @@
                                                     </x-button-link>
                                                 @endif
                                             @endcan
-                                            @if ($medicalDate->certificates->isNotEmpty())
+                                            @if ($medicalDate->certificate)
                                                 @can('read.certificates')
                                                     <x-button-link :href="route('dashboard.show', [$specialty, $medicalDate])"
                                                         variant="badge">

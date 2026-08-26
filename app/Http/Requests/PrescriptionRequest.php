@@ -37,8 +37,8 @@ class PrescriptionRequest extends FormRequest
     {
         return [
             'timezone' => ['required', 'string'],
-            'person.id' => ['required', 'exists:people,id'],
-            'doctor.id' => ['required', 'exists:doctors,id'],
+            'person.id' => ['required', 'exists:personal_data,id'],
+            'doctor.id' => ['nullable', 'exists:doctors,id'],
             'notes' => ['nullable', 'string'],
             'medications' => ['required', 'array'],
             'medications.*.id' => ['required', 'exists:medications,id'],

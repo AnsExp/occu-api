@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\AgreementObserver;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
 /**
  * @property int $id
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[ObservedBy(AgreementObserver::class)]
 class Agreement extends Model
 {
     use SoftDeletes;
