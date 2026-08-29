@@ -47,7 +47,7 @@ class MedicationController extends Controller
      */
     public function update(MedicationRequest $request, Medication $medication)
     {
-        $medication = $this->medicationService->store($request);
+        $medication = $this->medicationService->update($request, $medication);
         return MedicationResource::make($medication);
     }
 

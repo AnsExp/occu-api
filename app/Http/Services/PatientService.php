@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class PatientService
 {
     public function __construct(
-        private PersonService $personService,
+        private PersonalDataService $personalDataService,
         private MetadataService $metadataService
     ) {
     }
@@ -21,13 +21,13 @@ class PatientService
     {
         return DB::transaction(function () use ($request) {
 
-            $person = $this->personService->store($request);
+            $personalData = $this->personalDataService->store($request);
 
-            if (!$person) {
-                throw new \Exception('Failed to create person for patient.');
+            if (!$personalData) {
+                throw new \Exception('Failed to create personal data for patient.');
             }
 
-            $patient = self::preparePerson($person);
+            $patient = self::preparePatient($personalData);
 
             if (!$patient) {
                 throw new \Exception(json_encode($patient));
@@ -46,7 +46,6 @@ class PatientService
             $this->manageAgreement($request, $patient);
 
             $this->metadataService->store($patient, $request->input('metadata', []));
-            $this->handleIdCardFile($request, $patient);
 
             return $patient;
         });
@@ -56,23 +55,30 @@ class PatientService
     {
         return DB::transaction(function () use ($request, $patient) {
 
-            $this->personService->update($request, $patient->personalData);
+            $this->personalDataService->update($request, $patient->personalData);
 
             $this->manageAgreement($request, $patient);
 
             $this->metadataService->store($patient, $request->input('metadata', []));
-            $this->handleIdCardFile($request, $patient);
 
             return $patient;
         });
     }
 
-    public static function preparePerson(PersonalData $personalData)
+    public static function preparePatient(PersonalData $personalData)
     {
         if ($personalData->patient) {
             return $personalData->patient;
         }
-        $patient = $personalData->patient()->create();
+        $user = User::create([
+            'name' => $personalData->first_name . ' ' . $personalData->last_name,
+            'email' => $personalData->email,
+            'password' => bcrypt($personalData->id_card),
+        ]);
+        $user->assignRole('patient');
+        $patient = $personalData->patient()->create([
+            'user_id' => $user->id,
+        ]);
         return $patient;
     }
 
@@ -85,21 +91,5 @@ class PatientService
         );
 
         $patient->save();
-    }
-
-    private function handleIdCardFile(Request $request, Patient $patient): void
-    {
-        if (!$request->hasFile('id_card_file')) {
-            return;
-        }
-
-        $file = $request->file('id_card_file');
-        $content = $file->getContent();
-        $path = 'patients/id_cards/' . $patient->personalData->id_card . '.pdf';
-        $saved = occu_storage()->put($path, $content);
-
-        if ($saved) {
-            $patient->personalData->update(['id_card_file' => $path]);
-        }
     }
 }

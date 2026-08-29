@@ -29,8 +29,10 @@ class MedicalDateResource extends JsonResource
             ],
             'patient' => [
                 'id' => $this->patient->id,
-                'fullname' => $this->patient->personalData->fullname,
                 'email' => $this->patient->personalData->email,
+                'phone' => $this->patient->personalData->phone,
+                'id_card' => $this->patient->personalData->id_card,
+                'fullname' => $this->patient->personalData->fullname,
             ],
             'specialty' => $this->specialty ? [
                 'id' => $this->specialty->id,
@@ -46,6 +48,7 @@ class MedicalDateResource extends JsonResource
                 'temperature' => (float) $this->vitalSigns->temperature,
                 'oxygen_saturation' => (float) $this->vitalSigns->oxygen_saturation,
             ] : null,
+            'relationship' => array_map(fn($relationship) => self::make($relationship->related), $this->relationship->all()),
             'has_certificate' => $this->certificate?->exists() ?? false,
             'created_at' => $this->created_at->setTimezone($this->timezone)->format('Y-m-d H:i:s'),
         ];

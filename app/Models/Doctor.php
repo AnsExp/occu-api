@@ -54,6 +54,6 @@ class Doctor extends Model
 
     public function metadata()
     {
-        return $this->morphMany(Metadata::class, 'modelable');
+        return $this->morphMany(Metadata::class, 'metadatable');
     }
 }

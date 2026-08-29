@@ -8,9 +8,9 @@ use Illuminate\Database\Seeder;
 class SpecialtySeeder extends Seeder
 {
     private array $items = [
-        ['name' => 'Audiología', 'price_base' => 25, 'form' => 'forms.form-audiology',],
-        ['name' => 'Odontología', 'price_base' => 50, 'form' => 'forms.form-odontology',],
-        ['name' => 'Oftalmología', 'price_base' => 75, 'form' => 'forms.form-ophthalmology',],
+        ['name' => 'Audiología', 'price_base' => 25,],
+        ['name' => 'Odontología', 'price_base' => 50,],
+        ['name' => 'Oftalmología', 'price_base' => 75,],
     ];
 
     /**
@@ -24,7 +24,6 @@ class SpecialtySeeder extends Seeder
                 [
                     'name' => $item['name'],
                     'price_base' => $item['price_base'],
-                    'form' => $item['form']
                 ]
             );
         }

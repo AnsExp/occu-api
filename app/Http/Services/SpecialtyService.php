@@ -11,7 +11,12 @@ class SpecialtyService
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $specialty = Specialty::create($request->all());
+            $specialty = Specialty::create([
+                'name' => $request->input('name'),
+                'slug' => occu_slug($request->input('name')),
+                'price_base' => $request->input('price_base'),
+                'description' => $request->input('description'),
+            ]);
             return $specialty;
         });
     }

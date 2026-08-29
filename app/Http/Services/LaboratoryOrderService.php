@@ -17,8 +17,8 @@ class LaboratoryOrderService
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $person = PersonalData::find($request->input('person.id'));
-            $patient = PatientService::preparePerson($person);
+            $person = PersonalData::findByIdCard($request->input('person.id_card'));
+            $patient = PatientService::preparePatient($person);
 
             $order = LaboratoryOrder::create([
                 'code' => $this->generateCode(),

@@ -17,6 +17,7 @@ trait HasAuditLog
             'action' => $action,
             'changes' => $model->getChanges(),
             'user_id' => auth()->id(),
+            // 'user_id' => auth()->check() ? auth()->id() : null,
             'ip_address' => $request?->ip(),
             'user_agent' => $request?->userAgent(),
         ]);

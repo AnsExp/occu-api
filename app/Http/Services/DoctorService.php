@@ -3,15 +3,15 @@
 namespace App\Http\Services;
 
 use App\Models\Doctor;
-use App\Models\Person;
 use App\Models\Specialty;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DoctorService
 {
     public function __construct(
-        private PersonService $personService,
+        private PersonalDataService $personalDataService,
         private MetadataService $metadataService
     ) {
     }
@@ -20,17 +20,26 @@ class DoctorService
     {
         return DB::transaction(function () use ($request) {
 
-            $person = $this->personService->store($request);
+            $personalData = $this->personalDataService->store($request);
 
-            if (!$person) {
-                throw new \Exception('Failed to create person');
+            if (!$personalData) {
+                throw new \Exception('Failed to create personal data for doctor.');
             }
 
-            $doctor = $person->doctor()->create([
+            $user = User::create([
+                'name' => "{$personalData->first_name} {$personalData->last_name}",
+                'email' => $personalData->email,
+                'password' => bcrypt($personalData->id_card),
+            ]);
+
+            $user->assignRole('doctor');
+
+            $doctor = Doctor::create([
+                'user_id' => $user->id,
+                'personal_data_id' => $personalData->id,
                 'specialty_id' => $request->input('specialty.id'),
                 'is_occupational_doctor' => $request->input('is_occupational_doctor', false)
             ]);
-            $person->user->assignRole('doctor');
 
             $this->metadataService->store($doctor, $request->input('metadata', []));
 
@@ -42,7 +51,7 @@ class DoctorService
     {
         return DB::transaction(function () use ($request, $doctor) {
 
-            $this->personService->update($request, $doctor->personalData);
+            $this->personalDataService->update($request, $doctor->personalData);
 
             $this->manageSpecialty($request, $doctor);
 

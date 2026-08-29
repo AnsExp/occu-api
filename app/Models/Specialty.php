@@ -12,7 +12,6 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $slug
  * @property string $name
- * @property string|null $form
  * @property string $description
  * @property float $price_base
  * @property Carbon|null $created_at
@@ -27,9 +26,12 @@ class Specialty extends Model
     protected $fillable = [
         'slug',
         'name',
-        'form',
         'description',
         'price_base',
+    ];
+
+    protected $casts = [
+        'price_base' => 'float',
     ];
 
     public function doctors()

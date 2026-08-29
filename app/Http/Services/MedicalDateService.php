@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Models\Doctor;
 use App\Models\MedicalDate;
+use App\Models\MedicalDateRelationship;
 use App\Models\PersonalData;
 use App\Models\Specialty;
 use Illuminate\Http\Request;
@@ -18,24 +19,50 @@ class MedicalDateService
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $person = PersonalData::find($request->input('person.id'));
+
+            $person = PersonalData::findByIdCard($request->input('person.id_card'));
             $doctor = Doctor::find($request->input('doctor.id'));
-            $specialty = Specialty::find($request->input('specialty.id'));
+            $patient = PatientService::preparePatient($person);
 
-            $patient = PatientService::preparePerson($person);
+            $specialty = null;
+            if ($request->has('specialty.id')) {
+                $specialty = Specialty::find($request->input('specialty.id'));
+            }
 
-            $medicalDate = new MedicalDate([
+            $medicalDate = MedicalDate::create([
                 'code' => MedicalDate::generateCode(),
                 'timezone' => $request->input('timezone'),
                 'date' => $request->input('date'),
-                'price' => $specialty->price_base,
+                'type' => $request->input('type', 'normal'),
                 'shift' => $this->generateOrder($request->input('date'), $doctor),
+                'doctor_id' => $doctor->id,
+                'patient_id' => $patient->id,
+                'specialty_id' => $specialty?->id,
             ]);
 
-            $medicalDate->doctor()->associate($doctor);
-            $medicalDate->specialty()->associate($specialty);
-            $medicalDate->patient()->associate($patient);
-            $medicalDate->save();
+            foreach ($request->input('relationship', []) as $relationship) {
+
+                $relatedPerson = PersonalData::findByIdCard($relationship['person']['id_card']);
+                $relatedPatient = PatientService::preparePatient($relatedPerson);
+                $relatedDoctor = Doctor::find($relationship['doctor']['id']);
+                $relatedSpecialty = Specialty::find($relationship['specialty']['id']);
+
+                $related = MedicalDate::create([
+                    'code' => MedicalDate::generateCode(),
+                    'timezone' => $request->input('timezone'),
+                    'date' => $relationship['date'],
+                    'type' => $relationship['type'] ?? 'normal',
+                    'shift' => $this->generateOrder($relationship['date'], $relatedDoctor),
+                    'doctor_id' => $relatedDoctor->id,
+                    'patient_id' => $relatedPatient->id,
+                    'specialty_id' => $relatedSpecialty?->id,
+                ]);
+
+                MedicalDateRelationship::create([
+                    'principal_id' => $medicalDate->id,
+                    'related_id' => $related->id,
+                ]);
+            }
 
             return $medicalDate;
         });
@@ -44,19 +71,22 @@ class MedicalDateService
     public function update(Request $request, MedicalDate $medicalDate)
     {
         return DB::transaction(function () use ($request, $medicalDate) {
-            $person = PersonalData::find($request->input('person.id'));
+
+            $person = PersonalData::findByIdCard($request->input('person.id_card'));
             $doctor = Doctor::find($request->input('doctor.id'));
             $specialty = Specialty::find($request->input('specialty.id'));
 
-            PatientService::preparePerson($person);
+            $patient = PatientService::preparePatient($person);
 
-            $medicalDate->date = $request->input('date');
-            $medicalDate->price = $specialty->price_base;
-            $medicalDate->timezone = $request->input('timezone');
-            $medicalDate->order = $this->generateOrder($request->input('date'), $doctor);
-            $medicalDate->doctor()->associate($doctor);
-            $medicalDate->specialty()->associate($specialty);
-            $medicalDate->patient()->associate(PatientService::preparePerson($person));
+            $medicalDate->update([
+                'timezone' => $request->input('timezone'),
+                'date' => $request->input('date'),
+                'type' => $request->input('type', 'normal'),
+                'shift' => $this->generateOrder($request->input('date'), $doctor),
+                'doctor_id' => $doctor->id,
+                'patient_id' => $patient->id,
+                'specialty_id' => $specialty?->id,
+            ]);
 
             $this->metadataService->store($medicalDate, $request->input('metadata', []));
 
@@ -68,7 +98,7 @@ class MedicalDateService
 
     private function generateOrder(string $date, Doctor $doctor)
     {
-        $lastMedicalDate = MedicalDate::where('date', $date)->where('doctor_id', $doctor->id)->orderBy('shift', 'desc')->pluck('shift')->first();
+        $lastMedicalDate = MedicalDate::where('doctor_id', $doctor->id)->where('date', $date)->orderBy('shift', 'desc')->pluck('shift')->first();
         return $lastMedicalDate + 1;
     }
 }

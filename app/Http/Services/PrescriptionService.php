@@ -12,24 +12,21 @@ use Illuminate\Support\Facades\DB;
 class PrescriptionService
 {
     private $documentTemplate = 'documents.prescription';
-    private $storageDiskPath = 'documents/prescriptions';
+    private $storageDiskPath = 'prescriptions';
 
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
 
-            $person = PersonalData::find($request->input('person.id'));
-            $patient = PatientService::preparePerson($person);
+            $person = PersonalData::findByIdCard($request->input('person.id_card'));
+            $patient = PatientService::preparePatient($person);
 
             $prescription = Prescription::create([
                 'code' => $this->generateCode(),
                 'doctor_id' => $request->input('doctor.id'),
                 'patient_id' => $patient->id,
-                'timezone' => $request->input('timezone'),
                 'notes' => $request->input('notes'),
-                'sha256' => 'temp',
-                'file' => 'temp',
-                'snapshot' => $request->all(),
+                'timezone' => $request->input('timezone'),
             ]);
 
             foreach ($request->input('medications', []) as $medication) {
@@ -48,9 +45,11 @@ class PrescriptionService
             [$filePath, $content] = $this->storePdf($prescription);
 
             if ($filePath && $content) {
-                $prescription->update([
-                    'file' => $filePath,
+                $prescription->document()->create([
+                    'timezone' => $request->input('timezone'),
+                    'snapshot' => $request->all(),
                     'sha256' => occu_hash($content),
+                    'file' => $filePath,
                 ]);
             }
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Models\Certificate;
+use App\Models\Document;
 use App\Models\MedicalDate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class OccupationalMedicineService
         return $this->persistCertificate($request, MedicalDate::findOrFail($request->input('occupational_medical_date.id')));
     }
 
-    private function persistCertificate(Request $request, MedicalDate $medicalDate): Certificate
+    private function persistCertificate(Request $request, MedicalDate $medicalDate): Document
     {
         return DB::transaction(function () use ($request, $medicalDate) {
             [$file, $content] = $this->storePdf($medicalDate, $request->input('medical_exam'));

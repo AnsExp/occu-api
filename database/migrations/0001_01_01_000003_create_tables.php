@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->string('name')->nullable(false);
             $table->text('description')->nullable(true);
             $table->decimal('price_base', 10, 2)->nullable(false)->default(0.00);
-            $table->string('form')->nullable(true);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -133,7 +132,7 @@ return new class extends Migration {
 
         Schema::create('medications', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable(false);
+            $table->string('name')->unique(true)->nullable(false);
             $table->decimal('price', 10, 2)->nullable(false)->default(0.00);
             $table->timestamps();
             $table->softDeletes();
@@ -206,13 +205,14 @@ return new class extends Migration {
             $table->enum('action', ['created', 'updated', 'deleted'])->nullable(false);
             $table->json('changes')->nullable(false);
             $table->foreignId('user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
-            $table->string('ip_address', 45)->nullable();
+            $table->string('ip_address', 15)->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
 
             $table->index('table');
             $table->index(['table', 'record_id']);
             $table->index(['table', 'record_id', 'action']);
+            $table->index(['table', 'user_id']);
             $table->index(['user_id', 'action']);
         });
 
@@ -226,7 +226,7 @@ return new class extends Migration {
 
         Schema::create('metadata', function (Blueprint $table) {
             $table->id();
-            $table->morphs('modelable');
+            $table->morphs('metadatable');
             $table->string('key')->nullable(false);
             $table->text('value')->nullable(false);
         });
@@ -242,10 +242,15 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        Schema::create('options', function (Blueprint $table) {
+        Schema::create('login_attempts', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->nullable(false)->constrained('users')->cascadeOnDelete();
-            $table->string('key')->nullable(false);
-            $table->longText('value')->nullable(false);
+            $table->boolean('success')->nullable(false)->default(false);
+            $table->string('ip_address', 15)->nullable();
+            $table->timestamp('attempted_at')->nullable(false)->default(DB::raw('CURRENT_TIMESTAMP'));
+
+            $table->index('user_id');
+            $table->index(['user_id', 'success']);
         });
     }
 
@@ -254,7 +259,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('options');
+        Schema::dropIfExists('login_attempts');
         Schema::dropIfExists('documents');
         Schema::dropIfExists('metadata');
         Schema::dropIfExists('allowed_ips');

@@ -19,10 +19,15 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'blocked' => (bool) $this->blocked_at,
             'roles' => array_map(fn($role) => [
                 'id' => $role->id,
                 'name' => $role->name,
             ], $this->roles->all() ?? []),
+            'metadata' => array_map(fn($meta) => [
+                'key' => $meta->key,
+                'value' => $meta->value,
+            ], $this->metadata->all()),
         ];
     }
 }

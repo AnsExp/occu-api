@@ -2,7 +2,6 @@
 
 namespace App\Http\Services;
 
-use App\Models\Agreement;
 use App\Models\MedicalDate;
 use App\Models\VitalSign;
 use Illuminate\Http\Request;

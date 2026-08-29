@@ -20,7 +20,6 @@ class MedicalDateController extends Controller
      */
     public function index(Request $request, MedicalDateFilter $filter)
     {
-        // $request->merge(['type' => 'normal']);
         $perPage = $request->input('per_page', 10);
         $data = $filter->query($request)->paginate($perPage);
         return MedicalDateResource::collection($data);

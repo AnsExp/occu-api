@@ -20,9 +20,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $email
  * @property Carbon|null $email_verified_at
  * @property string $password
+ * @property int $failed_attempts
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Carbon|null $blocked_at
  * @property Carbon|null $deleted_at
  */
 #[ObservedBy(UserObserver::class)]
@@ -39,16 +41,22 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'blocked_at',
+        'failed_attempts',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'failed_attempts',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'blocked_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        'failed_attempts' => 'integer',
     ];
 
     /**
@@ -64,18 +72,23 @@ class User extends Authenticatable
         return $this->where('email', $email)->first();
     }
 
-    public function personalData()
+    public function patient()
     {
-        return $this->hasOne(PersonalData::class);
+        return $this->hasOne(Patient::class);
     }
 
-    public function options()
+    public function doctor()
     {
-        return $this->hasMany(Option::class);
+        return $this->hasOne(Doctor::class);
     }
 
     public function getPrettyCreatedAtAttribute()
     {
         return $this->created_at->translatedFormat('F j, Y g:i A');
+    }
+
+    public function metadata()
+    {
+        return $this->morphMany(Metadata::class, 'metadatable');
     }
 }

@@ -20,6 +20,8 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    'failed_attempts_limit' => env('FAILED_ATTEMPTS_LIMIT', 5),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

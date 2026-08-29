@@ -31,6 +31,9 @@ class UserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
             'roles.*' => ['required', 'string', 'max:255', Rule::exists('roles', 'name')],
+            'metadata' => ['nullable', 'array'],
+            'metadata.*.key' => ['required', 'string', 'max:255'],
+            'metadata.*.value' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
         return $rules;

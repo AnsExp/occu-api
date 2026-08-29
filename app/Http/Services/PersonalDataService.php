@@ -5,7 +5,7 @@ namespace App\Http\Services;
 use App\Models\PersonalData;
 use Illuminate\Http\Request;
 
-class PersonService
+class PersonalDataService
 {
     public function store(Request $request)
     {
@@ -26,6 +26,8 @@ class PersonService
             'nationality' => $request->input('nationality'),
         ]);
 
+        $this->handleIdCardFile($request, $personalData);
+
         return $personalData;
     }
 
@@ -42,6 +44,20 @@ class PersonService
             'nationality' => $request->input('nationality') ?? $personalData->nationality,
         ])->save();
 
+        $this->handleIdCardFile($request, $personalData);
+
         return $personalData;
+    }
+
+    private function handleIdCardFile(Request $request, PersonalData $personalData): void
+    {
+        if (!$request->hasFile('id_card_file')) {
+            return;
+        }
+        $file = $request->file('id_card_file');
+        $filePath = 'personal_data/id_cards/' . $personalData->id_card . '.' . $file->getClientOriginalExtension();
+        occu_storage()->put($filePath, file_get_contents($file->getRealPath()));
+        $personalData->id_card_file = $filePath;
+        $personalData->save();
     }
 }

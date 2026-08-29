@@ -50,29 +50,6 @@ if (!function_exists('generate_laboratory_code')) {
     }
 }
 
-if (!function_exists('set_option')) {
-    function set_option(string $key, $value): void
-    {
-        App\Models\Option::updateOrCreate(
-            ['key' => $key],
-            ['value' => $value]
-        );
-        $GLOBALS['APP_OPTIONS'][$key] = $value;
-    }
-}
-
-if (!function_exists('get_option')) {
-    function get_option(string $key, $default = null)
-    {
-        if (array_key_exists($key, $GLOBALS['APP_OPTIONS'])) {
-            return $GLOBALS['APP_OPTIONS'][$key];
-        }
-        $setting = App\Models\Option::where('key', $key)->first();
-
-        return $setting ? $setting->value : $default;
-    }
-}
-
 if (!function_exists('occu_storage')) {
     function occu_storage()
     {

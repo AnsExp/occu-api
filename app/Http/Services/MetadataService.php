@@ -6,12 +6,15 @@ class MetadataService
 {
     public function store($model, array $metadata)
     {
+        $metadataByKey = collect($metadata)->keyBy('key');
+
         foreach ($model->metadata as $meta) {
-            if (!\array_key_exists($meta->key, $metadata)) {
+            if (!$metadataByKey->has($meta->key)) {
                 $meta->delete();
             }
         }
-        foreach ($metadata as $meta) {
+
+        foreach ($metadataByKey as $meta) {
             $model->metadata()->updateOrCreate(
                 ['key' => $meta['key']],
                 ['value' => $meta['value']]

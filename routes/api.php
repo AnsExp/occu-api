@@ -8,7 +8,6 @@ use App\Http\Controllers\OdontologyController;
 use App\Http\Controllers\OphthalmologyController;
 use App\Http\Controllers\PersonalDataController;
 use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\OccupationalMedicalDateController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VitalSignController;
@@ -58,9 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medical_dates', [MedicalDateController::class, 'index'])->middleware('ability:read.medical_dates');
     Route::get('/medical_dates/{medicalDate}', [MedicalDateController::class, 'show'])->middleware('ability:read.medical_dates');
     Route::get('/medical_dates/{medicalDate}/file', [MedicalDateController::class, 'file'])->middleware('ability:read.medical_dates');
-
-    Route::get('/occupational_medical_dates', [OccupationalMedicalDateController::class, 'index'])->middleware('ability:read.occupational_medical_dates');
-    Route::get('/occupational_medical_dates/{occupationalMedicalDate}', [OccupationalMedicalDateController::class, 'show'])->middleware('ability:read.occupational_medical_dates');
 
     Route::get('/prescriptions', [PrescriptionController::class, 'index'])->middleware('ability:read.prescriptions');
     Route::get('/prescriptions/{prescription}', [PrescriptionController::class, 'show'])->middleware('ability:read.prescriptions');
@@ -138,13 +134,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/laboratory_options/{laboratoryOption}', [LaboratoryOptionController::class, 'update'])->middleware('ability:update.laboratory_options');
         Route::delete('/laboratory_options/{laboratoryOption}', [LaboratoryOptionController::class, 'destroy'])->middleware('ability:delete.laboratory_options');
 
-        Route::post('/occupational_medical_dates', [OccupationalMedicalDateController::class, 'store'])->middleware('ability:create.occupational_medical_dates');
-
         Route::post('/audiology', [AudiologyController::class, 'store'])->middleware('ability:create.certificates');
 
         Route::post('/odontology', [OdontologyController::class, 'store'])->middleware('ability:create.certificates');
 
         Route::post('/ophthalmology', [OphthalmologyController::class, 'store'])->middleware('ability:create.certificates');
+
+        Route::post('/change_password/{user}', [AuthenticationController::class, 'changePasswordPerUser'])->middleware('ability:update.users');
 
     });
 

@@ -12,9 +12,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property string $first_name
  * @property string $last_name
- * @property string $fullname
- * @property string $id_card
+ * @property string $email
  * @property string $phone
+ * @property string $id_card
+ * @property string $id_card_file
+ * @property string $gender
+ * @property Carbon|null $birth_date
+ * @property string $nationality
  * @property int $user_id
  * @property User $user
  * @property Carbon|null $created_at
@@ -34,7 +38,6 @@ class PersonalData extends Model
         'id_card',
         'id_card_file',
         'gender',
-        'user_id',
         'birth_date',
         'nationality',
     ];
@@ -46,11 +49,6 @@ class PersonalData extends Model
     public static function findByIdCard(string $id_card): ?self
     {
         return self::where('id_card', $id_card)->first();
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function doctor()

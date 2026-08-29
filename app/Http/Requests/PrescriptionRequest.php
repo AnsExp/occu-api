@@ -14,7 +14,7 @@ class PrescriptionRequest extends FormRequest
         if (!$this->has('doctor.id')) {
             if ($user->hasRole('doctor')) {
                 $this->merge([
-                    'doctor.id' => $user->person?->doctor?->id,
+                    'doctor.id' => $user->doctor->id,
                 ]);
             }
         }
@@ -37,7 +37,7 @@ class PrescriptionRequest extends FormRequest
     {
         return [
             'timezone' => ['required', 'string'],
-            'person.id' => ['required', 'exists:personal_data,id'],
+            'person.id_card' => ['required', 'exists:personal_data,id_card'],
             'doctor.id' => ['nullable', 'exists:doctors,id'],
             'notes' => ['nullable', 'string'],
             'medications' => ['required', 'array'],

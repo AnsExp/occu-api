@@ -19,11 +19,17 @@ class AllowedIpRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'ip_address' => ['required', 'string', 'max:15', 'unique:allowed_ips,ip_address'],
-            'notes' => ['required', 'string', 'max:255'],
-            'expires_at' => ['nullable', 'datetime'],
+        $rules = [
+            'notes' => ['nullable', 'string', 'max:255'],
+            'expires_at' => ['nullable', 'date'],
         ];
+
+        if ($allowedIp = $this->route('allowedIp'))
+            $rules['ip_address'] = ['required', 'string', 'max:15', 'unique:allowed_ips,ip_address' . ($allowedIp ? ",$allowedIp->id" : '')];
+        else
+            $rules['ip_address'] = ['required', 'string', 'max:15', 'unique:allowed_ips,ip_address'];
+
+        return $rules;
     }
 
     public function messages()

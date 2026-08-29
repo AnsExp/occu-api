@@ -27,7 +27,7 @@ class LaboratoryOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'person.id' => ['required', 'numeric', 'exists:personal_data,id'],
+            'person.id_card' => ['required', 'numeric', 'exists:personal_data,id_card'],
             'timezone' => ['required', 'string'],
             'items' => ['required', 'array'],
             'items.*.option' => ['nullable', 'numeric', 'exists:laboratory_options,id'],

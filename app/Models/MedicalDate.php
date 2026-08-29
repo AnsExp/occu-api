@@ -24,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property Patient $patient
  * @property Specialty|null $specialty
  * @property VitalSign|null $vital_signs
- * @property Certificate|null $certificate
+ * @property Document|null $certificate
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -113,6 +113,6 @@ class MedicalDate extends Model
 
     public function metadata()
     {
-        return $this->morphMany(Metadata::class, 'model');
+        return $this->morphMany(Metadata::class, 'metadatable');
     }
 }

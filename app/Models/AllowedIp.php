@@ -22,6 +22,6 @@ class AllowedIp extends Model
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime',
+        'expires_at' => 'date',
     ];
 }

@@ -51,7 +51,7 @@ class AgreementService
                 ]);
             }
 
-            return null;
+            return $agreement;
         });
     }
 }

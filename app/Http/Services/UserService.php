@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 
 class UserService
 {
+    public function __construct(private MetadataService $metadataService)
+    {
+    }
+
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
@@ -17,6 +21,9 @@ class UserService
                 'password' => bcrypt($request->input('password')),
             ]);
             $user->syncRoles($request->input('roles'));
+
+            $this->metadataService->store($user, $request->input('metadata', []));
+
             return $user;
         });
     }
@@ -32,6 +39,8 @@ class UserService
 
             $user->givePermissionTo([]);
             $user->syncRoles($request->input('roles'));
+
+            $this->metadataService->store($user, $request->input('metadata', []));
 
             return $user;
         });

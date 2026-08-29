@@ -68,7 +68,7 @@ class Patient extends Model
 
     public function metadata()
     {
-        return $this->morphMany(Metadata::class, 'modelable');
+        return $this->morphMany(Metadata::class, 'metadatable');
     }
 
     public function getMeta(string $key, $default = null)
