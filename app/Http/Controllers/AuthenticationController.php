@@ -8,8 +8,46 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @group Autenticación
+ *
+ * Inicio y cierre de sesión, emisión de tokens Sanctum y administración de contraseñas.
+ */
 class AuthenticationController extends Controller
 {
+    /**
+    * Iniciar sesión
+    *
+    * Valida las credenciales, registra el intento de acceso y devuelve un token personal de Sanctum.
+    * El token queda limitado a las habilidades asignadas al usuario y debe enviarse como
+    * `Authorization: Bearer {token}` en los endpoints protegidos.
+    *
+    * Tras alcanzar el límite configurado de intentos fallidos, la cuenta queda bloqueada.
+    * Un inicio de sesión exitoso reinicia el contador de intentos y revoca los tokens previos.
+    *
+    * @bodyParam email string required Correo electrónico registrado del usuario. Example: usuario@occumaster.test
+    * @bodyParam password string required Contraseña del usuario. Example: password123
+    *
+    * @response 200 scenario="Acceso concedido" {
+    *   "success": true,
+    *   "message": "Authorization complete.",
+    *   "token": "1|token-personal-de-sanctum",
+    *   "abilities": ["read.patients", "create.medical_dates"],
+    *   "user": {
+    *     "name": "María Pérez",
+    *     "email": "usuario@occumaster.test",
+    *     "roles": ["doctor"]
+    *   }
+    * }
+    * @response 401 scenario="Usuario inexistente o credenciales inválidas" {
+    *   "success": false,
+    *   "message": "Unauthorized"
+    * }
+    * @response 403 scenario="Cuenta bloqueada" {
+    *   "success": false,
+    *   "message": "Account is blocked due to too many failed login attempts."
+    * }
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -90,41 +128,20 @@ class AuthenticationController extends Controller
         ], 200);
     }
 
+    /**
+     * Cerrar sesión
+     *
+     * Revoca todos los tokens personales activos del usuario autenticado.
+     *
+     * @authenticated
+     * @response 200 {
+     *   "message": "Logged out successfully."
+     * }
+     */
     public function logout(Request $request)
     {
         $user = Auth::user();
         $user->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully.'], 200);
-    }
-
-    public function changePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        $user = Auth::user();
-
-        if (!\Hash::check($request->input('current_password', ''), $user->password)) {
-            return response()->json(['message' => 'Current password is incorrect.'], 400);
-        }
-
-        $user->password = \Hash::make($request->input('new_password'));
-        $user->save();
-
-        return response()->json(['message' => 'Password changed successfully.'], 200);
-    }
-
-    public function changePasswordPerUser(Request $request, User $user)
-    {
-        $request->validate([
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        $user->password = \Hash::make($request->input('new_password'));
-        $user->save();
-
-        return response()->json(['message' => 'Password changed successfully.'], 200);
     }
 }

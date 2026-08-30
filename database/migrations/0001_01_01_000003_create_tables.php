@@ -236,7 +236,8 @@ return new class extends Migration {
             $table->morphs('documentable');
             $table->string('timezone')->nullable(true);
             $table->json('snapshot')->nullable(true);
-            $table->string('sha256')->unique(true)->nullable(false);
+            $table->string('version')->nullable(false)->default('1.0');
+            $table->string('sha256')->nullable(false)->unique(true);
             $table->string('file')->nullable(false);
             $table->timestamps();
             $table->softDeletes();

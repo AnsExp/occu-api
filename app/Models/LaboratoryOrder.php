@@ -57,8 +57,12 @@ class LaboratoryOrder extends Model
         return $this->created_at->translatedFormat('F j, Y g:i A');
     }
 
-    public function document()
+    public function documents()
     {
-        return $this->morphOne(Document::class, 'documentable');
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function latestDocument(){
+        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 }

@@ -3,21 +3,30 @@
 namespace App\Http\Filters;
 
 use App\Models\Medication;
-use Illuminate\Http\Request;
 
 class MedicationFilter
 {
-    public function query(Request $request)
+    public function query(array $params)
     {
         $query = Medication::query();
 
-        if ($request->has('name')) {
-            $query->where('name', 'like', "%{$request->input('name')}%");
+        if (isset($params['name'])) {
+            $query->where('name', 'like', "%{$params['name']}%");
         }
 
-        if ($request->has('order_by')) {
-            $orderBy = $request->input('order_by');
-            $order = $request->input('order', 'asc');
+        if (isset($params['price'])) {
+            $query->where('price', $params['price']);
+        } else if (isset($params['price_min']) && isset($params['price_max'])) {
+            $query->whereBetween('price', [$params['price_min'], $params['price_max']]);
+        } else if (isset($params['price_min'])) {
+            $query->where('price', '>=', $params['price_min']);
+        } else if (isset($params['price_max'])) {
+            $query->where('price', '<=', $params['price_max']);
+        }
+
+        if (isset($params['order_by'])) {
+            $orderBy = $params['order_by'];
+            $order = $params['order'] ?? 'asc';
             $query->orderBy($orderBy, $order);
         } else {
             $query->orderBy('created_at', 'desc');

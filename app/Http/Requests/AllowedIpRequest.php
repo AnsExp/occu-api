@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AllowedIpRequest extends FormRequest
 {
@@ -19,17 +20,12 @@ class AllowedIpRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        $allowedIp = $this->route('allowedIp');
+        return [
             'notes' => ['nullable', 'string', 'max:255'],
             'expires_at' => ['nullable', 'date'],
+            'ip_address' => ['required', 'string', 'max:15', Rule::unique('allowed_ips', 'ip_address')->ignore($allowedIp)],
         ];
-
-        if ($allowedIp = $this->route('allowedIp'))
-            $rules['ip_address'] = ['required', 'string', 'max:15', 'unique:allowed_ips,ip_address' . ($allowedIp ? ",$allowedIp->id" : '')];
-        else
-            $rules['ip_address'] = ['required', 'string', 'max:15', 'unique:allowed_ips,ip_address'];
-
-        return $rules;
     }
 
     public function messages()

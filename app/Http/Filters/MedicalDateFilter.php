@@ -3,14 +3,13 @@
 namespace App\Http\Filters;
 
 use App\Models\MedicalDate;
-use Illuminate\Http\Request;
 
 class MedicalDateFilter
 {
-    public function query(Request $request)
+    public function query(array $params)
     {
         $query = MedicalDate::query();
-        $user = $request->user();
+        $user = auth()->user();
 
         if ($user->hasRole('doctor')) {
             $query->where('doctor_id', $user->person->doctor->id);
@@ -18,65 +17,71 @@ class MedicalDateFilter
             $query->where('patient_id', $user->person->patient->id);
         }
 
-        if ($request->has('date')) {
-            $query->where('date', $request->input('date'));
+        if (isset($params['date'])) {
+            $query->where('date', $params['date']);
+        } else if (isset($params['date_min']) && isset($params['date_max'])) {
+            $query->whereBetween('date', [$params['date_min'], $params['date_max']]);
+        } else if (isset($params['date_min'])) {
+            $query->where('date', '>=', $params['date_min']);
+        } else if (isset($params['date_max'])) {
+            $query->where('date', '<=', $params['date_max']);
         }
 
-        if ($request->has('type')) {
-            $query->where('type', $request->input('type'));
+        if (isset($params['type'])) {
+            $query->where('type', $params['type']);
         }
 
-        if ($request->has('doctor_id')) {
-            $query->where('doctor_id', $request->input('doctor_id'));
+        if (isset($params['doctor_id'])) {
+            $query->where('doctor_id', $params['doctor_id']);
         }
 
-        if ($request->has('specialty_id')) {
-            $query->where('specialty_id', $request->input('specialty_id'));
+        if (isset($params['specialty_id'])) {
+            $query->where('specialty_id', $params['specialty_id']);
         }
 
-        if ($request->has('doctor_id_card')) {
-            $query->whereHas('doctor.person', function ($q) use ($request) {
-                $q->where('id_card', $request->input('doctor_id_card'));
+        if (isset($params['doctor_id_card'])) {
+            $query->whereHas('doctor.personalData', function ($q) use ($params) {
+                $q->where('id_card', $params['doctor_id_card']);
             });
         }
 
-        if ($request->has('doctor_first_name')) {
-            $query->whereHas('doctor.person', function ($q) use ($request) {
-                $q->where('first_name', 'like', "%{$request->input('doctor_first_name')}%");
+        if (isset($params['doctor_first_name'])) {
+            $query->whereHas('doctor.personalData', function ($q) use ($params) {
+                $q->where('first_name', 'like', "%{$params['doctor_first_name']}%");
             });
         }
 
-        if ($request->has('doctor_last_name')) {
-            $query->whereHas('doctor.person', function ($q) use ($request) {
-                $q->where('last_name', 'like', "%{$request->input('doctor_last_name')}%");
+        if (isset($params['doctor_last_name'])) {
+            $query->whereHas('doctor.personalData', function ($q) use ($params) {
+                $q->where('last_name', 'like', "%{$params['doctor_last_name']}%");
             });
         }
 
-        if ($request->has('patient_id')) {
-            $query->where('patient_id', $request->input('patient_id'));
+        if (isset($params['patient_id'])) {
+            $query->where('patient_id', $params['patient_id']);
         }
 
-        if ($request->has('patient_id_card')) {
-            $query->whereHas('patient.person', function ($q) use ($request) {
-                $q->where('id_card', $request->input('patient_id_card'));
+        if (isset($params['patient_id_card'])) {
+            $query->whereHas('patient.personalData', function ($q) use ($params) {
+                $q->where('id_card', $params['patient_id_card']);
             });
         }
 
-        if ($request->has('patient_first_name')) {
-            $query->whereHas('patient.person', function ($q) use ($request) {
-                $q->where('first_name', 'like', "%{$request->input('patient_first_name')}%");
+        if (isset($params['patient_first_name'])) {
+            $query->whereHas('patient.personalData', function ($q) use ($params) {
+                $q->where('first_name', 'like', "%{$params['patient_first_name']}%");
             });
         }
 
-        if ($request->has('patient_last_name')) {
-            $query->whereHas('patient.person', function ($q) use ($request) {
-                $q->where('last_name', 'like', "%{$request->input('patient_last_name')}%");
+        if (isset($params['patient_last_name'])) {
+            $query->whereHas('patient.personalData', function ($q) use ($params) {
+                $q->where('last_name', 'like', "%{$params['patient_last_name']}%");
             });
         }
 
-        if ($request->has('order_by')) {
-            $orderBy = $request->input('order_by');
-            $order = $request->input('order', 'asc');
+        if (isset($params['order_by'])) {
+            $orderBy = $params['order_by'];
+            $order = $params['order'] ?? 'asc';
             $query->orderBy($orderBy, $order);
         } else {
             $query->orderBy('created_at', 'desc');

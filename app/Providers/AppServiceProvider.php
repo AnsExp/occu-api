@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // $this->configureDefaults();
         Gate::before(fn($user, $ability) => $user->hasRole('administrator') ? true : null);
+        Gate::define('viewApiDoc', fn(User $user) => true); 
     }
 
     /**

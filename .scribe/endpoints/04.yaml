@@ -1,0 +1,627 @@
+name: Convenios
+description: |-
+
+  Gestión de convenios médicos en el sistema.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/agreements
+    metadata:
+      custom: []
+      groupName: Convenios
+      groupDescription: |-
+
+        Gestión de convenios médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta la información de los convenios en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Número de resultados por página. Por defecto, 15.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Número de página actual. Por defecto, 1.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      institution:
+        custom: []
+        name: institution
+        description: 'Filtro por institución.'
+        required: false
+        example: 'Hospital Central'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'Filtro por tipo de descuento.'
+        required: false
+        example: percentage
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_amount:
+        custom: []
+        name: discount_amount
+        description: 'Filtro por monto de descuento.'
+        required: false
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_amount_min:
+        custom: []
+        name: discount_amount_min
+        description: 'Filtro por monto mínimo de descuento.'
+        required: false
+        example: 5
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_amount_max:
+        custom: []
+        name: discount_amount_max
+        description: 'Filtro por monto máximo de descuento.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      order_by:
+        custom: []
+        name: order_by
+        description: 'Campo por el cual ordenar los resultados.'
+        required: false
+        example: institution
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      order:
+        custom: []
+        name: order
+        description: 'Orden de los resultados. Valores posibles: asc, desc.'
+        required: false
+        example: asc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 16
+      page: 16
+      institution: 'Hospital Central'
+      discount_type: percentage
+      discount_amount: 10
+      discount_amount_min: 5
+      discount_amount_max: 16
+      order_by: institution
+      order: asc
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": [
+                  {
+                      "id": 1,
+                      "institution": "Universidad Católica",
+                      "description": "Convenio para estudiantes y personal docente",
+                      "discount_type": "percentage",
+                      "discount_amount": 15,
+                      "requirements": [
+                          {
+                              "id": 10,
+                              "name": "Medicina General"
+                          },
+                          {
+                              "id": 12,
+                              "name": "Odontología"
+                          }
+                      ]
+                  },
+                  {
+                      "id": 2,
+                      "institution": "Empresa Eléctrica",
+                      "description": "Beneficio para empleados activos",
+                      "discount_type": "fixed",
+                      "discount_amount": 25,
+                      "requirements": [
+                          {
+                              "id": 14,
+                              "name": "Cardiología"
+                          }
+                      ]
+                  }
+              ],
+              "links": {
+                  "first": "http://example.com/api/agreements?page=1",
+                  "last": "http://example.com/api/agreements?page=10",
+                  "prev": null,
+                  "next": "http://example.com/api/agreements?page=2"
+              },
+              "meta": {
+                  "current_page": 1,
+                  "from": 1,
+                  "last_page": 10,
+                  "links": [
+                      {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/agreements?page=1",
+                          "label": "1",
+                          "active": true
+                      },
+                      {
+                          "url": "http://example.com/api/agreements?page=2",
+                          "label": "2",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/agreements?page=3",
+                          "label": "3",
+                          "active": false
+                      }
+                  ],
+                  "path": "http://example.com/api/agreements",
+                  "per_page": 15,
+                  "to": 15,
+                  "total": 150
+              }
+          }
+        headers: []
+        description: 'Consulta exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/agreements/{agreement_id}'
+    metadata:
+      custom: []
+      groupName: Convenios
+      groupDescription: |-
+
+        Gestión de convenios médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta la información de un convenio específico en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      agreement_id:
+        custom: []
+        name: agreement_id
+        description: 'ID del convenio.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      agreement_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "id": 1,
+                  "institution": "Universidad Católica",
+                  "description": "Convenio para estudiantes y personal docente",
+                  "discount_type": "percentage",
+                  "discount_amount": 15,
+                  "requirements": [
+                      {
+                          "id": 10,
+                          "name": "Medicina General"
+                      },
+                      {
+                          "id": 12,
+                          "name": "Odontología"
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: 'Consulta exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/agreements
+    metadata:
+      custom: []
+      groupName: Convenios
+      groupDescription: |-
+
+        Gestión de convenios médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Guarda un nuevo convenio en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      institution:
+        custom: []
+        name: institution
+        description: 'Nombre de la institución.'
+        required: true
+        example: 'Hospital Central'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'Tipo de descuento.'
+        required: true
+        example: Porcentaje
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_amount:
+        custom: []
+        name: discount_amount
+        description: 'Monto del descuento.'
+        required: true
+        example: 10.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'Descripción del convenio.'
+        required: false
+        example: 'Descuento especial para empleados.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      requirements:
+        custom: []
+        name: requirements
+        description: 'Must match an existing stored value.'
+        required: true
+        example:
+          - architecto
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      requirement:
+        custom: []
+        name: requirement
+        description: 'IDs de las especialidades asociadas al convenio.'
+        required: false
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      institution: 'Hospital Central'
+      discount_type: Porcentaje
+      discount_amount: 10.0
+      description: 'Descuento especial para empleados.'
+      requirements:
+        - architecto
+      requirement:
+        - 1
+        - 2
+        - 3
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "institution": "Universidad Católica",
+                  "description": "Convenio para estudiantes y personal docente",
+                  "discount_type": "percentage",
+                  "discount_amount": 15,
+                  "requirements": [
+                      {
+                          "id": 10,
+                          "name": "Medicina General"
+                      },
+                      {
+                          "id": 12,
+                          "name": "Odontología"
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: 'Guardado exitoso'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/agreements/{agreement_id}'
+    metadata:
+      custom: []
+      groupName: Convenios
+      groupDescription: |-
+
+        Gestión de convenios médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Actualiza la información de un convenio específico en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      agreement_id:
+        custom: []
+        name: agreement_id
+        description: 'ID del convenio.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      agreement_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      institution:
+        custom: []
+        name: institution
+        description: 'Nombre de la institución.'
+        required: true
+        example: 'Hospital Central'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_type:
+        custom: []
+        name: discount_type
+        description: 'Tipo de descuento.'
+        required: true
+        example: Porcentaje
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      discount_amount:
+        custom: []
+        name: discount_amount
+        description: 'Monto del descuento.'
+        required: true
+        example: 10.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'Descripción del convenio.'
+        required: false
+        example: 'Descuento especial para empleados.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      requirement:
+        custom: []
+        name: requirement
+        description: 'IDs de las especialidades asociadas al convenio.'
+        required: false
+        example:
+          - 1
+          - 2
+          - 3
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      institution: 'Hospital Central'
+      discount_type: Porcentaje
+      discount_amount: 10.0
+      description: 'Descuento especial para empleados.'
+      requirement:
+        - 1
+        - 2
+        - 3
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "institution": "Universidad Católica",
+                  "description": "Convenio para estudiantes y personal docente",
+                  "discount_type": "percentage",
+                  "discount_amount": 15,
+                  "requirements": [
+                      {
+                          "id": 10,
+                          "name": "Medicina General"
+                      },
+                      {
+                          "id": 12,
+                          "name": "Odontología"
+                      }
+                  ]
+              }
+          }
+        headers: []
+        description: 'Actualización exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/agreements/{agreement_id}'
+    metadata:
+      custom: []
+      groupName: Convenios
+      groupDescription: |-
+
+        Gestión de convenios médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Elimina un convenio específico del sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      agreement_id:
+        custom: []
+        name: agreement_id
+        description: 'ID del convenio.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      agreement_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "message": "Agreement deleted successfully"
+          }
+        headers: []
+        description: 'Eliminación exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

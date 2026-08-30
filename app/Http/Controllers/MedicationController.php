@@ -20,8 +20,8 @@ class MedicationController extends Controller
      */
     public function index(Request $request, MedicationFilter $filter)
     {
-        $perPage = $request->input('per_page', 15);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return MedicationResource::collection($data);
     }
 
@@ -31,7 +31,7 @@ class MedicationController extends Controller
     public function store(MedicationRequest $request)
     {
         $medication = $this->medicationService->store($request);
-        return MedicationResource::make($medication);
+        return response()->json(MedicationResource::make($medication), 201);
     }
 
     /**
@@ -39,7 +39,7 @@ class MedicationController extends Controller
      */
     public function show(Medication $medication)
     {
-        return MedicationResource::make($medication);
+        return response()->json(MedicationResource::make($medication), 200);
     }
 
     /**
@@ -48,7 +48,7 @@ class MedicationController extends Controller
     public function update(MedicationRequest $request, Medication $medication)
     {
         $medication = $this->medicationService->update($request, $medication);
-        return MedicationResource::make($medication);
+        return response()->json(MedicationResource::make($medication), 200);
     }
 
     /**
@@ -57,6 +57,6 @@ class MedicationController extends Controller
     public function destroy(Medication $medication)
     {
         $medication->delete();
-        return response()->noContent();
+        return response()->json(['message' => 'Medication deleted successfully.'], 200);
     }
 }

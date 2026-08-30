@@ -3,21 +3,20 @@
 namespace App\Http\Filters;
 
 use App\Models\Specialty;
-use Illuminate\Http\Request;
 
 class SpecialtyFilter
 {
-    public function query(Request $request)
+    public function query(array $params)
     {
         $query = Specialty::query();
 
-        if ($request->has('name')) {
-            $query->where('name', 'like', "%{$request->input('name')}%");
+        if (isset($params['name'])) {
+            $query->where('name', 'like', "%{$params['name']}%");
         }
 
-        if ($request->has('order_by')) {
-            $orderBy = $request->input('order_by');
-            $order = $request->input('order', 'asc');
+        if (isset($params['order_by'])) {
+            $orderBy = $params['order_by'];
+            $order = $params['order'] ?? 'asc';
             $query->orderBy($orderBy, $order);
         } else {
             $query->orderBy('created_at', 'desc');

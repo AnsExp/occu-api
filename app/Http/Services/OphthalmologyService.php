@@ -2,55 +2,42 @@
 
 namespace App\Http\Services;
 
-use App\Models\Document;
 use App\Models\MedicalDate;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OphthalmologyService
 {
-    private string $documentTemplate = 'documents.ophthalmology';
-    private string $storageDiskPath = 'certificates/ophthalmology';
+    use DocumentService;
+
+    public function __construct()
+    {
+        $this->documentTemplate = 'documents.ophthalmology';
+        $this->storageDiskPath = 'certificates/ophthalmology';
+    }
 
     public function store(Request $request)
     {
-        return $this->persistCertificate($request, MedicalDate::findOrFail($request->input('medical_date.id')));
+        $medicalDate = MedicalDate::findOrFail($request->input('medical_date.id'));
+        return $this->createDocument($request, $medicalDate);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, MedicalDate $medicalDate)
     {
-        return $this->persistCertificate($request, MedicalDate::findOrFail($request->input('medical_date.id')));
+        return $this->createDocument($request, $medicalDate);
     }
 
-    private function persistCertificate(Request $request, MedicalDate $medicalDate): Document
+    private function createDocument(Request $request, MedicalDate $medicalDate)
     {
         return DB::transaction(function () use ($request, $medicalDate) {
-            [$file, $content] = $this->storePdf($medicalDate, $request->input('medical_exam'));
+            $snapshot = $request->input('medical_exam', []);
 
-            if (!$file || !$content) {
-                throw new \RuntimeException("Error al generar PDF del certificado.");
-            }
-
-            $medicalDate->certificate()->create([
-                'timezone' => $request->input('timezone'),
-                'snapshot' => $request->input('medical_exam', []),
-                'sha256' => occu_hash($content),
-                'file' => $file,
-            ]);
-
-            return $medicalDate->certificate()->first();
+            return $this->createVersionedDocument(
+                $medicalDate,
+                ['medical_date' => $medicalDate, 'snapshot' => $snapshot],
+                $snapshot,
+                $request->input('timezone'),
+            );
         });
-    }
-
-    /**
-     * Genera y guarda el PDF del certificado.
-     */
-    private function storePdf(MedicalDate $medicalDate, array $snapshot): array
-    {
-        $pdf = Pdf::loadView($this->documentTemplate, compact('medicalDate', 'snapshot'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
-        $filePath = "{$this->storageDiskPath}/{$medicalDate->code}.pdf";
-        $content = $pdf->output();
-        return occu_storage()->put($filePath, $content) ? [$filePath, $content] : [false, false];
     }
 }

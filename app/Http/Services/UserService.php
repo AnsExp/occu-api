@@ -45,4 +45,17 @@ class UserService
             return $user;
         });
     }
+
+    public function changePassword(Request $request, User $user)
+    {
+        return DB::transaction(function () use ($request, $user) {
+            $request->validate([
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+            $user->update([
+                'password' => bcrypt($request->input('password')),
+            ]);
+            return $user;
+        });
+    }
 }

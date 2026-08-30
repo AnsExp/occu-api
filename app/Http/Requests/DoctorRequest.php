@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class DoctorRequest extends FormRequest
+class DoctorRequest extends PersonalDataRequest
 {
     protected function prepareForValidation()
     {
@@ -28,13 +27,8 @@ class DoctorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            ...$this->commonRules(),
             'is_occupational_doctor' => ['required', 'boolean'],
-            'phone' => ['nullable', 'string'],
-            'id_card' => ['required', 'string'],
-            'id_card_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
             'specialty.id' => ['required', 'exists:specialties,id'],
             'metadata' => ['nullable', 'array'],
             'metadata.*.key' => ['required', 'string'],
@@ -45,18 +39,11 @@ class DoctorRequest extends FormRequest
     public function messages()
     {
         return [
-            'doctor.id.required' => __('validation.required', ['attribute' => __('attributes.responsible_doctor')]),
-            'doctor.id.numeric' => __('validation.numeric', ['attribute' => __('attributes.responsible_doctor')]),
-            'doctor.id.exists' => __('validation.exists', ['attribute' => __('attributes.responsible_doctor')]),
-            'order.order_number.required' => __('validation.required', ['attribute' => __('attributes.order_number')]),
-            'order.order_number.numeric' => __('validation.numeric', ['attribute' => __('attributes.order_number')]),
-            'order.order_number.exists' => __('validation.exists', ['attribute' => __('attributes.order_number')]),
-            'medical_exam.array' => __('validation.array', ['attribute' => __('audiology.medical_exam')]),
-            'medical_exam.required' => __('validation.required', ['attribute' => __('audiology.medical_exam')]),
-            'medical_exam.hearing.array' => __('validation.array', ['attribute' => __('audiology.hearing')]),
-            'medical_exam.hearing.required' => __('validation.required', ['attribute' => __('audiology.hearing')]),
-            'medical_exam.speech_whisper.array' => __('validation.array', ['attribute' => __('audiology.speech_whisper_test')]),
-            'medical_exam.speech_whisper.required' => __('validation.required', ['attribute' => __('audiology.speech_whisper_test')]),
+            ...$this->commonMessages(),
+            'is_occupational_doctor.required' => __('validation.required', ['attribute' => __('attributes.is_occupational_doctor')]),
+            'is_occupational_doctor.boolean' => __('validation.boolean', ['attribute' => __('attributes.is_occupational_doctor')]),
+            'specialty.id.required' => __('validation.required', ['attribute' => __('attributes.specialty')]),
+            'specialty.id.exists' => __('validation.exists', ['attribute' => __('attributes.specialty')]),
         ];
     }
 }

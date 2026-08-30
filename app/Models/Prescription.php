@@ -55,8 +55,17 @@ class Prescription extends Model
         return $this->updated_at->setTimezone($this->timezone)->translatedFormat('F j, Y H:i A');
     }
 
-    public function document()
+    /**
+     * Summary of document
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document, Prescription>
+     */
+    public function documents()
     {
-        return $this->morphOne(Document::class, 'documentable');
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function latestDocument()
+    {
+        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 }

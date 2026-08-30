@@ -10,9 +10,10 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
- * @property string $modelable_type
- * @property int $modelable_id
- * @property string $timezone
+ * @property string $documentable_type
+ * @property int $documentable_id
+ * @property string $version
+ * @property string|null $timezone
  * @property array|null $snapshot
  * @property string $sha256
  * @property string $file
@@ -28,6 +29,7 @@ class Document extends Model
     protected $fillable = [
         'documentable_type',
         'documentable_id',
+        'version',
         'timezone',
         'snapshot',
         'sha256',

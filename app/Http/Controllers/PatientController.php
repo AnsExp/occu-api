@@ -20,8 +20,8 @@ class PatientController extends Controller
      */
     public function index(Request $request, PatientFilter $filter)
     {
-        $perPage = $request->input('per_page', 15);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return PatientResource::collection($data);
     }
 
@@ -31,7 +31,7 @@ class PatientController extends Controller
     public function store(PatientRequest $request)
     {
         $patient = $this->patientService->store($request);
-        return PatientResource::make($patient);
+        return response()->json(PatientResource::make($patient), 201);
     }
 
     /**
@@ -39,7 +39,7 @@ class PatientController extends Controller
      */
     public function show(Patient $patient)
     {
-        return PatientResource::make($patient);
+        return response()->json(PatientResource::make($patient), 200);
     }
 
     /**
@@ -48,7 +48,7 @@ class PatientController extends Controller
     public function update(PatientRequest $request, Patient $patient)
     {
         $patient = $this->patientService->update($request, $patient);
-        return PatientResource::make($patient);
+        return response()->json(PatientResource::make($patient), 200);
     }
 
     /**
@@ -57,6 +57,6 @@ class PatientController extends Controller
     public function destroy(Patient $patient)
     {
         $patient->delete();
-        return response()->json(['message' => 'Patient deleted successfully']);
+        return response()->json(['message' => 'Patient deleted successfully.'], 200);
     }
 }

@@ -32,14 +32,14 @@ class OccupationalMedicineService
                 throw new \RuntimeException("Error al generar PDF del certificado.");
             }
 
-            $medicalDate->certificate()->create([
+            $medicalDate->document()->create([
                 'timezone' => $request->input('timezone'),
                 'snapshot' => $request->input('medical_exam', []),
                 'sha256' => occu_hash($content),
                 'file' => $file,
             ]);
 
-            return $medicalDate->certificate()->first();
+            return $medicalDate->document()->first();
         });
     }
 

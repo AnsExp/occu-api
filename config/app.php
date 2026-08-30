@@ -17,6 +17,8 @@ return [
 
     'tax_rate' => env('TAX_RATE', 0),
 
+    'page_limit' => env('PAGE_LIMIT', 15),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -8,7 +8,6 @@ use App\Models\Prescription;
 use App\Http\Services\PrescriptionService;
 use App\Http\Resources\PrescriptionResource;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PrescriptionController extends Controller
 {
@@ -21,8 +20,8 @@ class PrescriptionController extends Controller
      */
     public function index(Request $request, PrescriptionFilter $filter)
     {
-        $perPage = $request->input('per_page', 10);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return PrescriptionResource::collection($data);
     }
 
@@ -32,7 +31,7 @@ class PrescriptionController extends Controller
     public function store(PrescriptionRequest $request)
     {
         $prescription = $this->prescriptionService->store($request);
-        return PrescriptionResource::make($prescription);
+        return response()->json(PrescriptionResource::make($prescription), 201);
     }
 
     /**
@@ -40,7 +39,7 @@ class PrescriptionController extends Controller
      */
     public function show(Prescription $prescription)
     {
-        return PrescriptionResource::make($prescription);
+        return response()->json(PrescriptionResource::make($prescription), 200);
     }
 
     /**
@@ -48,8 +47,16 @@ class PrescriptionController extends Controller
      */
     public function file(Prescription $prescription)
     {
-        $pdf = Pdf::loadView('documents.prescription', compact('prescription'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
-        return $pdf->stream();
+        $document = $prescription->document;
+        $storage = occu_storage();
+
+        if (!$document || !$storage->exists($document->file)) {
+            return response()->json([
+                'message' => 'Document not found for this prescription.'
+            ], 404);
+        }
+
+        return response()->file($storage->path($document->file));
     }
 
     /**
@@ -58,7 +65,7 @@ class PrescriptionController extends Controller
     public function update(PrescriptionRequest $request, Prescription $prescription)
     {
         $prescription = $this->prescriptionService->update($request, $prescription);
-        return PrescriptionResource::make($prescription);
+        return response()->json(PrescriptionResource::make($prescription), 200);
     }
 
     /**
@@ -67,6 +74,6 @@ class PrescriptionController extends Controller
     public function destroy(Prescription $prescription)
     {
         $prescription->delete();
-        return response()->json(['message' => 'Prescription deleted successfully']);
+        return response()->json(['message' => 'Prescription deleted successfully'], 200);
     }
 }

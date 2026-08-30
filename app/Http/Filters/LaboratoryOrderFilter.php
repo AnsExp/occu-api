@@ -3,41 +3,40 @@
 namespace App\Http\Filters;
 
 use App\Models\LaboratoryOrder;
-use Illuminate\Http\Request;
 
 class LaboratoryOrderFilter
 {
-    public function query(Request $request)
+    public function query(array $params)
     {
         $query = LaboratoryOrder::query();
 
-        if ($request->has('patient_id_card')) {
-            $query->whereHas('patient.personalData', function ($q) use ($request) {
-                $q->where('id_card', $request->input('patient_id_card'));
+        if (isset($params['patient_id_card'])) {
+            $query->whereHas('patient.personalData', function ($q) use ($params) {
+                $q->where('id_card', $params['patient_id_card']);
             });
         }
 
-        if ($request->has('patient_id')) {
-            $query->whereHas('patient.personalData', function ($q) use ($request) {
-                $q->where('id', $request->input('patient_id'));
+        if (isset($params['patient_id'])) {
+            $query->whereHas('patient.personalData', function ($q) use ($params) {
+                $q->where('id', $params['patient_id']);
             });
         }
 
-        if ($request->has('doctor_id_card')) {
-            $query->whereHas('doctor.personalData', function ($q) use ($request) {
-                $q->where('id_card', $request->input('doctor_id_card'));
+        if (isset($params['doctor_id_card'])) {
+            $query->whereHas('doctor.personalData', function ($q) use ($params) {
+                $q->where('id_card', $params['doctor_id_card']);
             });
         }
 
-        if ($request->has('doctor_id')) {
-            $query->whereHas('doctor.personalData', function ($q) use ($request) {
-                $q->where('id', $request->input('doctor_id'));
+        if (isset($params['doctor_id'])) {
+            $query->whereHas('doctor.personalData', function ($q) use ($params) {
+                $q->where('id', $params['doctor_id']);
             });
         }
 
-        if ($request->has('order_by')) {
-            $orderBy = $request->input('order_by');
-            $order = $request->input('order', 'asc');
+        if (isset($params['order_by'])) {
+            $orderBy = $params['order_by'];
+            $order = $params['order'] ?? 'asc';
             $query->orderBy($orderBy, $order);
         } else {
             $query->orderBy('created_at', 'desc');

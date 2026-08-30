@@ -1,0 +1,875 @@
+name: Médicos
+description: |-
+
+  Gestiona los médicos en el sistema.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/doctors
+    metadata:
+      custom: []
+      groupName: Médicos
+      groupDescription: |-
+
+        Gestiona los médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta la información de los médicos en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Número de resultados por página. Por defecto, 15.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Número de página actual. Por defecto, 1.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id_occupational_doctor:
+        custom: []
+        name: id_occupational_doctor
+        description: 'Filtro por si es médico ocupacional.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      id_card:
+        custom: []
+        name: id_card
+        description: 'Filtro por número de identificación.'
+        required: false
+        example: 12345678A
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      first_name:
+        custom: []
+        name: first_name
+        description: 'Filtro por nombre.'
+        required: false
+        example: Juan
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      last_name:
+        custom: []
+        name: last_name
+        description: 'Filtro por apellido.'
+        required: false
+        example: Pérez
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      specialty_id:
+        custom: []
+        name: specialty_id
+        description: 'Filtro por especialidad.'
+        required: false
+        example: '1'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      order_by:
+        custom: []
+        name: order_by
+        description: 'Campo por el cual ordenar los resultados.'
+        required: false
+        example: first_name
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      order:
+        custom: []
+        name: order
+        description: 'Orden de los resultados. Valores posibles: asc, desc.'
+        required: false
+        example: asc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 16
+      page: 16
+      id_occupational_doctor: true
+      id_card: 12345678A
+      first_name: Juan
+      last_name: Pérez
+      specialty_id: '1'
+      order_by: first_name
+      order: asc
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": [
+                  {
+                      "id": 1,
+                      "personal_data": {
+                          "first_name": "Juan",
+                          "last_name": "Pérez",
+                          "fullname": "Juan Pérez",
+                          "phone": "0998745632",
+                          "id_card": "0958745601",
+                          "email": "juan.perez@example.com",
+                          "nationality": "Ecuatoriana",
+                          "gender": "Masculino"
+                      },
+                      "specialty": {
+                          "id": 10,
+                          "name": "Pediatría"
+                      },
+                      "metadata": [
+                          {
+                              "key": "experience_years",
+                              "value": "12"
+                          },
+                          {
+                              "key": "hospital",
+                              "value": "Hospital del Niño"
+                          }
+                      ],
+                      "is_occupational_doctor": false
+                  },
+                  {
+                      "id": 2,
+                      "personal_data": {
+                          "first_name": "María",
+                          "last_name": "Gómez",
+                          "fullname": "María Gómez",
+                          "phone": "0987456321",
+                          "id_card": "0958745602",
+                          "email": "maria.gomez@example.com",
+                          "nationality": "Colombiana",
+                          "gender": "Femenino"
+                      },
+                      "specialty": {
+                          "id": 11,
+                          "name": "Ginecología"
+                      },
+                      "metadata": [
+                          {
+                              "key": "experience_years",
+                              "value": "8"
+                          },
+                          {
+                              "key": "hospital",
+                              "value": "Clínica San José"
+                          }
+                      ],
+                      "is_occupational_doctor": true
+                  }
+              ],
+              "links": {
+                  "first": "http://example.com/api/doctors?page=1",
+                  "last": "http://example.com/api/doctors?page=10",
+                  "prev": null,
+                  "next": "http://example.com/api/doctors?page=2"
+              },
+              "meta": {
+                  "current_page": 1,
+                  "from": 1,
+                  "last_page": 10,
+                  "links": [
+                      {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/doctors?page=1",
+                          "label": "1",
+                          "active": true
+                      },
+                      {
+                          "url": "http://example.com/api/doctors?page=2",
+                          "label": "2",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/doctors?page=3",
+                          "label": "3",
+                          "active": false
+                      }
+                  ],
+                  "path": "http://example.com/api/doctors",
+                  "per_page": 15,
+                  "to": 15,
+                  "total": 150
+              }
+          }
+        headers: []
+        description: 'Consulta exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/doctors/{doctor_id}'
+    metadata:
+      custom: []
+      groupName: Médicos
+      groupDescription: |-
+
+        Gestiona los médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta la información de un médico específico en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      doctor_id:
+        custom: []
+        name: doctor_id
+        description: 'ID del médico.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      doctor_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "personal_data": {
+                      "first_name": "Juan",
+                      "last_name": "Pérez",
+                      "fullname": "Juan Pérez",
+                      "phone": "0998745632",
+                      "id_card": "0958745601",
+                      "email": "juan.perez@example.com",
+                      "nationality": "Ecuatoriana",
+                      "gender": "Masculino"
+                  },
+                  "specialty": {
+                      "id": 10,
+                      "name": "Pediatría"
+                  },
+                  "metadata": [
+                      {
+                          "key": "experience_years",
+                          "value": "12"
+                      },
+                      {
+                          "key": "hospital",
+                          "value": "Hospital del Niño"
+                      }
+                  ],
+                  "is_occupational_doctor": false
+              }
+          }
+        headers: []
+        description: 'Consulta exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/doctors
+    metadata:
+      custom: []
+      groupName: Médicos
+      groupDescription: |-
+
+        Gestiona los médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Guarda un nuevo médico en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      first_name:
+        custom: []
+        name: first_name
+        description: 'Primer nombre del médico.'
+        required: true
+        example: Juan
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      last_name:
+        custom: []
+        name: last_name
+        description: 'Apellido del médico.'
+        required: true
+        example: Pérez
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Correo electrónico del médico.'
+        required: true
+        example: juan.perez@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      is_occupational_doctor:
+        custom: []
+        name: is_occupational_doctor
+        description: 'Indica si el médico es ocupacional.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'Teléfono del médico.'
+        required: false
+        example: '0998745632'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      id_card:
+        custom: []
+        name: id_card
+        description: 'Cédula de identidad del médico.'
+        required: true
+        example: '0958745601'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      id_card_file:
+        custom: []
+        name: id_card_file
+        description: 'Archivo PDF de la cédula de identidad del médico. Tamaño máximo: 2MB.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      nationality:
+        custom: []
+        name: nationality
+        description: 'Nacionalidad del médico.'
+        required: false
+        example: Ecuatoriana
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      gender:
+        custom: []
+        name: gender
+        description: 'Género del médico. Valores posibles: Masculino, Femenino, Otro.'
+        required: false
+        example: Masculino
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      specialty:
+        custom: []
+        name: specialty
+        description: ''
+        required: false
+        example: []
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      specialty.id:
+        custom: []
+        name: specialty.id
+        description: 'ID de la especialidad del médico.'
+        required: false
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      metadata:
+        custom: []
+        name: metadata
+        description: 'Arreglo de metadatos del médico.'
+        required: false
+        example:
+          - architecto
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'metadata[].key':
+        custom: []
+        name: 'metadata[].key'
+        description: 'Clave del metadato.'
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'metadata[].value':
+        custom: []
+        name: 'metadata[].value'
+        description: 'Valor del metadato.'
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      first_name: Juan
+      last_name: Pérez
+      email: juan.perez@example.com
+      is_occupational_doctor: false
+      phone: '0998745632'
+      id_card: '0958745601'
+      nationality: Ecuatoriana
+      gender: Masculino
+      specialty:
+        id: 10
+      metadata:
+        - architecto
+    fileParameters:
+      id_card_file: null
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "personal_data": {
+                      "first_name": "Juan",
+                      "last_name": "Pérez",
+                      "fullname": "Juan Pérez",
+                      "phone": "0998745632",
+                      "id_card": "0958745601",
+                      "email": "juan.perez@example.com",
+                      "nationality": "Ecuatoriana",
+                      "gender": "Masculino"
+                  },
+                  "specialty": {
+                      "id": 10,
+                      "name": "Pediatría"
+                  },
+                  "metadata": [
+                      {
+                          "key": "experience_years",
+                          "value": "12"
+                      },
+                      {
+                          "key": "hospital",
+                          "value": "Hospital del Niño"
+                      }
+                  ],
+                  "is_occupational_doctor": false
+              }
+          }
+        headers: []
+        description: 'Guardado exitoso'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/doctors/{doctor_id}'
+    metadata:
+      custom: []
+      groupName: Médicos
+      groupDescription: |-
+
+        Gestiona los médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Actualiza la información de un médico específico en el sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters:
+      doctor_id:
+        custom: []
+        name: doctor_id
+        description: 'ID del médico.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      doctor_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      first_name:
+        custom: []
+        name: first_name
+        description: 'Primer nombre del médico.'
+        required: true
+        example: Juan
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      last_name:
+        custom: []
+        name: last_name
+        description: 'Apellido del médico.'
+        required: true
+        example: Pérez
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Correo electrónico del médico.'
+        required: true
+        example: juan.perez@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      is_occupational_doctor:
+        custom: []
+        name: is_occupational_doctor
+        description: 'Indica si el médico es ocupacional.'
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'Teléfono del médico.'
+        required: false
+        example: '0998745632'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        deprecated: false
+      id_card:
+        custom: []
+        name: id_card
+        description: 'Cédula de identidad del médico.'
+        required: true
+        example: '0958745601'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      id_card_file:
+        custom: []
+        name: id_card_file
+        description: 'Archivo PDF de la cédula de identidad del médico. Tamaño máximo: 2MB.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      nationality:
+        custom: []
+        name: nationality
+        description: 'Nacionalidad del médico.'
+        required: false
+        example: Ecuatoriana
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      gender:
+        custom: []
+        name: gender
+        description: 'Género del médico. Valores posibles: Masculino, Femenino, Otro.'
+        required: false
+        example: Masculino
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      specialty:
+        custom: []
+        name: specialty
+        description: ''
+        required: false
+        example: []
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      specialty.id:
+        custom: []
+        name: specialty.id
+        description: 'ID de la especialidad del médico.'
+        required: false
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      metadata:
+        custom: []
+        name: metadata
+        description: 'Arreglo de metadatos del médico.'
+        required: false
+        example:
+          - architecto
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      'metadata[].key':
+        custom: []
+        name: 'metadata[].key'
+        description: 'Clave del metadato.'
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'metadata[].value':
+        custom: []
+        name: 'metadata[].value'
+        description: 'Valor del metadato.'
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      first_name: Juan
+      last_name: Pérez
+      email: juan.perez@example.com
+      is_occupational_doctor: false
+      phone: '0998745632'
+      id_card: '0958745601'
+      nationality: Ecuatoriana
+      gender: Masculino
+      specialty:
+        id: 10
+      metadata:
+        - architecto
+    fileParameters:
+      id_card_file: null
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": {
+                  "id": 1,
+                  "personal_data": {
+                      "first_name": "Juan",
+                      "last_name": "Pérez",
+                      "fullname": "Juan Pérez",
+                      "phone": "0998745632",
+                      "id_card": "0958745601",
+                      "email": "juan.perez@example.com",
+                      "nationality": "Ecuatoriana",
+                      "gender": "Masculino"
+                  },
+                  "specialty": {
+                      "id": 10,
+                      "name": "Pediatría"
+                  },
+                  "metadata": [
+                      {
+                          "key": "experience_years",
+                          "value": "12"
+                      },
+                      {
+                          "key": "hospital",
+                          "value": "Hospital del Niño"
+                      }
+                  ],
+                  "is_occupational_doctor": false
+              }
+          }
+        headers: []
+        description: 'Actualización exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/doctors/{doctor_id}'
+    metadata:
+      custom: []
+      groupName: Médicos
+      groupDescription: |-
+
+        Gestiona los médicos en el sistema.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Elimina un médico específico del sistema.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {tu-token-personal-aqui}.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      doctor_id:
+        custom: []
+        name: doctor_id
+        description: 'ID del médico.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      doctor_id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "message": "Doctor deleted successfully"
+          }
+        headers: []
+        description: 'Eliminación exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

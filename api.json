@@ -1,0 +1,13 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "OccuMaster Health",
+        "version": "0.0.1",
+        "description": "API REST para la gesti\u00f3n de la informaci\u00f3n de pacientes y profesionales de la salud. Desarrollada por Occumaster S.A.S. para la plataforma de telemedicina OccuMaster Health."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api"
+        }
+    ]
+}

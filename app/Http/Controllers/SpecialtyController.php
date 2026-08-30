@@ -20,8 +20,8 @@ class SpecialtyController extends Controller
      */
     public function index(Request $request, SpecialtyFilter $filter)
     {
-        $perPage = $request->input('per_page', 15);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return SpecialtyResource::collection($data);
     }
 
@@ -31,7 +31,7 @@ class SpecialtyController extends Controller
     public function store(SpecialtyRequest $request)
     {
         $specialty = $this->specialtyService->store($request);
-        return SpecialtyResource::make($specialty);
+        return response()->json(SpecialtyResource::make($specialty), 201);
     }
 
     /**
@@ -39,7 +39,7 @@ class SpecialtyController extends Controller
      */
     public function show(Specialty $specialty)
     {
-        return SpecialtyResource::make($specialty);
+        return response()->json(SpecialtyResource::make($specialty), 200);
     }
 
     /**
@@ -48,7 +48,7 @@ class SpecialtyController extends Controller
     public function update(SpecialtyRequest $request, Specialty $specialty)
     {
         $specialty = $this->specialtyService->update($request, $specialty);
-        return SpecialtyResource::make($specialty);
+        return response()->json(SpecialtyResource::make($specialty), 200);
     }
 
     /**
@@ -57,6 +57,6 @@ class SpecialtyController extends Controller
     public function destroy(Specialty $specialty)
     {
         $specialty->delete();
-        return response()->json(['message' => 'Specialty deleted successfully']);
+        return response()->json(['message' => 'Specialty deleted successfully'], 200);
     }
 }

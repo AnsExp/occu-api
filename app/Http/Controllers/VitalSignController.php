@@ -20,8 +20,8 @@ class VitalSignController extends Controller
      */
     public function index(Request $request, VitalSignFilter $filter)
     {
-        $perPage = $request->input('per_page', 10);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return VitalSignResource::collection($data);
     }
 
@@ -31,7 +31,7 @@ class VitalSignController extends Controller
     public function store(VitalSignRequest $request)
     {
         $vitalSign = $this->vitalSignService->store($request);
-        return VitalSignResource::make($vitalSign);
+        return response()->json(VitalSignResource::make($vitalSign), 201);
     }
 
     /**
@@ -39,7 +39,7 @@ class VitalSignController extends Controller
      */
     public function show(VitalSign $vitalSign)
     {
-        return VitalSignResource::make($vitalSign);
+        return response()->json(VitalSignResource::make($vitalSign), 200);
     }
 
     /**
@@ -48,7 +48,7 @@ class VitalSignController extends Controller
     public function update(VitalSignRequest $request, VitalSign $vitalSign)
     {
         $vitalSign = $this->vitalSignService->update($request, $vitalSign);
-        return VitalSignResource::make($vitalSign);
+        return response()->json(VitalSignResource::make($vitalSign), 200);
     }
 
     /**
@@ -57,6 +57,6 @@ class VitalSignController extends Controller
     public function destroy(VitalSign $vitalSign)
     {
         $vitalSign->delete();
-        return response()->json(['message' => 'Vital sign deleted successfully']);
+        return response()->json(['message' => 'Vital sign deleted successfully'], 200);
     }
 }

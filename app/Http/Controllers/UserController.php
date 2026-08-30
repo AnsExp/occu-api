@@ -20,8 +20,8 @@ class UserController extends Controller
      */
     public function index(Request $request, UserFilter $filter)
     {
-        $perPage = $request->query('per_page', 15);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return UserResource::collection($data);
     }
 
@@ -31,7 +31,7 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $user = $this->userService->store($request);
-        return UserResource::make($user);
+        return response()->json(UserResource::make($user), 201);
     }
 
     /**
@@ -39,7 +39,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return UserResource::make($user);
+        return response()->json(UserResource::make($user), 200);
     }
 
     /**
@@ -48,7 +48,13 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user)
     {
         $user = $this->userService->update($request, $user);
-        return UserResource::make($user);
+        return response()->json(UserResource::make($user), 200);
+    }
+
+    public function changePassword(Request $request, User $user)
+    {
+        $user = $this->userService->changePassword($request, $user);
+        return response()->json(['message' => 'Password changed successfully'], 200);
     }
 
     /**
@@ -57,6 +63,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return response()->json(['message' => 'User deleted successfully']);
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }

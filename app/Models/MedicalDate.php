@@ -18,13 +18,12 @@ use Illuminate\Support\Carbon;
  * @property int $doctor_id
  * @property int $patient_id
  * @property int|null $specialty_id
- * @property int|null $certificate_id
  * @property int|null $vital_signs_id
  * @property Doctor $doctor
  * @property Patient $patient
  * @property Specialty|null $specialty
  * @property VitalSign|null $vital_signs
- * @property Document|null $certificate
+ * @property Document|null $latestDocument
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -106,9 +105,14 @@ class MedicalDate extends Model
         return $this->hasOne(VitalSign::class);
     }
 
-    public function certificate()
+    public function documents()
     {
-        return $this->morphOne(Document::class, 'documentable');
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function latestDocument()
+    {
+        return $this->morphOne(Document::class, 'documentable')->latestOfMany();
     }
 
     public function metadata()

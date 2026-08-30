@@ -1,0 +1,242 @@
+name: 'Información personal'
+description: |-
+
+  Consulta la información personal de los usuarios.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/personal_data
+    metadata:
+      custom: []
+      groupName: 'Información personal'
+      groupDescription: |-
+
+        Consulta la información personal de los usuarios.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta la información personal de los usuarios.'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {token} Token de autenticación de Sanctum.'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Número de resultados por página. Por defecto, 15.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Número de página actual. Por defecto, 1.'
+        required: false
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      first_name:
+        custom: []
+        name: first_name
+        description: 'Filtro por nombre.'
+        required: false
+        example: Juan
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      last_name:
+        custom: []
+        name: last_name
+        description: 'Filtro por apellido.'
+        required: false
+        example: Pérez
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      phone:
+        custom: []
+        name: phone
+        description: 'Filtro por número de teléfono.'
+        required: false
+        example: '+34123456789'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      id_card:
+        custom: []
+        name: id_card
+        description: 'Filtro por número de identificación.'
+        required: false
+        example: 12345678A
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      gender:
+        custom: []
+        name: gender
+        description: 'Filtro por género. Valores posibles: male, female, other.'
+        required: false
+        example: male
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      birth_date:
+        custom: []
+        name: birth_date
+        description: 'Filtro por fecha de nacimiento.'
+        required: false
+        example: '1990-01-01'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      nationality:
+        custom: []
+        name: nationality
+        description: 'Filtro por nacionalidad.'
+        required: false
+        example: España
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Filtro por correo electrónico.'
+        required: false
+        example: usuario@occumaster.test
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      order_by:
+        custom: []
+        name: order_by
+        description: 'Campo por el cual ordenar los resultados.'
+        required: false
+        example: first_name
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      order:
+        custom: []
+        name: order
+        description: 'Orden de los resultados. Valores posibles: asc, desc.'
+        required: false
+        example: asc
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      per_page: 16
+      page: 16
+      first_name: Juan
+      last_name: Pérez
+      phone: '+34123456789'
+      id_card: 12345678A
+      gender: male
+      birth_date: '1990-01-01'
+      nationality: España
+      email: usuario@occumaster.test
+      order_by: first_name
+      order: asc
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+              "data": [
+                  {
+                      "id": 1,
+                      "first_name": "Juan",
+                      "last_name": "Pérez",
+                      "fullname": "Juan Pérez",
+                      "phone": "+34123456789",
+                      "id_card": "12345678A",
+                      "gender": "male",
+                      "email": "usuario@occumaster.test",
+                      "birth_date": "1990-01-01",
+                      "nationality": "España"
+                  }
+              ],
+              "links": {
+                  "first": "http://example.com/api/personal-data?page=1",
+                  "last": "http://example.com/api/personal-data?page=10",
+                  "prev": null,
+                  "next": "http://example.com/api/personal-data?page=2"
+              },
+              "meta": {
+                  "current_page": 1,
+                  "from": 1,
+                  "last_page": 10,
+                  "links": [
+                      {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/personal-data?page=1",
+                          "label": "1",
+                          "active": true
+                      },
+                      {
+                          "url": "http://example.com/api/personal-data?page=2",
+                          "label": "2",
+                          "active": false
+                      },
+                      {
+                          "url": "http://example.com/api/personal-data?page=3",
+                          "label": "3",
+                          "active": false
+                      }
+                  ],
+                  "path": "http://example.com/api/personal-data",
+                  "per_page": 15,
+                  "to": 15,
+                  "total": 150
+              }
+          }
+        headers: []
+        description: 'Consulta exitosa'
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

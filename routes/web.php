@@ -8,3 +8,7 @@ Route::get('/test', function () {
     $pdf = Pdf::loadView('documents.prescription', compact('prescription'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
     return $pdf->stream();
 });
+
+Route::get('/', function () {
+    return view('welcome');
+});

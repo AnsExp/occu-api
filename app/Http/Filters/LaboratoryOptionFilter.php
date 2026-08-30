@@ -3,38 +3,35 @@
 namespace App\Http\Filters;
 
 use App\Models\LaboratoryOption;
-use Illuminate\Http\Request;
 
 class LaboratoryOptionFilter
 {
-    public function query(Request $request)
+    public function query(array $params)
     {
         $query = LaboratoryOption::query();
 
-        if ($request->has('name')) {
-            $query->where('name', 'like', '%' . $request->input('name') . '%');
+        if (isset($params['name'])) {
+            $query->where('name', 'like', '%' . $params['name'] . '%');
         }
 
-        if ($request->has('price_min')) {
-            $query->where('price', '>=', $request->input('price_min'));
+        if (isset($params['price'])) {
+            $query->where('price', $params['price']);
+        } else if (isset($params['price_max']) && isset($params['price_min'])) {
+            $query->whereBetween('price', [$params['price_min'], $params['price_max']]);
+        } else if (isset($params['price_max'])) {
+            $query->where('price', '<=', $params['price_max']);
+        } else if (isset($params['price_min'])) {
+            $query->where('price', '>=', $params['price_min']);
         }
 
-        if ($request->has('price_max')) {
-            $query->where('price', '<=', $request->input('price_max'));
-        }
-
-        if ($request->has('price_between')) {
-            [$min, $max] = explode(',', $request->input('price_between'));
-            $query->whereBetween('price', [(float) $min, (float) $max]);
-        }
-
-        if ($request->has('order_by')) {
-            $orderBy = $request->input('order_by');
-            $order = $request->input('order', 'asc');
-            $query->orderBy($orderBy, $order);
+        if (isset($params['order_by'])) {
+            $orderBy = $params['order_by'];
+            $order = $params['order'] ?? 'asc';
         } else {
-            $query->orderBy('created_at', 'desc');
+            $orderBy = 'created_at';
+            $order = 'asc';
         }
+        $query->orderBy($orderBy, $order);
 
         return $query;
     }

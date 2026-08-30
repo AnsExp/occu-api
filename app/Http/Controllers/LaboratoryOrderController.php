@@ -6,7 +6,6 @@ use App\Http\Requests\LaboratoryOrderRequest;
 use App\Models\LaboratoryOrder;
 use App\Http\Services\LaboratoryOrderService;
 use App\Http\Resources\LaboratoryOrderResource;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class LaboratoryOrderController extends Controller
@@ -20,9 +19,17 @@ class LaboratoryOrderController extends Controller
      */
     public function index(Request $request, LaboratoryOrderFilter $filter)
     {
-        $perPage = $request->input('per_page', 10);
-        $data = $filter->query($request)->paginate($perPage);
+        $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all())->paginate($perPage);
         return LaboratoryOrderResource::collection($data);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(LaboratoryOrder $laboratoryOrder)
+    {
+        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 200);
     }
 
     /**
@@ -31,15 +38,7 @@ class LaboratoryOrderController extends Controller
     public function store(LaboratoryOrderRequest $request)
     {
         $laboratoryOrder = $this->laboratoryOrderService->store($request);
-        return LaboratoryOrderResource::make($laboratoryOrder);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(LaboratoryOrder $laboratoryOrder)
-    {
-        return LaboratoryOrderResource::make($laboratoryOrder);
+        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 201);
     }
 
     /**
@@ -47,8 +46,16 @@ class LaboratoryOrderController extends Controller
      */
     public function file(LaboratoryOrder $laboratoryOrder)
     {
-        $pdf = Pdf::loadView('documents.laboratory_order', ['order' => $laboratoryOrder])->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
-        return $pdf->stream();
+        $document = $laboratoryOrder->latestDocument;
+        $storage = occu_storage();
+
+        if (!$document || !$storage->exists($document->file)) {
+            return response()->json([
+                'message' => 'Document not found for this laboratory order.'
+            ], 404);
+        }
+
+        return response()->file($storage->path($document->file));
     }
 
     /**
@@ -57,7 +64,7 @@ class LaboratoryOrderController extends Controller
     public function update(LaboratoryOrderRequest $request, LaboratoryOrder $laboratoryOrder)
     {
         $laboratoryOrder = $this->laboratoryOrderService->update($request, $laboratoryOrder);
-        return LaboratoryOrderResource::make($laboratoryOrder);
+        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 200);
     }
 
     /**
@@ -66,6 +73,6 @@ class LaboratoryOrderController extends Controller
     public function destroy(LaboratoryOrder $laboratoryOrder)
     {
         $laboratoryOrder->delete();
-        return response()->json(['message' => 'Laboratory order deleted successfully']);
+        return response()->json(['message' => 'Laboratory order deleted successfully.'], 200);
     }
 }

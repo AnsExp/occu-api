@@ -9,10 +9,10 @@ use App\Http\Controllers\OphthalmologyController;
 use App\Http\Controllers\PersonalDataController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VitalSignController;
 use App\Http\Controllers\AuthenticationController;
-use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\LaboratoryOptionController;
@@ -20,12 +20,13 @@ use App\Http\Controllers\LaboratoryOrderController;
 use App\Http\Controllers\MedicalDateController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\MedicationController;
-use App\Http\Controllers\CheckIPController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthenticationController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
 
     Route::get('/personal_data', [PersonalDataController::class, 'index']);
 
@@ -33,8 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/doctors/{doctor}', [DoctorController::class, 'show'])->middleware('ability:read.doctors');
 
     Route::get('/medications', [MedicationController::class, 'index']);
-
-    Route::get('/certificates/{certificate}', [CertificateController::class, 'show'])->middleware('ability:read.certificates')->name('certificate.show');
+    Route::get('/medications/{medication}', [MedicationController::class, 'show']);
 
     Route::get('/plans', [PlanController::class, 'index'])->middleware('ability:read.plans');
     Route::get('/plans/{plan}', [PlanController::class, 'show'])->middleware('ability:read.plans');
@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medical_dates', [MedicalDateController::class, 'index'])->middleware('ability:read.medical_dates');
     Route::get('/medical_dates/{medicalDate}', [MedicalDateController::class, 'show'])->middleware('ability:read.medical_dates');
     Route::get('/medical_dates/{medicalDate}/file', [MedicalDateController::class, 'file'])->middleware('ability:read.medical_dates');
+    Route::get('/medical_dates/{medicalDate}/snapshot', [MedicalDateController::class, 'snapshot'])->middleware('ability:read.medical_dates');
 
     Route::get('/prescriptions', [PrescriptionController::class, 'index'])->middleware('ability:read.prescriptions');
     Route::get('/prescriptions/{prescription}', [PrescriptionController::class, 'show'])->middleware('ability:read.prescriptions');
@@ -78,8 +79,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/allowed_ips', [AllowedIpController::class, 'index'])->middleware('ability:read.allowed_ips');
     Route::get('/allowed_ips/{allowedIp}', [AllowedIpController::class, 'show'])->middleware('ability:read.allowed_ips');
 
-    Route::get('/check_ip', CheckIPController::class);
-
     Route::middleware('allowed_ip')->group(function () {
 
         Route::post('/allowed_ips', [AllowedIpController::class, 'store'])->middleware('ability:create.allowed_ips');
@@ -97,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users', [UserController::class, 'store'])->middleware('ability:create.users');
         Route::put('/users/{user}', [UserController::class, 'update'])->middleware('ability:update.users');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('ability:delete.users');
+        Route::post('/users/{user}/change_password', [UserController::class, 'changePassword'])->middleware('ability:update.users');
 
         Route::post('/doctors', [DoctorController::class, 'store'])->middleware('ability:create.doctors');
         Route::put('/doctors/{doctor}', [DoctorController::class, 'update'])->middleware('ability:update.doctors');
@@ -135,17 +135,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/laboratory_options/{laboratoryOption}', [LaboratoryOptionController::class, 'destroy'])->middleware('ability:delete.laboratory_options');
 
         Route::post('/audiology', [AudiologyController::class, 'store'])->middleware('ability:create.certificates');
-
         Route::post('/odontology', [OdontologyController::class, 'store'])->middleware('ability:create.certificates');
-
         Route::post('/ophthalmology', [OphthalmologyController::class, 'store'])->middleware('ability:create.certificates');
-
-        Route::post('/change_password/{user}', [AuthenticationController::class, 'changePasswordPerUser'])->middleware('ability:update.users');
 
     });
 
-    Route::post('/logout', [AuthenticationController::class, 'logout']);
-    Route::post('/change_password', [AuthenticationController::class, 'changePassword']);
-    Route::get('/abilities', fn() => response()->json(auth()->user()->tokens()->first()->abilities));
+    Route::get('/session/check_ip', [SessionController::class, 'checkIp']);
+    Route::get('/session/abilities', [SessionController::class, 'abilities']);
+    Route::post('/session/change_password', [SessionController::class, 'changePassword']);
 
 });
