@@ -22,18 +22,8 @@ class MedicalDateResource extends JsonResource
             'timezone' => $this->timezone,
             'shift' => $this->shift,
             'type' => $this->type,
-            'doctor' => [
-                'id' => $this->doctor->id,
-                'fullname' => $this->doctor->personalData->fullname,
-                'email' => $this->doctor->personalData->email,
-            ],
-            'patient' => [
-                'id' => $this->patient->id,
-                'email' => $this->patient->personalData->email,
-                'phone' => $this->patient->personalData->phone,
-                'id_card' => $this->patient->personalData->id_card,
-                'fullname' => $this->patient->personalData->fullname,
-            ],
+            'doctor' => DoctorResource::make($this->doctor),
+            'patient' => PatientResource::make($this->patient),
             'specialty' => $this->specialty ? [
                 'id' => $this->specialty->id,
                 'name' => $this->specialty->name,
@@ -49,7 +39,8 @@ class MedicalDateResource extends JsonResource
                 'oxygen_saturation' => (float) $this->vitalSigns->oxygen_saturation,
             ] : null,
             'relationship' => array_map(fn($relationship) => self::make($relationship->related), $this->relationship->all()),
-            'has_certificate' => $this->certificate?->exists() ?? false,
+            'documents' => array_map(fn($document) => DocumentResource::make($document), $this->documents->all()),
+            'document' => $this->latestDocument ? DocumentResource::make($this->latestDocument) : null,
             'created_at' => $this->created_at->setTimezone($this->timezone)->format('Y-m-d H:i:s'),
         ];
     }

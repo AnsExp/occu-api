@@ -34,7 +34,7 @@ class OphthalmologyService
 
             return $this->createVersionedDocument(
                 $medicalDate,
-                ['medical_date' => $medicalDate, 'snapshot' => $snapshot],
+                compact('medicalDate', 'snapshot'),
                 $snapshot,
                 $request->input('timezone'),
             );

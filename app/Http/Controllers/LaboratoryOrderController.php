@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\LaboratoryOrderFilter;
 use App\Http\Requests\LaboratoryOrderRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\LaboratoryOrder;
 use App\Http\Services\LaboratoryOrderService;
 use App\Http\Resources\LaboratoryOrderResource;
@@ -21,15 +22,29 @@ class LaboratoryOrderController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return LaboratoryOrderResource::collection($data);
+        $data->getCollection()->transform([LaboratoryOrderResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Laboratory orders retrieved successfully' : 'No laboratory orders found'
+        );
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(LaboratoryOrder $laboratoryOrder)
+    public function show(int $id)
     {
-        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 200);
+        $laboratoryOrder = LaboratoryOrder::find($id);
+        if (!$laboratoryOrder) {
+            return ApiResponse::formResponse(['Laboratory order not found'], false, 'Laboratory order not found', 404);
+        }
+        return ApiResponse::data(
+            LaboratoryOrderResource::make($laboratoryOrder),
+            true,
+            'Laboratory order retrieved successfully',
+            200
+        );
     }
 
     /**
@@ -38,24 +53,25 @@ class LaboratoryOrderController extends Controller
     public function store(LaboratoryOrderRequest $request)
     {
         $laboratoryOrder = $this->laboratoryOrderService->store($request);
-        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 201);
+        return ApiResponse::data(LaboratoryOrderResource::make($laboratoryOrder), true, 'Laboratory order created successfully', 201);
     }
 
     /**
-     * Display the specified resource file.
+     * Display the specified resource document.
      */
-    public function file(LaboratoryOrder $laboratoryOrder)
+    public function document($id, $idDocument)
     {
-        $document = $laboratoryOrder->latestDocument;
-        $storage = occu_storage();
-
-        if (!$document || !$storage->exists($document->file)) {
+        $laboratoryOrder = LaboratoryOrder::find($id);
+        if (!$laboratoryOrder) {
             return response()->json([
-                'message' => 'Document not found for this laboratory order.'
+                'message' => 'Laboratory order not found.'
             ], 404);
         }
-
-        return response()->file($storage->path($document->file));
+        $document = $laboratoryOrder->documents()->find($idDocument);
+        if (!$document || !$document->file || !occu_storage()->exists($document->file)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        return response()->file(occu_storage()->path($document->file));
     }
 
     /**
@@ -64,7 +80,7 @@ class LaboratoryOrderController extends Controller
     public function update(LaboratoryOrderRequest $request, LaboratoryOrder $laboratoryOrder)
     {
         $laboratoryOrder = $this->laboratoryOrderService->update($request, $laboratoryOrder);
-        return response()->json(LaboratoryOrderResource::make($laboratoryOrder), 200);
+        return ApiResponse::data(LaboratoryOrderResource::make($laboratoryOrder), true, 'Laboratory order updated successfully', 200);
     }
 
     /**
@@ -73,6 +89,6 @@ class LaboratoryOrderController extends Controller
     public function destroy(LaboratoryOrder $laboratoryOrder)
     {
         $laboratoryOrder->delete();
-        return response()->json(['message' => 'Laboratory order deleted successfully.'], 200);
+        return ApiResponse::data(null, true, 'Laboratory order deleted successfully', 200);
     }
 }

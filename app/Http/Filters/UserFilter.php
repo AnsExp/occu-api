@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\User;
 
-class UserFilter
+class UserFilter extends Filter
 {
     public function query(array $params)
     {

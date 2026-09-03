@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\AllowedIpFilter;
 use App\Http\Requests\AllowedIpRequest;
+use App\Http\Responses\ApiResponse;
 use App\Http\Services\AllowedIpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -92,7 +93,12 @@ class AllowedIpController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return AllowedIpResource::collection($data);
+        $data->getCollection()->transform([AllowedIpResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Allowed IPs retrieved successfully' : 'No allowed IPs found'
+        );
     }
 
     /**
@@ -114,9 +120,13 @@ class AllowedIpController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show(AllowedIp $allowedIp)
+    public function show($id)
     {
-        return response()->json(AllowedIpResource::make($allowedIp), 200);
+        $allowedIp = AllowedIp::find($id);
+        if (!$allowedIp) {
+            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
+        }
+        return ApiResponse::data(AllowedIpResource::make($allowedIp), true, 'Allowed IP retrieved successfully', 200);
     }
 
     /**
@@ -143,7 +153,7 @@ class AllowedIpController extends Controller
     public function store(AllowedIpRequest $request)
     {
         $allowedIp = $this->allowedIpService->store($request);
-        return response()->json(AllowedIpResource::make($allowedIp), 201);
+        return ApiResponse::data(AllowedIpResource::make($allowedIp), true, 'Allowed IP created successfully', 201);
     }
 
     /**
@@ -167,10 +177,14 @@ class AllowedIpController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(AllowedIpRequest $request, AllowedIp $allowedIp)
+    public function update(AllowedIpRequest $request, $id)
     {
-        $allowedIp = $this->allowedIpService->update($request, $allowedIp);
-        return response()->json(AllowedIpResource::make($allowedIp), 200);
+        $allowedIp = AllowedIp::find($id);
+        if (!$allowedIp) {
+            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
+        }
+        $allowedIpUpdated = $this->allowedIpService->update($request, $allowedIp);
+        return ApiResponse::data(AllowedIpResource::make($allowedIpUpdated), true, 'Allowed IP updated successfully', 200);
     }
 
     /**
@@ -179,17 +193,21 @@ class AllowedIpController extends Controller
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
      *
-     * @urlParam allowedIp integer required ID de la dirección IP permitida.
+     * @urlParam id integer required ID de la dirección IP permitida.
      *
      * @response 200 scenario="Eliminación exitosa"
      * {
-     *     "message": "Deleted successfully"
+     *     "message": "Allowed IP deleted successfully"
      * }
      * @return JsonResponse
      */
-    public function destroy(AllowedIp $allowedIp)
+    public function destroy($id)
     {
+        $allowedIp = AllowedIp::find($id);
+        if (!$allowedIp) {
+            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
+        }
         $allowedIp->delete();
-        return response()->json(['message' => 'Deleted successfully'], 200);
+        return ApiResponse::data(null, true, 'Allowed IP deleted successfully', 200);
     }
 }

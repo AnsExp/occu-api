@@ -19,9 +19,7 @@ trait DocumentService
         $this->persistPdf();
 
         $latestDocument = $documentable->documents()->latest('id')->first();
-        $version = $latestDocument
-            ? number_format(((float) $latestDocument->version) + 0.1, 1)
-            : '1.0';
+        $version = $latestDocument ? number_format(((float) $latestDocument->version) + 0.1, 1) : '1.0';
 
         return $documentable->documents()->create([
             'version' => $version,

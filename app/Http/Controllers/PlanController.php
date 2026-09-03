@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Http\Services\PlanService;
 use App\Http\Resources\PlanResource;
 use Illuminate\Http\Request;
+use App\Http\Responses\ApiResponse;
 
 class PlanController extends Controller
 {
@@ -22,7 +23,12 @@ class PlanController extends Controller
     {
         $perPage = $request->query('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return PlanResource::collection($data);
+        $data->getCollection()->transform([PlanResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Plans retrieved successfully' : 'No plans found'
+        );
     }
 
     /**
@@ -31,32 +37,44 @@ class PlanController extends Controller
     public function store(PlanRequest $request)
     {
         $plan = $this->planService->store($request);
-        return response()->json(PlanResource::make($plan), 201);
+        return ApiResponse::data(PlanResource::make($plan), true, 'Plan created successfully', 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Plan $plan)
+    public function show($id)
     {
-        return response()->json(PlanResource::make($plan), 200);
+        $plan = Plan::find($id);
+        if (!$plan) {
+            return ApiResponse::data(null, false, 'Plan not found', 404);
+        }
+        return ApiResponse::data(PlanResource::make($plan), true, 'Plan retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PlanRequest $request, Plan $plan)
+    public function update(PlanRequest $request, $id)
     {
+        $plan = Plan::find($id);
+        if (!$plan) {
+            return ApiResponse::data(null, false, 'Plan not found', 404);
+        }
         $plan = $this->planService->update($request, $plan);
-        return response()->json(PlanResource::make($plan), 200);
+        return ApiResponse::data(PlanResource::make($plan), true, 'Plan updated successfully', 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Plan $plan)
+    public function destroy($id)
     {
+        $plan = Plan::find($id);
+        if (!$plan) {
+            return ApiResponse::data(null, false, 'Plan not found', 404);
+        }
         $plan->delete();
-        return response()->json(['message' => 'Plan deleted successfully'], 200);
+        return ApiResponse::message(null, true, 'Plan deleted successfully.', 200);
     }
 }

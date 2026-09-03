@@ -8,6 +8,7 @@ use App\Models\Specialty;
 use App\Http\Services\SpecialtyService;
 use App\Http\Resources\SpecialtyResource;
 use Illuminate\Http\Request;
+use App\Http\Responses\ApiResponse;
 
 class SpecialtyController extends Controller
 {
@@ -22,7 +23,12 @@ class SpecialtyController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return SpecialtyResource::collection($data);
+        $data->getCollection()->transform([SpecialtyResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Specialties retrieved successfully' : 'No specialties found'
+        );
     }
 
     /**
@@ -31,32 +37,44 @@ class SpecialtyController extends Controller
     public function store(SpecialtyRequest $request)
     {
         $specialty = $this->specialtyService->store($request);
-        return response()->json(SpecialtyResource::make($specialty), 201);
+        return ApiResponse::data(SpecialtyResource::make($specialty), true, 'Specialty created successfully', 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Specialty $specialty)
+    public function show($id)
     {
-        return response()->json(SpecialtyResource::make($specialty), 200);
+        $specialty = Specialty::find($id);
+        if (!$specialty) {
+            return ApiResponse::data(null, false, 'Specialty not found', 404);
+        }
+        return ApiResponse::data(SpecialtyResource::make($specialty), true, 'Specialty retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(SpecialtyRequest $request, Specialty $specialty)
+    public function update(SpecialtyRequest $request, $id)
     {
+        $specialty = Specialty::find($id);
+        if (!$specialty) {
+            return ApiResponse::data(null, false, 'Specialty not found', 404);
+        }
         $specialty = $this->specialtyService->update($request, $specialty);
-        return response()->json(SpecialtyResource::make($specialty), 200);
+        return ApiResponse::data(SpecialtyResource::make($specialty), true, 'Specialty updated successfully', 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Specialty $specialty)
+    public function destroy($id)
     {
+        $specialty = Specialty::find($id);
+        if (!$specialty) {
+            return ApiResponse::data(null, false, 'Specialty not found', 404);
+        }
         $specialty->delete();
-        return response()->json(['message' => 'Specialty deleted successfully'], 200);
+        return ApiResponse::data(null, true, 'Specialty deleted successfully.', 200);
     }
 }

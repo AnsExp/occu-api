@@ -195,14 +195,14 @@
                 @for ($index = 18; $index >= 11; $index--)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-square', [
+                            $html = view('components.tooth-square', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -215,14 +215,14 @@
                 @for ($index = 55; $index >= 51; $index--)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-circle', [
+                            $html = view('components.tooth-circle', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -235,14 +235,14 @@
                 @for ($index = 85; $index >= 81; $index--)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-circle', [
+                            $html = view('components.tooth-circle', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -255,14 +255,14 @@
                 @for ($index = 48; $index >= 41; $index--)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-square', [
+                            $html = view('components.tooth-square', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -275,14 +275,14 @@
                 @for ($index = 21; $index <= 28; $index++)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-square', [
+                            $html = view('components.tooth-square', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -295,14 +295,14 @@
                 @for ($index = 61; $index <= 65; $index++)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-circle', [
+                            $html = view('components.tooth-circle', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -315,14 +315,14 @@
                 @for ($index = 71; $index <= 75; $index++)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-circle', [
+                            $html = view('components.tooth-circle', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">
@@ -335,14 +335,14 @@
                 @for ($index = 31; $index <= 38; $index++)
                     <td class="text-center" style="padding: 20px;">
                         @php
-                            $html = Livewire\Livewire::mount('components.tooth-square', [
+                            $html = view('components.tooth-square', [
                                 'index' => $index,
                                 'east' => $odontogram[$index]['east'],
                                 'west' => $odontogram[$index]['west'],
                                 'north' => $odontogram[$index]['north'],
                                 'south' => $odontogram[$index]['south'],
                                 'center' => $odontogram[$index]['center'],
-                            ]);
+                            ])->render();
                             $base64 = base64_encode($html);
                         @endphp
                         <img width="20px" src="data:image/svg+xml;base64,{{ $base64 }}">

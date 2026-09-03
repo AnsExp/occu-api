@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\DoctorFilter;
 use App\Http\Requests\DoctorRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Doctor;
 use App\Http\Services\DoctorService;
 use App\Http\Resources\DoctorResource;
@@ -141,7 +142,12 @@ class DoctorController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return DoctorResource::collection($data);
+        $data->getCollection()->transform([DoctorResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Doctors retrieved successfully' : 'No doctors found'
+        );
     }
 
     /**
@@ -201,7 +207,7 @@ class DoctorController extends Controller
     public function store(DoctorRequest $request)
     {
         $doctor = $this->doctorService->store($request);
-        return response()->json(DoctorResource::make($doctor), 201);
+        return ApiResponse::data(DoctorResource::make($doctor), true, 'Doctor created successfully', 201);
     }
 
     /**
@@ -245,9 +251,13 @@ class DoctorController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show(Doctor $doctor)
+    public function show($id)
     {
-        return response()->json(DoctorResource::make($doctor), 200);
+        $doctor = Doctor::find($id);
+        if (!$doctor) {
+            return ApiResponse::data(null, false, 'Doctor not found', 404);
+        }
+        return ApiResponse::data(DoctorResource::make($doctor), true, 'Doctor retrieved successfully', 200);
     }
 
     /**
@@ -305,27 +315,35 @@ class DoctorController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(DoctorRequest $request, Doctor $doctor)
+    public function update(DoctorRequest $request, $id)
     {
-        $doctor = $this->doctorService->update($request, $doctor);
-        return response()->json(DoctorResource::make($doctor), 200);
+        $doctorUpdated = Doctor::find($id);
+        if (!$doctorUpdated) {
+            return ApiResponse::data(null, false, 'Doctor not found', 404);
+        }
+        $doctorUpdated = $this->doctorService->update($request, $doctorUpdated);
+        return ApiResponse::data(DoctorResource::make($doctorUpdated), true, 'Doctor updated successfully', 200);
     }
 
     /**
      * Elimina un médico específico del sistema.
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
-     * @urlParam doctor_id integer required ID del médico.
+     * @urlParam id integer required ID del médico.
      * @response 200 scenario="Eliminación exitosa"
      * {
      *     "message": "Doctor deleted successfully"
      * }
-     * @param Doctor $doctor
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy(Doctor $doctor)
+    public function destroy($id)
     {
+        $doctor = Doctor::find($id);
+        if (!$doctor) {
+            return ApiResponse::data(null, false, 'Doctor not found', 404);
+        }
         $doctor->delete();
-        return response()->json(['message' => 'Doctor deleted successfully'], 200);
+        return ApiResponse::data(null, true, 'Doctor deleted successfully', 200);
     }
 }

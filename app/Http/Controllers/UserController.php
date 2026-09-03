@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\UserFilter;
 use App\Http\Requests\UserRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\User;
 use App\Http\Services\UserService;
 use App\Http\Resources\UserResource;
@@ -22,7 +23,12 @@ class UserController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return UserResource::collection($data);
+        $data->getCollection()->transform([UserResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Users retrieved successfully' : 'No users found'
+        );
     }
 
     /**
@@ -31,38 +37,54 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $user = $this->userService->store($request);
-        return response()->json(UserResource::make($user), 201);
+        return ApiResponse::data(UserResource::make($user), true, 'User created successfully', 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show($id)
     {
-        return response()->json(UserResource::make($user), 200);
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponse::data(null, false, 'User not found', 404);
+        }
+        return ApiResponse::data(UserResource::make($user), true, 'User retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, User $user)
+    public function update(UserRequest $request, $id)
     {
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponse::data(null, false, 'User not found', 404);
+        }
         $user = $this->userService->update($request, $user);
-        return response()->json(UserResource::make($user), 200);
+        return ApiResponse::data(UserResource::make($user), true, 'User updated successfully', 200);
     }
 
-    public function changePassword(Request $request, User $user)
+    public function changePassword(Request $request, $id)
     {
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponse::data(null, false, 'User not found', 404);
+        }
         $user = $this->userService->changePassword($request, $user);
-        return response()->json(['message' => 'Password changed successfully'], 200);
+        return ApiResponse::data(null, true, 'Password changed successfully', 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponse::data(null, false, 'User not found', 404);
+        }
         $user->delete();
-        return response()->json(['message' => 'User deleted successfully'], 200);
+        return ApiResponse::data(null, true, 'User deleted successfully', 200);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\Plan;
 
-class PlanFilter
+class PlanFilter extends Filter
 {
     public function query(array $params)
     {

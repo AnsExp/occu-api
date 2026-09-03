@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\Specialty;
 
-class SpecialtyFilter
+class SpecialtyFilter extends Filter
 {
     public function query(array $params)
     {

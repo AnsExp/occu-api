@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OphthalmologyRequest;
-use App\Http\Resources\CertificateResource;
+use App\Http\Resources\DocumentResource;
 use App\Http\Services\OphthalmologyService;
 
 class OphthalmologyController extends Controller
@@ -18,6 +18,6 @@ class OphthalmologyController extends Controller
     public function store(OphthalmologyRequest $request)
     {
         $ophthalmology = $this->ophthalmologyService->store($request);
-        return CertificateResource::make($ophthalmology);
+        return DocumentResource::make($ophthalmology);
     }
 }

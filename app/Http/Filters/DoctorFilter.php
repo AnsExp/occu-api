@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\Doctor;
 
-class DoctorFilter
+class DoctorFilter extends Filter
 {
     public function query(array $params): \Illuminate\Database\Eloquent\Builder
     {
@@ -34,6 +34,12 @@ class DoctorFilter
 
         if (isset($params['specialty_id'])) {
             $query->where('specialty_id', $params['specialty_id']);
+        }
+
+        if (isset($params['gender'])) {
+            $query->whereHas('personalData', function ($q) use ($params) {
+                $q->where('gender', $params['gender']);
+            });
         }
 
         if (isset($params['order_by'])) {

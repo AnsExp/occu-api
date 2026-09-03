@@ -46,17 +46,17 @@
                     <tbody>
                         <tr>
                             <th class="bg-light" style="width: 20%;">Paciente</th>
-                            <td style="width: 30%;">{{ $patient->person->fullname ?? 'N/D' }}</td>
+                            <td style="width: 30%;">{{ $patient->personalData->fullname ?? 'N/D' }}</td>
                             <th class="bg-light" style="width: 20%;">C.I. / ID</th>
-                            <td style="width: 30%;">{{ $patient->person->id_card ?? 'N/D' }}</td>
+                            <td style="width: 30%;">{{ $patient->personalData->id_card ?? 'N/D' }}</td>
                         </tr>
                         <tr>
                             <th class="bg-light">Fecha de nacimiento</th>
                             <td>
-                                {{ $patient?->person?->pretty_birth_date ?? 'N/D' }}
+                                {{ $patient?->personalData?->pretty_birth_date ?? 'N/D' }}
                             </td>
                             <th class="bg-light">Nacionalidad</th>
-                            <td>{{ $patient?->person?->nationality ?? 'N/D' }}</td>
+                            <td>{{ $patient?->personalData?->nationality ?? 'N/D' }}</td>
                         </tr>
                     </tbody>
                 </table>

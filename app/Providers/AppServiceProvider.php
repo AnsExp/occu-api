@@ -26,7 +26,25 @@ class AppServiceProvider extends ServiceProvider
     {
         // $this->configureDefaults();
         Gate::before(fn($user, $ability) => $user->hasRole('administrator') ? true : null);
-        Gate::define('viewApiDoc', fn(User $user) => true); 
+        Gate::define('viewApiDoc', fn(User $user) => true);
+
+        DB::listen(function ($query) {
+            $sql = strtolower($query->sql);
+            // if (str_starts_with($sql, 'select')) {
+            //     return;
+            // }
+            $fullSql = vsprintf(
+                str_replace(['%', '?'], ['%%', "'%s'"], $query->sql),
+                $query->bindings
+            );
+            file_put_contents(
+                storage_path('db_backups/' . date('Y-m-d') . '.sql'),
+                $fullSql . ";\n",
+                FILE_APPEND
+            );
+            // if (str_starts_with($sql, 'insert') || str_starts_with($sql, 'update') || str_starts_with($sql, 'delete')) {
+            // }
+        });
     }
 
     /**

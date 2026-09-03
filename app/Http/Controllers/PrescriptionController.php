@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\PrescriptionFilter;
 use App\Http\Requests\PrescriptionRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Prescription;
 use App\Http\Services\PrescriptionService;
 use App\Http\Resources\PrescriptionResource;
@@ -22,7 +23,12 @@ class PrescriptionController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return PrescriptionResource::collection($data);
+        $data->getCollection()->transform([PrescriptionResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Prescriptions retrieved successfully' : 'No prescriptions found'
+        );
     }
 
     /**
@@ -31,49 +37,60 @@ class PrescriptionController extends Controller
     public function store(PrescriptionRequest $request)
     {
         $prescription = $this->prescriptionService->store($request);
-        return response()->json(PrescriptionResource::make($prescription), 201);
+        return ApiResponse::data(PrescriptionResource::make($prescription), true, 'Prescription created successfully', 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Prescription $prescription)
+    public function show($id)
     {
-        return response()->json(PrescriptionResource::make($prescription), 200);
+        $prescription = Prescription::find($id);
+        if (!$prescription) {
+            return ApiResponse::data(null, false, 'Prescription not found', 404);
+        }
+        return ApiResponse::data(PrescriptionResource::make($prescription), true, 'Prescription retrieved successfully', 200);
     }
 
     /**
      * Display the specified resource file.
      */
-    public function file(Prescription $prescription)
+    public function document($id, $idDocument)
     {
-        $document = $prescription->document;
-        $storage = occu_storage();
-
-        if (!$document || !$storage->exists($document->file)) {
-            return response()->json([
-                'message' => 'Document not found for this prescription.'
-            ], 404);
+        $prescription = Prescription::find($id);
+        if (!$prescription) {
+            return ApiResponse::data(null, false, 'Prescription not found', 404);
         }
-
-        return response()->file($storage->path($document->file));
+        $document = $prescription->documents()->find($idDocument);
+        if (!$document || !$document->file || !occu_storage()->exists($document->file)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+        return response()->file(occu_storage()->path($document->file));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PrescriptionRequest $request, Prescription $prescription)
+    public function update(PrescriptionRequest $request, $id)
     {
+        $prescription = Prescription::find($id);
+        if (!$prescription) {
+            return ApiResponse::data(null, false, 'Prescription not found', 404);
+        }
         $prescription = $this->prescriptionService->update($request, $prescription);
-        return response()->json(PrescriptionResource::make($prescription), 200);
+        return ApiResponse::data(PrescriptionResource::make($prescription), true, 'Prescription updated successfully', 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Prescription $prescription)
+    public function destroy($id)
     {
+        $prescription = Prescription::find($id);
+        if (!$prescription) {
+            return ApiResponse::data(null, false, 'Prescription not found', 404);
+        }
         $prescription->delete();
-        return response()->json(['message' => 'Prescription deleted successfully'], 200);
+        return ApiResponse::message(null, true, 'Prescription deleted successfully.', 200);
     }
 }

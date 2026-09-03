@@ -63,3 +63,24 @@ if (!function_exists('occu_slug')) {
         return Illuminate\Support\Str::slug($value);
     }
 }
+
+if (!function_exists('occu_ip_timezone')) {
+    function occu_ip_timezone(?string $ip = null): ?string
+    {
+        $ip ??= request()->ip();
+
+        try {
+            $response = Illuminate\Support\Facades\Http::get(
+                "http://ip-api.com/json/{$ip}",
+                ['fields' => 'timezone,status']
+            );
+
+            return $response->json('status') === 'success'
+                ? $response->json('timezone')
+                : null;
+        } catch (\Exception $e) {
+            logger()->error("Error consultando timezone: {$e->getMessage()}");
+            return null;
+        }
+    }
+}

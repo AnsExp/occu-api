@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\PersonalDataFilter;
 use App\Http\Resources\PersonalDataResource;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -91,6 +92,11 @@ class PersonalDataController extends Controller
     {
         $perPage = $request->input('per_page', 15);
         $data = $filter->query($request->all())->paginate($perPage);
-        return PersonalDataResource::collection($data);
+        $data->getCollection()->transform([PersonalDataResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Personal data retrieved successfully' : 'No personal data found'
+        );
     }
 }

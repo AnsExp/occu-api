@@ -4,10 +4,6 @@ return [
     'receptionist' => [
         'read.patients',
 
-        'read.occupational_medical_dates',
-        'create.occupational_medical_dates',
-        'update.occupational_medical_dates',
-
         'read.medical_dates',
         'create.medical_dates',
         'update.medical_dates',
@@ -55,8 +51,6 @@ return [
         "read.specialties",
 
         "read.agreements",
-
-        "read.certificates",
 
         "read.plans",
 

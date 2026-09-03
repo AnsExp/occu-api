@@ -4,18 +4,11 @@ namespace App\Http\Filters;
 
 use App\Models\MedicalDate;
 
-class MedicalDateFilter
+class MedicalDateFilter extends Filter
 {
     public function query(array $params)
     {
         $query = MedicalDate::query();
-        $user = auth()->user();
-
-        if ($user->hasRole('doctor')) {
-            $query->where('doctor_id', $user->person->doctor->id);
-        } else if ($user->hasRole('patient')) {
-            $query->where('patient_id', $user->person->patient->id);
-        }
 
         if (isset($params['date'])) {
             $query->where('date', $params['date']);

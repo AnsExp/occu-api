@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\AllowedIp;
 
-class AllowedIpFilter
+class AllowedIpFilter extends Filter
 {
     public function query(array $params)
     {

@@ -39,17 +39,17 @@
                     <tbody>
                         <tr>
                             <th class="bg-light" style="width: 20%;">Paciente</th>
-                            <td style="width: 30%;">{{ $patient->person->fullname ?? '-' }}</td>
+                            <td style="width: 30%;">{{ $patient->personalData->fullname ?? '-' }}</td>
                             <th class="bg-light" style="width: 20%;">C.I. / ID</th>
-                            <td style="width: 30%;">{{ $patient->person->id_card ?? '-' }}</td>
+                            <td style="width: 30%;">{{ $patient->personalData->id_card ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="bg-light">Fecha de nacimiento</th>
                             <td>
-                                {{ $patient?->person?->pretty_birth_date ?? '-' }}
+                                {{ $patient?->personalData?->pretty_birth_date ?? '-' }}
                             </td>
                             <th class="bg-light">Nacionalidad</th>
-                            <td>{{ $patient?->person?->nationality ?? '-' }}</td>
+                            <td>{{ $patient?->personalData?->nationality ?? '-' }}</td>
                         </tr>
                     </tbody>
                 </table>

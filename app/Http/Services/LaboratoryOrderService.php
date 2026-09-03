@@ -62,7 +62,7 @@ class LaboratoryOrderService
         $order->laboratoryExams()->delete();
 
         foreach ($items as $item) {
-            if ($option = LaboratoryOption::find($item['option'])) {
+            if ($option = LaboratoryOption::find($item['id'])) {
                 $order->laboratoryExams()->create([
                     'quantity'              => $item['quantity'] ?? 1,
                     'laboratory_option_id'  => $option->id,

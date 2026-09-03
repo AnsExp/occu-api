@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
 abstract class PersonalDataRequest extends FormRequest
 {
     protected function commonRules(): array
@@ -17,9 +15,6 @@ abstract class PersonalDataRequest extends FormRequest
             'id_card_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
             'nationality' => ['nullable', 'string'],
             'gender' => ['nullable', 'string'],
-            'metadata' => ['nullable', 'array'],
-            'metadata.*.key' => ['required', 'string'],
-            'metadata.*.value' => ['required', 'string'],
         ];
     }
 

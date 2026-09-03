@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\VitalSign;
 
-class VitalSignFilter
+class VitalSignFilter extends Filter
 {
     public function query(array $params)
     {

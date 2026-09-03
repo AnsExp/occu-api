@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\AuditLog;
 
-class AuditLogFilter
+class AuditLogFilter extends Filter
 {
     public function query(array $params)
     {

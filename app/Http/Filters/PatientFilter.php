@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\Patient;
 
-class PatientFilter
+class PatientFilter extends Filter
 {
     public function query(array $params)
     {

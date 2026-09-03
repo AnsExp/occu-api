@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\AgreementFilter;
 use App\Http\Requests\AgreementRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Agreement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,105 +18,41 @@ use App\Http\Resources\AgreementResource;
  */
 class AgreementController extends Controller
 {
-    public function __construct(private AgreementService $agreementService)
+    public function __construct(private AgreementService $service)
     {
     }
 
     /**
      * Consulta la información de los convenios en el sistema.
      * 
+     * Este endpoint devuelve una lista paginada de convenios registrados,
+     * permitiendo aplicar filtros y ordenamientos sobre los resultados.
+     * 
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
      * 
      * @queryParam per_page integer Número de resultados por página. Por defecto, 15.
      * @queryParam page integer Número de página actual. Por defecto, 1.
-     * @queryParam institution string Filtro por institución. Example: Hospital Central
-     * @queryParam discount_type string Filtro por tipo de descuento. Example: percentage
-     * @queryParam discount_amount integer Filtro por monto de descuento. Example: 10
-     * @queryParam discount_amount_min integer Filtro por monto mínimo de descuento. Example: 5
-     * @queryParam discount_amount_max integer Filtro por monto máximo de descuento.
-     * @queryParam order_by string Campo por el cual ordenar los resultados. Example: institution
-     * @queryParam order string Orden de los resultados. Valores posibles: asc, desc. Example: asc
-     *
-     * @response 200 scenario="Consulta exitosa"
-     * {
-     *     "data": [
-     *         {
-     *             "id": 1,
-     *             "institution": "Universidad Católica",
-     *             "description": "Convenio para estudiantes y personal docente",
-     *             "discount_type": "percentage",
-     *             "discount_amount": 15,
-     *             "requirements": [
-     *                 {
-     *                     "id": 10,
-     *                     "name": "Medicina General"
-     *                 },
-     *                 {
-     *                     "id": 12,
-     *                     "name": "Odontología"
-     *                 }
-     *             ]
-     *         },
-     *         {
-     *             "id": 2,
-     *             "institution": "Empresa Eléctrica",
-     *             "description": "Beneficio para empleados activos",
-     *             "discount_type": "fixed",
-     *             "discount_amount": 25,
-     *             "requirements": [
-     *                 {
-     *                     "id": 14,
-     *                     "name": "Cardiología"
-     *                 }
-     *             ]
-     *         }
-     *     ],
-     *     "links": {
-     *         "first": "http://example.com/api/agreements?page=1",
-     *         "last": "http://example.com/api/agreements?page=10",
-     *         "prev": null,
-     *         "next": "http://example.com/api/agreements?page=2"
-     *     },
-     *     "meta": {
-     *         "current_page": 1,
-     *         "from": 1,
-     *         "last_page": 10,
-     *         "links": [
-     *             {
-     *                 "url": null,
-     *                 "label": "&laquo; Previous",
-     *                 "active": false
-     *             },
-     *             {
-     *                 "url": "http://example.com/api/agreements?page=1",
-     *                 "label": "1",
-     *                 "active": true
-     *             },
-     *             {
-     *                 "url": "http://example.com/api/agreements?page=2",
-     *                 "label": "2",
-     *                 "active": false
-     *             },
-     *             {
-     *                 "url": "http://example.com/api/agreements?page=3",
-     *                 "label": "3",
-     *                 "active": false
-     *             }
-     *         ],
-     *         "path": "http://example.com/api/agreements",
-     *         "per_page": 15,
-     *         "to": 15,
-     *         "total": 150
-     *     }
-     * }
-     * @return JsonResponse
+     * @queryParam institution string Filtrar por institución. Ejemplo: Hospital Central
+     * @queryParam discount_type string Filtrar por tipo de descuento. Ejemplo: percentage
+     * @queryParam discount_amount integer Filtrar por monto de descuento. Ejemplo: 10
+     * @queryParam discount_amount_min integer Filtrar por monto mínimo de descuento. Ejemplo: 5
+     * @queryParam discount_amount_max integer Filtrar por monto máximo de descuento.
+     * @queryParam order_by string Campo por el cual ordenar los resultados. Ejemplo: institution
+     * @queryParam order string Orden de los resultados. Valores posibles: asc, desc. Ejemplo: asc
+     * 
+     * @return JsonResponse Devuelve un objeto JSON con los convenios paginados, enlaces de navegación y metadatos.
      */
     public function index(Request $request, AgreementFilter $filter)
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return AgreementResource::collection($data);
+        $data->getCollection()->transform([AgreementResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Agreements retrieved successfully' : 'No agreements found'
+        );
     }
 
     /**
@@ -148,8 +85,8 @@ class AgreementController extends Controller
      */
     public function store(AgreementRequest $request)
     {
-        $agreement = $this->agreementService->store($request);
-        return response()->json(AgreementResource::make($agreement), 201);
+        $agreement = $this->service->store($request);
+        return ApiResponse::data(AgreementResource::make($agreement), true, 'Agreement created successfully', 201);
     }
 
     /**
@@ -163,7 +100,6 @@ class AgreementController extends Controller
      * @response 200 scenario="Consulta exitosa"
      * {
      *     "data": {
-     *         "id": 1,
      *         "id": 1,
      *         "institution": "Universidad Católica",
      *         "description": "Convenio para estudiantes y personal docente",
@@ -183,9 +119,13 @@ class AgreementController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show(Agreement $agreement)
+    public function show($id)
     {
-        return response()->json(AgreementResource::make($agreement), 200);
+        $agreement = Agreement::find($id);
+        if (!$agreement) {
+            return ApiResponse::data(null, false, 'Agreement not found', 404);
+        }
+        return ApiResponse::data(AgreementResource::make($agreement), true, 'Agreement retrieved successfully', 200);
     }
 
     /**
@@ -194,7 +134,7 @@ class AgreementController extends Controller
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
      * 
-     * @urlParam agreement_id integer required ID del convenio.
+     * @urlParam id integer required ID del convenio.
      *
      * @bodyParam institution string required Nombre de la institución. Example: Hospital Central
      * @bodyParam discount_type string required Tipo de descuento. Example: Porcentaje
@@ -224,27 +164,35 @@ class AgreementController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(Request $request, Agreement $agreement)
+    public function update(Request $request, $id)
     {
-        $agreement = $this->agreementService->update($request, $agreement);
-        return response()->json(AgreementResource::make($agreement), 200);
+        $agreement = Agreement::find($id);
+        if (!$agreement) {
+            return ApiResponse::data(null, false, 'Agreement not found', 404);
+        }
+        $agreementUpdated = $this->service->update($request, $agreement);
+        return ApiResponse::data(AgreementResource::make($agreementUpdated), true, 'Agreement updated successfully', 200);
     }
 
     /**
      * Elimina un convenio específico del sistema.
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
-     * @urlParam agreement_id integer required ID del convenio.
+     * @urlParam id integer required ID del convenio.
      * @response 200 scenario="Eliminación exitosa"
      * {
      *     "message": "Agreement deleted successfully"
      * }
-     * @param Agreement $agreement
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy(Agreement $agreement)
+    public function destroy($id)
     {
+        $agreement = Agreement::find($id);
+        if (!$agreement) {
+            return ApiResponse::data(null, false, 'Agreement not found', 404);
+        }
         $agreement->delete();
-        return response()->json(['message' => 'Agreement deleted successfully.'], 200);
+        return ApiResponse::data(null, true, 'Agreement deleted successfully', 200);
     }
 }

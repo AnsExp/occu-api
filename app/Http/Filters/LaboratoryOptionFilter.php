@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\LaboratoryOption;
 
-class LaboratoryOptionFilter
+class LaboratoryOptionFilter extends Filter
 {
     public function query(array $params)
     {

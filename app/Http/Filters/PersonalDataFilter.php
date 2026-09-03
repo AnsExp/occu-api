@@ -4,7 +4,7 @@ namespace App\Http\Filters;
 
 use App\Models\PersonalData;
 
-class PersonalDataFilter
+class PersonalDataFilter extends Filter
 {
     public function query(array $params)
     {

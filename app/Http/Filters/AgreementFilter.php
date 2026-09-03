@@ -4,8 +4,14 @@ namespace App\Http\Filters;
 
 use App\Models\Agreement;
 
-class AgreementFilter
+class AgreementFilter extends Filter
 {
+    /**
+     * Aplica los filtros a la consulta de convenios.
+     *
+     * @param array $params Los parámetros de filtro.
+     * @return \Illuminate\Database\Eloquent\Builder La consulta filtrada.
+     */
     public function query(array $params)
     {
         $query = Agreement::query();

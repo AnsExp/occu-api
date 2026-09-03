@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Doctor;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
 class AudiologyRequest extends FormRequest
 {

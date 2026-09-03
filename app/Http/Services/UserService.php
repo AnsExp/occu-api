@@ -16,7 +16,7 @@ class UserService
     {
         return DB::transaction(function () use ($request) {
             $user = User::create([
-                'name' => $request->input('first_name'),
+                'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'password' => bcrypt($request->input('password')),
             ]);
@@ -32,7 +32,7 @@ class UserService
     {
         return DB::transaction(function () use ($request, $user) {
             $user->update([
-                'name' => $request->input('first_name'),
+                'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'email_hash' => $request->input('email_hash'),
             ]);

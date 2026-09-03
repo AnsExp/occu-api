@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\ApiResponse;
 use App\Models\AllowedIp;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\SessionPasswordRequest;
 use Illuminate\Support\Facades\Auth;
 
 class SessionController extends Controller
@@ -22,13 +24,15 @@ class SessionController extends Controller
             return $this->response($ip, true, 'IP address is allowed (debug mode).');
         }
 
-        $allowedIp = AllowedIp::where('ip', $ip)->first();
+        $allowedIp = AllowedIp::where('ip_address', $ip)->first();
 
         if (!$allowedIp) {
             return $this->response($ip, false, 'IP address is not allowed.', 403);
         }
 
-        if ($allowedIp->expires_at && now()->greaterThan($allowedIp->expires_at)) {
+        $timezoneIp = occu_ip_timezone($ip);
+
+        if ($allowedIp->expires_at && now()->setTimezone($timezoneIp)->format('Y-m-d H:i:s') > $allowedIp->expires_at->format('Y-m-d H:i:s')) {
             return $this->response($ip, false, 'IP address is not allowed. The allowed period has expired.', 403);
         }
 
@@ -51,23 +55,14 @@ class SessionController extends Controller
      *   "message": "Current password is incorrect."
      * }
      */
-    public function changePassword(Request $request)
+    public function changePassword(SessionPasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
         $user = Auth::user();
-
-        if (!\Hash::check($request->input('current_password', ''), $user->password)) {
-            return response()->json(['message' => 'Current password is incorrect.'], 400);
-        }
 
         $user->password = \Hash::make($request->input('new_password'));
         $user->save();
 
-        return response()->json(['message' => 'Password changed successfully.'], 200);
+        return ApiResponse::formResponse([], true, 'Password changed successfully.', 200);
     }
 
     private function response(string $ip, bool $allowed, string $message, int $status = 200)

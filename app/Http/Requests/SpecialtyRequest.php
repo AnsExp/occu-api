@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SpecialtyRequest extends FormRequest
 {
@@ -22,16 +22,13 @@ class SpecialtyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        $id = $this->route('specialty');
+
+        return [
+            'name' => ['required', 'string', 'max:255', Rule::unique('specialties', 'name')->ignore($id)],
             'price_base' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string'],
         ];
-        if ($specialty = $this->route('specialty')) {
-            $rules['name'] = ['required', 'string', 'max:255', 'unique:specialties,name,' . $specialty->id];
-        } else {
-            $rules['name'] = ['required', 'string', 'max:255', 'unique:specialties,name'];
-        }
-        return $rules;
     }
 
     public function messages()

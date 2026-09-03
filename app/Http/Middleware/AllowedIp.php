@@ -24,13 +24,15 @@ class AllowedIp
         }
 
         $ip = $request->ip();
-        $allowedIp = \App\Models\AllowedIp::where('ip', $ip)->first();
+        $allowedIp = \App\Models\AllowedIp::where('ip_address', $ip)->first();
 
         if (!$allowedIp) {
             abort(403, 'Tu IP no está autorizada. Si lo crees un error, contacta al área de sistemas.');
         }
 
-        if ($allowedIp->expires_at && now()->greaterThan($allowedIp->expires_at)) {
+        $timezoneIp = occu_ip_timezone($ip);
+
+        if ($allowedIp->expires_at && now()->setTimezone($timezoneIp)->greaterThan($allowedIp->expires_at)) {
             abort(403, 'Tu IP estaba autorizada, pero el periodo ha expirado.');
         }
 

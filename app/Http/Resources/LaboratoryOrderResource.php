@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\LaboratoryOrder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,9 +18,11 @@ class LaboratoryOrderResource extends JsonResource
         return [
             'id' => $this->id,
             'code' => $this->code,
-            'sha256' => $this->document->sha256,
             'timezone' => $this->timezone,
             'patient' => PatientResource::make($this->patient),
+            'doctor' => $this->doctor ? DoctorResource::make($this->doctor) : null,
+            'documents' => array_map(fn($document) => DocumentResource::make($document), $this->documents->all()),
+            'document' => $this->latestDocument ? DocumentResource::make($this->latestDocument) : null,
             'exams' => array_map(fn($exam) => [
                 'id' => $exam->id,
                 'name' => $exam->laboratoryOption->name,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\PatientFilter;
 use App\Http\Requests\PatientRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Patient;
 use App\Http\Services\PatientService;
 use App\Http\Resources\PatientResource;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
-    public function __construct(private PatientService $patientService)
+    public function __construct(private PatientService $service)
     {
     }
 
@@ -22,7 +23,12 @@ class PatientController extends Controller
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
         $data = $filter->query($request->all())->paginate($perPage);
-        return PatientResource::collection($data);
+        $data->getCollection()->transform([PatientResource::class, 'make']);
+        return ApiResponse::pagination(
+            $data,
+            $data->count() > 0,
+            $data->count() > 0 ? 'Patients retrieved successfully' : 'No patients found'
+        );
     }
 
     /**
@@ -30,33 +36,45 @@ class PatientController extends Controller
      */
     public function store(PatientRequest $request)
     {
-        $patient = $this->patientService->store($request);
-        return response()->json(PatientResource::make($patient), 201);
+        $patient = $this->service->store($request);
+        return ApiResponse::data(PatientResource::make($patient), true, 'Patient created successfully', 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Patient $patient)
+    public function show($id)
     {
-        return response()->json(PatientResource::make($patient), 200);
+        $patient = Patient::find($id);
+        if (!$patient) {
+            return ApiResponse::data(null, false, 'Patient not found', 404);
+        }
+        return ApiResponse::data(PatientResource::make($patient), true, 'Patient retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PatientRequest $request, Patient $patient)
+    public function update(PatientRequest $request, $id)
     {
-        $patient = $this->patientService->update($request, $patient);
-        return response()->json(PatientResource::make($patient), 200);
+        $patient = Patient::find($id);
+        if (!$patient) {
+            return ApiResponse::data(null, false, 'Patient not found', 404);
+        }
+        $patient = $this->service->update($request, $patient);
+        return ApiResponse::data(PatientResource::make($patient), true, 'Patient updated successfully', 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Patient $patient)
+    public function destroy($id)
     {
+        $patient = Patient::find($id);
+        if (!$patient) {
+            return ApiResponse::data(null, false, 'Patient not found', 404);
+        }
         $patient->delete();
-        return response()->json(['message' => 'Patient deleted successfully.'], 200);
+        return ApiResponse::message(null, true, 'Patient deleted successfully.', 200);
     }
 }

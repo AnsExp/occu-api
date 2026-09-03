@@ -38,7 +38,8 @@ class PrescriptionResource extends JsonResource
                 'quantity' => $medication->quantity,
                 'notes' => $medication->notes,
             ], $this->medications->all()),
-            'has_file' => $this->document?->exists() ?? false,
+            'documents' => array_map(fn($document) => DocumentResource::make($document), $this->documents->all()),
+            'document' => $this->latestDocument ? DocumentResource::make($this->latestDocument) : null,
             'timezone' => $this->timezone,
             'created_at' => $this->created_at,
         ];

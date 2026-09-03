@@ -19,6 +19,7 @@ class OdontologyService
     public function store(Request $request)
     {
         $medicalDate = MedicalDate::findOrFail($request->input('medical_date.id'));
+        // return $medicalDate;
         return $this->createDocument($request, $medicalDate);
     }
 
@@ -34,7 +35,7 @@ class OdontologyService
 
             return $this->createVersionedDocument(
                 $medicalDate,
-                ['medical_date' => $medicalDate, 'snapshot' => $snapshot],
+                compact('medicalDate', 'snapshot'),
                 $snapshot,
                 $request->input('timezone'),
             );

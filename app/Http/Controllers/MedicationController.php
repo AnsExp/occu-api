@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class MedicationController extends Controller
 {
-    public function __construct(private MedicationService $medicationService)
+    public function __construct(private MedicationService $service)
     {
     }
 
@@ -30,32 +30,44 @@ class MedicationController extends Controller
      */
     public function store(MedicationRequest $request)
     {
-        $medication = $this->medicationService->store($request);
+        $medication = $this->service->store($request);
         return response()->json(MedicationResource::make($medication), 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Medication $medication)
+    public function show($id)
     {
+        $medication = Medication::find($id);
+        if (!$medication) {
+            return response()->json(['message' => 'Medication not found'], 404);
+        }
         return response()->json(MedicationResource::make($medication), 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(MedicationRequest $request, Medication $medication)
+    public function update(MedicationRequest $request, $id)
     {
-        $medication = $this->medicationService->update($request, $medication);
+        $medication = Medication::find($id);
+        if (!$medication) {
+            return response()->json(['message' => 'Medication not found'], 404);
+        }
+        $medication = $this->service->update($request, $medication);
         return response()->json(MedicationResource::make($medication), 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Medication $medication)
+    public function destroy($id)
     {
+        $medication = Medication::find($id);
+        if (!$medication) {
+            return response()->json(['message' => 'Medication not found'], 404);
+        }
         $medication->delete();
         return response()->json(['message' => 'Medication deleted successfully.'], 200);
     }

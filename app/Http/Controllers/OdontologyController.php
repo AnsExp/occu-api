@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OdontologyRequest;
-use App\Http\Resources\CertificateResource;
+use App\Http\Resources\DocumentResource;
 use App\Http\Services\OdontologyService;
 
 class OdontologyController extends Controller
@@ -18,6 +18,7 @@ class OdontologyController extends Controller
     public function store(OdontologyRequest $request)
     {
         $odontology = $this->odontologyService->store($request);
-        return CertificateResource::make($odontology);
+        return $odontology;
+        return DocumentResource::make($odontology);
     }
 }

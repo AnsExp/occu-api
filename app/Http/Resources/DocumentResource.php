@@ -2,11 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Certificate;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CertificateResource extends JsonResource
+class DocumentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,9 +17,9 @@ class CertificateResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'timezone' => $this->timezone,
             'sha256' => $this->sha256,
-            'file' => route('certificate.show', ['certificate' => $this->id]),
+            'timezone' => $this->timezone,
+            'created_at' => $this->created_at,
         ];
     }
 }

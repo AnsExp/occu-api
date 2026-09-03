@@ -16,10 +16,10 @@ return [
     'update.agreements',
     'delete.agreements',
 
-    'read.certificates',
-    'create.certificates',
-    'update.certificates',
-    'delete.certificates',
+    'read.documents',
+    'create.documents',
+    'update.documents',
+    'delete.documents',
 
     'read.plans',
     'create.plans',
@@ -61,20 +61,12 @@ return [
     'update.medical_dates',
     'delete.medical_dates',
 
-    'read.occupational_medical_dates',
-    'create.occupational_medical_dates',
-    'update.occupational_medical_dates',
-    'delete.occupational_medical_dates',
-
     'read.vital_signs',
     'create.vital_signs',
     'update.vital_signs',
     'delete.vital_signs',
 
-    'read.allowed_ips',
-    'create.allowed_ips',
-    'update.allowed_ips',
-    'delete.allowed_ips',
-
     'read.audit_logs',
+
+    'manage.system',
 ];

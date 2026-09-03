@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
 class PrescriptionRequest extends FormRequest
 {
@@ -50,7 +49,7 @@ class PrescriptionRequest extends FormRequest
     public function messages()
     {
         return [
-            'timezone.required' => '',
+            'timezone.required' => __('validation.required', ['attribute' => __('attributes.timezone')]),
         ];
     }
 }
