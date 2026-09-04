@@ -4,6 +4,7 @@ use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\AllowedIpController;
 use App\Http\Controllers\AudiologyController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\OccupationalMedicineController;
 use App\Http\Controllers\OdontologyController;
 use App\Http\Controllers\OphthalmologyController;
 use App\Http\Controllers\PersonalDataController;
@@ -116,7 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/specialties/{id}', [SpecialtyController::class, 'destroy'])->middleware('ability:delete.specialties');
 
         Route::post('/medical_dates', [MedicalDateController::class, 'store'])->middleware('ability:create.medical_dates');
-        Route::put('/medical_dates/{id}', [MedicalDateController::class, 'update'])->middleware('ability:update.medical_dates');
+        Route::put('/medical_dates/{id}/reschedule', [MedicalDateController::class, 'reschedule'])->middleware('ability:update.medical_dates');
         Route::delete('/medical_dates/{id}', [MedicalDateController::class, 'destroy'])->middleware('ability:delete.medical_dates');
 
         Route::post('/prescriptions', [PrescriptionController::class, 'store'])->middleware('ability:create.prescriptions');
@@ -134,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/audiology', [AudiologyController::class, 'store'])->middleware('ability:create.documents');
         Route::post('/odontology', [OdontologyController::class, 'store'])->middleware('ability:create.documents');
         Route::post('/ophthalmology', [OphthalmologyController::class, 'store'])->middleware('ability:create.documents');
+        Route::post('/occupational_medicine', [OccupationalMedicineController::class, 'store'])->middleware('ability:create.documents');
 
     });
 

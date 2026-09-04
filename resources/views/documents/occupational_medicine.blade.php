@@ -3,11 +3,9 @@
 @section('title', $medicalDate->code)
 
 @php
-    $certificate = $medicalDate->certificate;
-
-    $otherTests = $certificate->snapshot['other_tests'] ?? [];
-    $declarations = $certificate->snapshot['declarations'] ?? [];
-    $clinicalData = $certificate->snapshot['clinical_data'] ?? [];
+    $otherTests = $snapshot['other_tests'] ?? [];
+    $declarations = $snapshot['declarations'] ?? [];
+    $clinicalData = $snapshot['clinical_data'] ?? [];
 
     $timezone = request()->input('timezone', 'UTC');
     $carbon = \Carbon\Carbon::now()->setTimezone($timezone);
@@ -25,7 +23,7 @@
                     <td class="text-end align-top" style="width: 30%;">
                         <div class="small text-muted mt-2">Fecha de emision</div>
                         <div class="fw-semibold">
-                            {{ $certificate->created_at ? $certificate->created_at->translatedFormat('j \\d\\e F, Y H:i') : 'N/D' }}
+                            {{ $carbon->translatedFormat('j \\d\\e F, Y H:i') }}
                         </div>
                     </td>
                 </tr>
@@ -130,9 +128,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($otherTests as $test)
+            @foreach ($otherTests['checks'] as $key => $test)
                 <tr>
-                    <th>{{ __('occupational_medicine.' . $test['test']) }}</th>
+                    <th>{{ __('occupational_medicine.' . $key) }}</th>
                     <td class="text-center">{{ $test['status'] === 'normal' ? 'Normal' : 'Alteración' }}</td>
                     <td>{{ $test['result'] ?? '-' }}</td>
                 </tr>

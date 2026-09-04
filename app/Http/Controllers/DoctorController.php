@@ -141,6 +141,8 @@ class DoctorController extends Controller
     public function index(Request $request, DoctorFilter $filter)
     {
         $perPage = $request->input('per_page', config('app.page_limit'));
+        $data = $filter->query($request->all());
+        // return $data->toSql();
         $data = $filter->query($request->all())->paginate($perPage);
         $data->getCollection()->transform([DoctorResource::class, 'make']);
         return ApiResponse::pagination(
@@ -343,6 +345,8 @@ class DoctorController extends Controller
         if (!$doctor) {
             return ApiResponse::data(null, false, 'Doctor not found', 404);
         }
+        $doctor->user->removeRole('doctor');
+        $doctor->user->tokens()->delete();
         $doctor->delete();
         return ApiResponse::data(null, true, 'Doctor deleted successfully', 200);
     }

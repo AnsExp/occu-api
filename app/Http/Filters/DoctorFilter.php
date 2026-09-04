@@ -3,10 +3,11 @@
 namespace App\Http\Filters;
 
 use App\Models\Doctor;
+use Illuminate\Database\Eloquent\Builder;
 
 class DoctorFilter extends Filter
 {
-    public function query(array $params): \Illuminate\Database\Eloquent\Builder
+    public function query(array $params)
     {
         $query = Doctor::query();
 
@@ -42,12 +43,45 @@ class DoctorFilter extends Filter
             });
         }
 
-        if (isset($params['order_by'])) {
-            $orderBy = $params['order_by'];
-            $order = $params['order'] ?? 'asc';
-            $query->orderBy($orderBy, $order);
-        } else {
-            $query->orderBy('created_at', 'desc');
+        return $this->orderBy($query, $params['order_by'] ?? 'created_at', $params['order'] ?? 'asc');
+    }
+
+    private function orderBy(Builder $query, string $orderBy = 'created_at', string $order = 'asc')
+    {
+        if (
+            !in_array($orderBy, [
+                'is_occupational_doctor',
+                'id_card',
+                'first_name',
+                'last_name',
+                'specialty_name',
+                'gender',
+                'created_at',
+            ])
+        ) {
+            $orderBy = 'created_at';
+        }
+
+        if ($order !== 'asc' && $order !== 'desc') {
+            $order = 'asc';
+        }
+
+        if ($orderBy === 'first_name') {
+            $query->whereHas('personalData', function ($q) use ($order) {
+                $q->orderBy('first_name', $order);
+            });
+        }
+
+        if ($orderBy === 'last_name') {
+            $query->whereHas('personalData', function ($q) use ($order) {
+                $q->orderBy('last_name', $order);
+            });
+        }
+
+        if ($orderBy === 'specialty_name') {
+            $query->whereHas('specialty', function ($q) use ($order) {
+                $q->orderBy('name', $order);
+            });
         }
 
         return $query;

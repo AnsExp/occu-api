@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MedicalDateRequest;
+use App\Http\Requests\RescheduleMedicalDateRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\MedicalDate;
 use App\Http\Services\MedicalDateService;
@@ -90,13 +91,13 @@ class MedicalDateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(MedicalDateRequest $request, $id)
+    public function reschedule(RescheduleMedicalDateRequest $request, $id)
     {
         $medicalDate = MedicalDate::find($id);
         if (!$medicalDate) {
             return ApiResponse::data(null, false, 'Medical date not found', 404);
         }
-        $medicalDate = $this->service->update($request, $medicalDate);
+        $medicalDate = $this->service->reschedule($request, $medicalDate);
         return ApiResponse::data(MedicalDateResource::make($medicalDate), true, 'Medical date updated successfully', 200);
     }
 

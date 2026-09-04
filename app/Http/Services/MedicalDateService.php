@@ -21,7 +21,6 @@ class MedicalDateService
         return DB::transaction(function () use ($request) {
 
             $person = PersonalData::findByIdCard($request->input('person.id_card'));
-            $doctor = Doctor::find($request->input('doctor.id'));
             $patient = PatientService::preparePatient($person);
 
             $specialty = null;
@@ -34,8 +33,8 @@ class MedicalDateService
                 'timezone' => $request->input('timezone'),
                 'date' => $request->input('date'),
                 'type' => $request->input('type', 'normal'),
-                'shift' => $this->generateOrder($request->input('date'), $doctor),
-                'doctor_id' => $doctor->id,
+                'shift' => $this->generateOrder($request->input('date'), $request->input('doctor.id')),
+                'doctor_id' => $request->input('doctor.id'),
                 'patient_id' => $patient->id,
                 'specialty_id' => $specialty?->id,
             ]);
@@ -44,7 +43,6 @@ class MedicalDateService
 
                 $relatedPerson = PersonalData::findByIdCard($relationship['person']['id_card']);
                 $relatedPatient = PatientService::preparePatient($relatedPerson);
-                $relatedDoctor = Doctor::find($relationship['doctor']['id']);
                 $relatedSpecialty = Specialty::find($relationship['specialty']['id']);
 
                 $related = MedicalDate::create([
@@ -52,8 +50,8 @@ class MedicalDateService
                     'timezone' => $request->input('timezone'),
                     'date' => $relationship['date'],
                     'type' => $relationship['type'] ?? 'normal',
-                    'shift' => $this->generateOrder($relationship['date'], $relatedDoctor),
-                    'doctor_id' => $relatedDoctor->id,
+                    'shift' => $this->generateOrder($relationship['date'], $relationship['doctor']['id']),
+                    'doctor_id' => $relationship['doctor']['id'],
                     'patient_id' => $relatedPatient->id,
                     'specialty_id' => $relatedSpecialty?->id,
                 ]);
@@ -68,24 +66,14 @@ class MedicalDateService
         });
     }
 
-    public function update(Request $request, MedicalDate $medicalDate)
+    public function reschedule(Request $request, MedicalDate $medicalDate)
     {
         return DB::transaction(function () use ($request, $medicalDate) {
 
-            $person = PersonalData::findByIdCard($request->input('person.id_card'));
-            $doctor = Doctor::find($request->input('doctor.id'));
-            $specialty = Specialty::find($request->input('specialty.id'));
-
-            $patient = PatientService::preparePatient($person);
-
             $medicalDate->update([
-                'timezone' => $request->input('timezone'),
                 'date' => $request->input('date'),
-                'type' => $request->input('type', 'normal'),
-                'shift' => $this->generateOrder($request->input('date'), $doctor),
-                'doctor_id' => $doctor->id,
-                'patient_id' => $patient->id,
-                'specialty_id' => $specialty?->id,
+                'doctor_id' => $request->input('doctor.id'),
+                'shift' => $this->generateOrder($request->input('date'), $request->input('doctor.id')),
             ]);
 
             $this->metadataService->store($medicalDate, $request->input('metadata', []));
@@ -96,9 +84,9 @@ class MedicalDateService
         });
     }
 
-    private function generateOrder(string $date, Doctor $doctor)
+    private function generateOrder(string $date, int $doctorId)
     {
-        $lastMedicalDate = MedicalDate::where('doctor_id', $doctor->id)->where('date', $date)->orderBy('shift', 'desc')->pluck('shift')->first();
+        $lastMedicalDate = MedicalDate::where('doctor_id', $doctorId)->where('date', $date)->orderBy('shift', 'desc')->pluck('shift')->first();
         return $lastMedicalDate + 1;
     }
 }

@@ -84,6 +84,7 @@ class UserController extends Controller
         if (!$user) {
             return ApiResponse::data(null, false, 'User not found', 404);
         }
+        $user->tokens()->delete();
         $user->delete();
         return ApiResponse::data(null, true, 'User deleted successfully', 200);
     }

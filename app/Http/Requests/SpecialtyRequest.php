@@ -22,7 +22,7 @@ class SpecialtyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $id = $this->route('specialty');
+        $id = $this->route('id');
 
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('specialties', 'name')->ignore($id)],
