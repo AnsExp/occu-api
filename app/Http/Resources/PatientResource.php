@@ -23,6 +23,7 @@ class PatientResource extends JsonResource
                 'fullname' => $this->personalData->fullname,
                 'phone' => $this->personalData->phone,
                 'id_card' => $this->personalData->id_card,
+                'has_id_card_file' => (bool) $this->personalData->id_card_file,
                 'email' => $this->personalData->email,
                 'nationality' => $this->personalData->nationality,
                 'gender' => $this->personalData->gender,

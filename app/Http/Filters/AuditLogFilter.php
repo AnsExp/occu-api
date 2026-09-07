@@ -12,9 +12,10 @@ class AuditLogFilter extends Filter
 
         if (isset($params['table'])) {
             $query->where('table', $params['table']);
-            if (isset($params['record_id'])) {
-                $query->where('record_id', $params['record_id']);
-            }
+        }
+
+        if (isset($params['record_id'])) {
+            $query->where('record_id', $params['record_id']);
         }
 
         if (isset($params['action'])) {
@@ -23,6 +24,12 @@ class AuditLogFilter extends Filter
 
         if (isset($params['user_id'])) {
             $query->where('user_id', $params['user_id']);
+        }
+
+        if (isset($params['user_email'])) {
+            $query->whereHas('user', function ($q) use ($params) {
+                $q->where('email', $params['user_email']);
+            });
         }
 
         if (isset($params['ip_address'])) {

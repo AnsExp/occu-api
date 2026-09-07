@@ -36,7 +36,6 @@ class PatientService
             $user = User::create([
                 'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
                 'email' => $request->input('email'),
-                'email_hash' => occu_hash($request->input('email')),
                 'password' => bcrypt($request->input('id_card')),
             ]);
 

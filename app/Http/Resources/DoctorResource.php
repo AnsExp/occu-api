@@ -23,9 +23,11 @@ class DoctorResource extends JsonResource
                 'fullname' => $this->personalData->fullname,
                 'phone' => $this->personalData->phone,
                 'id_card' => $this->personalData->id_card,
+                'has_id_card_file' => (bool) $this->personalData->id_card_file,
                 'email' => $this->personalData->email,
                 'nationality' => $this->personalData->nationality,
                 'gender' => $this->personalData->gender,
+                'birth_date' => $this->personalData->birth_date,
             ],
             'specialty' => [
                 'id' => $this->specialty->id,

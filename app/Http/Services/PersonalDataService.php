@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use App\Models\PersonalData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PersonalDataService
 {
@@ -16,13 +17,13 @@ class PersonalDataService
         }
 
         $personalData = PersonalData::create([
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'phone' => $request->input('phone'),
-            'id_card' => $request->input('id_card'),
             'email' => $request->input('email'),
+            'phone' => $request->input('phone'),
             'gender' => $request->input('gender'),
+            'id_card' => $request->input('id_card'),
+            'last_name' => $request->input('last_name'),
             'birth_date' => $request->input('birth_date'),
+            'first_name' => $request->input('first_name'),
             'nationality' => $request->input('nationality'),
         ]);
 
@@ -34,13 +35,13 @@ class PersonalDataService
     public function update(Request $request, PersonalData $personalData)
     {
         $personalData->fill([
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'phone' => $request->input('phone') ?? $personalData->phone,
-            'id_card' => $request->input('id_card'),
             'email' => $request->input('email') ?? $personalData->email,
+            'phone' => $request->input('phone') ?? $personalData->phone,
             'gender' => $request->input('gender') ?? $personalData->gender,
+            'id_card' => $request->input('id_card') ?? $personalData->id_card,
+            'last_name' => $request->input('last_name') ?? $personalData->last_name,
             'birth_date' => $request->input('birth_date') ?? $personalData->birth_date,
+            'first_name' => $request->input('first_name') ?? $personalData->first_name,
             'nationality' => $request->input('nationality') ?? $personalData->nationality,
         ])->save();
 

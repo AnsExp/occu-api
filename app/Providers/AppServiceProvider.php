@@ -30,9 +30,12 @@ class AppServiceProvider extends ServiceProvider
 
         DB::listen(function ($query) {
             $sql = strtolower($query->sql);
-            // if (str_starts_with($sql, 'select')) {
-            //     return;
-            // }
+            if (
+                str_starts_with($sql, 'select') ||
+                str_starts_with($sql, 'update `personal_access_tokens`')
+            ) {
+                return;
+            }
             $fullSql = vsprintf(
                 str_replace(['%', '?'], ['%%', "'%s'"], $query->sql),
                 $query->bindings

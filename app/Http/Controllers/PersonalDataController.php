@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Filters\PersonalDataFilter;
 use App\Http\Resources\PersonalDataResource;
 use App\Http\Responses\ApiResponse;
+use App\Models\PersonalData;
 use Illuminate\Http\Request;
 
 /**
@@ -98,5 +99,14 @@ class PersonalDataController extends Controller
             $data->count() > 0,
             $data->count() > 0 ? 'Personal data retrieved successfully' : 'No personal data found'
         );
+    }
+
+    public function id_card(string $id_card)
+    {
+        $personalData = PersonalData::findByIdCard($id_card);
+        if (!$personalData || !$personalData->id_card_file || !occu_storage()->exists($personalData->id_card_file)) {
+            return ApiResponse::data(null, false, 'Personal data not found or ID card file missing', 404);
+        }
+        return response()->file(occu_storage()->path($personalData->id_card_file));
     }
 }
