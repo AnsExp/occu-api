@@ -19,6 +19,7 @@ class LaboratoryOrderResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'timezone' => $this->timezone,
+            'created_at' => $this->created_at,
             'patient' => PatientResource::make($this->patient),
             'doctor' => $this->doctor ? DoctorResource::make($this->doctor) : null,
             'documents' => array_map(fn($document) => DocumentResource::make($document), $this->documents->all()),
