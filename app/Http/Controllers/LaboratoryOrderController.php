@@ -7,6 +7,7 @@ use App\Http\Responses\ApiResponse;
 use App\Models\LaboratoryOrder;
 use App\Http\Services\LaboratoryOrderService;
 use App\Http\Resources\LaboratoryOrderResource;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class LaboratoryOrderController extends Controller
@@ -45,6 +46,19 @@ class LaboratoryOrderController extends Controller
             'Laboratory order retrieved successfully',
             200
         );
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function pdf(int $id)
+    {
+        $laboratoryOrder = LaboratoryOrder::find($id);
+        if (!$laboratoryOrder) {
+            return ApiResponse::formResponse(['Laboratory order not found'], false, 'Laboratory order not found', 404);
+        }
+        $pdf = Pdf::loadView('documents.laboratory_order', compact('laboratoryOrder'));
+        return $pdf->stream($laboratoryOrder->code . '.pdf');
     }
 
     /**

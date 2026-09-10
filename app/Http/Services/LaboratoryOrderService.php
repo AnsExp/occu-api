@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class LaboratoryOrderService
 {
-    use DocumentService;
+    // use DocumentService;
 
-    public function __construct(){
-        $this->documentTemplate = 'documents.laboratory_order';
-        $this->storageDiskPath = 'laboratory_orders';
-    }
+    // public function __construct(){
+    //     $this->documentTemplate = 'documents.laboratory_order';
+    //     $this->storageDiskPath = 'laboratory_orders';
+    // }
 
     public function store(Request $request): LaboratoryOrder
     {
@@ -28,7 +28,7 @@ class LaboratoryOrderService
             ]);
 
             $this->syncExams($order, $request->input('items', []));
-            $this->createDocument($order, $request, true);
+            // $this->createDocument($order, $request, true);
 
             return $order->load('laboratoryExams.laboratoryOption', 'documents');
         });
@@ -44,7 +44,7 @@ class LaboratoryOrderService
             ]);
 
             $this->syncExams($order, $request->input('items', []));
-            $this->createDocument($order, $request, false);
+            // $this->createDocument($order, $request, false);
 
             return $order->load('laboratoryExams.laboratoryOption', 'documents');
         });
@@ -73,22 +73,22 @@ class LaboratoryOrderService
         }
     }
 
-    private function createDocument(LaboratoryOrder $order, Request $request, bool $isNew): void
-    {
-        $this->documentParams = compact('order');
-        $this->persistPdf();
+    // private function createDocument(LaboratoryOrder $order, Request $request, bool $isNew): void
+    // {
+    //     $this->documentParams = compact('order');
+    //     $this->persistPdf();
 
-        $latest  = $order->documents()->latest('created_at')->first();
-        $version = $isNew ? '1.0' : ($latest ? number_format(((float) $latest->version) + 0.1, 1) : '1.0');
+    //     $latest  = $order->documents()->latest('created_at')->first();
+    //     $version = $isNew ? '1.0' : ($latest ? number_format(((float) $latest->version) + 0.1, 1) : '1.0');
 
-        $order->documents()->create([
-            'version'  => $version,
-            'timezone' => $request->input('timezone'),
-            'snapshot' => $request->all(),
-            'sha256'   => occu_hash($this->content),
-            'file'     => $this->filePath,
-        ]);
-    }
+    //     $order->documents()->create([
+    //         'version'  => $version,
+    //         'timezone' => $request->input('timezone'),
+    //         'snapshot' => $request->all(),
+    //         'sha256'   => occu_hash($this->content),
+    //         'file'     => $this->filePath,
+    //     ]);
+    // }
 
     private function generateCode(): string
     {

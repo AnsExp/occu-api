@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/laboratory_orders', [LaboratoryOrderController::class, 'index'])->middleware('ability:read.laboratory_orders');
     Route::get('/laboratory_orders/{id}', [LaboratoryOrderController::class, 'show'])->middleware('ability:read.laboratory_orders');
+    Route::get('/laboratory_orders/{id}/pdf', [LaboratoryOrderController::class, 'pdf'])->middleware('ability:read.laboratory_orders');
     Route::get('/laboratory_orders/{id}/document/{idDocument}', [LaboratoryOrderController::class, 'document'])->middleware('ability:read.laboratory_orders');
 
     Route::get('/medical_dates', [MedicalDateController::class, 'index'])->middleware('ability:read.medical_dates');
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/medical_dates/{id}/document/{idDocument}', [MedicalDateController::class, 'document'])->middleware('ability:read.medical_dates');
 
     Route::get('/personal_data', [PersonalDataController::class, 'index']);
+    Route::get('/personal_data/{id}', [PersonalDataController::class, 'show']);
     Route::get('/personal_data/id_card/{id_card}', [PersonalDataController::class, 'id_card']);
 
     Route::get('/plans', [PlanController::class, 'index'])->middleware('ability:read.plans');

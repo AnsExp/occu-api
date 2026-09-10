@@ -5,10 +5,10 @@
 @use(Carbon\Carbon)
 
 @php
-    $patient = $order->patient;
+    $patient = $laboratoryOrder->patient;
     $tax_rate = config('app.tax_rate', 0);
     $subtotal = 0;
-    foreach ($order->laboratoryExams as $exam) {
+    foreach ($laboratoryOrder->laboratoryExams as $exam) {
         $subtotal += $exam->laboratoryOption->price * $exam->quantity;
     }
 @endphp
@@ -21,10 +21,10 @@
                 <p class="brand-subtitle">Centro de Evaluaciones y Certificaciones</p>
             </td>
             <td>
-                <p class="document-title">ORDEN DE PAGO: {{ $order->order_number }}</p>
+                <p class="document-title">ORDEN DE PAGO: {{ $laboratoryOrder->order_number }}</p>
                 <div class="document-meta">
                     <div><strong>@lang('attributes.date'):</strong>
-                        {{ Carbon::now()->timezone($order->timezone)->translatedFormat('j \\d\\e F, Y') }}
+                        {{ Carbon::now()->timezone($laboratoryOrder->timezone)->translatedFormat('j \\d\\e F, Y') }}
                     </div>
                 </div>
             </td>
@@ -83,7 +83,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($order->laboratoryExams as $index => $exam)
+            @forelse ($laboratoryOrder->laboratoryExams as $index => $exam)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $exam->laboratoryOption->name }}</td>

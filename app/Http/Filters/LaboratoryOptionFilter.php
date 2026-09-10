@@ -14,6 +14,10 @@ class LaboratoryOptionFilter extends Filter
             $query->where('name', 'like', '%' . $params['name'] . '%');
         }
 
+        if (isset($params['code'])) {
+            $query->where('code', 'like', '%' . $params['code'] . '%');
+        }
+
         if (isset($params['price'])) {
             $query->where('price', $params['price']);
         } else if (isset($params['price_max']) && isset($params['price_min'])) {

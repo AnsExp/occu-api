@@ -101,6 +101,15 @@ class PersonalDataController extends Controller
         );
     }
 
+    public function show($id)
+    {
+        $personalData = PersonalData::find($id);
+        if (!$personalData) {
+            return ApiResponse::data(null, false, 'Personal data not found', 404);
+        }
+        return ApiResponse::data(PersonalDataResource::make($personalData), true, 'Personal data retrieved successfully');
+    }
+
     public function id_card(string $id_card)
     {
         $personalData = PersonalData::findByIdCard($id_card);
