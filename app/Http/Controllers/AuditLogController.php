@@ -22,12 +22,8 @@ class AuditLogController extends Controller
         );
     }
 
-    public function show(int $id)
+    public function show(AuditLog $auditLog)
     {
-        $auditLog = AuditLog::find($id);
-        if (!$auditLog) {
-            return ApiResponse::data(null, false, 'Audit log not found', 404);
-        }
         return ApiResponse::data(AuditLogResource::make($auditLog), true, 'Audit log retrieved successfully', 200);
     }
 }

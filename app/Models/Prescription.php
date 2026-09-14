@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int|null $doctor_id
  * @property int $patient_id
+ * @property string $code
  * @property Doctor|null $doctor
  * @property Patient $patient
  * @property Carbon|null $created_at

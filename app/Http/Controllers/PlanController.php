@@ -43,24 +43,16 @@ class PlanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Plan $plan)
     {
-        $plan = Plan::find($id);
-        if (!$plan) {
-            return ApiResponse::data(null, false, 'Plan not found', 404);
-        }
         return ApiResponse::data(PlanResource::make($plan), true, 'Plan retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PlanRequest $request, $id)
+    public function update(Plan $plan, PlanRequest $request)
     {
-        $plan = Plan::find($id);
-        if (!$plan) {
-            return ApiResponse::data(null, false, 'Plan not found', 404);
-        }
         $plan = $this->planService->update($request, $plan);
         return ApiResponse::data(PlanResource::make($plan), true, 'Plan updated successfully', 200);
     }
@@ -68,12 +60,8 @@ class PlanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Plan $plan)
     {
-        $plan = Plan::find($id);
-        if (!$plan) {
-            return ApiResponse::data(null, false, 'Plan not found', 404);
-        }
         $plan->delete();
         return ApiResponse::message(null, true, 'Plan deleted successfully.', 200);
     }

@@ -253,12 +253,8 @@ class DoctorController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(Doctor $doctor)
     {
-        $doctor = Doctor::find($id);
-        if (!$doctor) {
-            return ApiResponse::data(null, false, 'Doctor not found', 404);
-        }
         return ApiResponse::data(DoctorResource::make($doctor), true, 'Doctor retrieved successfully', 200);
     }
 
@@ -317,13 +313,9 @@ class DoctorController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(DoctorRequest $request, $id)
+    public function update(Doctor $doctor, DoctorRequest $request)
     {
-        $doctorUpdated = Doctor::find($id);
-        if (!$doctorUpdated) {
-            return ApiResponse::data(null, false, 'Doctor not found', 404);
-        }
-        $doctorUpdated = $this->doctorService->update($request, $doctorUpdated);
+        $doctorUpdated = $this->doctorService->update($request, $doctor);
         return ApiResponse::data(DoctorResource::make($doctorUpdated), true, 'Doctor updated successfully', 200);
     }
 
@@ -331,20 +323,16 @@ class DoctorController extends Controller
      * Elimina un médico específico del sistema.
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
-     * @urlParam id integer required ID del médico.
+     * @urlParam doctor integer required ID del médico.
      * @response 200 scenario="Eliminación exitosa"
      * {
      *     "message": "Doctor deleted successfully"
      * }
-     * @param int $id
+     * @param Doctor $doctor
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Doctor $doctor)
     {
-        $doctor = Doctor::find($id);
-        if (!$doctor) {
-            return ApiResponse::data(null, false, 'Doctor not found', 404);
-        }
         $doctor->user->removeRole('doctor');
         $doctor->user->tokens()->delete();
         $doctor->delete();

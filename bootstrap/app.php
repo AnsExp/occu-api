@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AllowedIp;
+use App\Http\Middleware\CurrentPassword;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
@@ -22,9 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
-
             'csrf' => PreventRequestForgery::class,
             'allowed_ip' => AllowedIp::class,
+            'current_password' => CurrentPassword::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

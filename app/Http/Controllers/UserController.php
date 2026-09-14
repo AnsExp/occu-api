@@ -43,34 +43,22 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return ApiResponse::data(null, false, 'User not found', 404);
-        }
         return ApiResponse::data(UserResource::make($user), true, 'User retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, $id)
+    public function update(User $user, UserRequest $request)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return ApiResponse::data(null, false, 'User not found', 404);
-        }
         $user = $this->userService->update($request, $user);
         return ApiResponse::data(UserResource::make($user), true, 'User updated successfully', 200);
     }
 
-    public function changePassword(Request $request, $id)
+    public function changePassword(User $user, UserRequest $request)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return ApiResponse::data(null, false, 'User not found', 404);
-        }
         $user = $this->userService->changePassword($request, $user);
         return ApiResponse::data(null, true, 'Password changed successfully', 200);
     }
@@ -78,12 +66,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return ApiResponse::data(null, false, 'User not found', 404);
-        }
         $user->tokens()->delete();
         $user->delete();
         return ApiResponse::data(null, true, 'User deleted successfully', 200);

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,11 +25,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $updated_at
  * @property Carbon|null $blocked_at
  * @property Carbon|null $deleted_at
+ * @property Carbon|null $password_changed_at
  */
 #[ObservedBy(UserObserver::class)]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens,
         HasFactory,
         Notifiable,
@@ -43,6 +42,7 @@ class User extends Authenticatable
         'password',
         'blocked_at',
         'failed_attempts',
+        'password_changed_at',
     ];
 
     protected $hidden = [
@@ -52,11 +52,11 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'blocked_at' => 'datetime',
         'deleted_at' => 'datetime',
         'failed_attempts' => 'integer',
+        'email_verified_at' => 'datetime',
+        'password_changed_at' => 'datetime',
     ];
 
     /**
@@ -67,9 +67,9 @@ class User extends Authenticatable
         return Str::of($this->name)->explode(' ')->take(2)->map(fn($word) => Str::substr($word, 0, 1))->implode('');
     }
 
-    public function findByEmail(string $email)
+    public static function findByEmail(string $email)
     {
-        return $this->where('email', $email)->first();
+        return self::where('email', $email)->first();
     }
 
     public function patient()

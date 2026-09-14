@@ -15,9 +15,11 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
-    'tax_rate' => env('TAX_RATE', 0),
+    'tax_rate' => (float) env('TAX_RATE', 0),
 
-    'page_limit' => env('PAGE_LIMIT', 15),
+    'page_limit' => (int) env('PAGE_LIMIT', 15),
+
+    'days_password_change' => (int) env('DAYS_PASSWORD_CHANGE', 85),
 
     /*
     |--------------------------------------------------------------------------

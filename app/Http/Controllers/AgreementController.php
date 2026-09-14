@@ -119,12 +119,8 @@ class AgreementController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(Agreement $agreement)
     {
-        $agreement = Agreement::find($id);
-        if (!$agreement) {
-            return ApiResponse::data(null, false, 'Agreement not found', 404);
-        }
         return ApiResponse::data(AgreementResource::make($agreement), true, 'Agreement retrieved successfully', 200);
     }
 
@@ -134,7 +130,7 @@ class AgreementController extends Controller
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
      * 
-     * @urlParam id integer required ID del convenio.
+     * @urlParam agreement integer required ID del convenio.
      *
      * @bodyParam institution string required Nombre de la institución. Example: Hospital Central
      * @bodyParam discount_type string required Tipo de descuento. Example: Porcentaje
@@ -164,12 +160,8 @@ class AgreementController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Agreement $agreement)
     {
-        $agreement = Agreement::find($id);
-        if (!$agreement) {
-            return ApiResponse::data(null, false, 'Agreement not found', 404);
-        }
         $agreementUpdated = $this->service->update($request, $agreement);
         return ApiResponse::data(AgreementResource::make($agreementUpdated), true, 'Agreement updated successfully', 200);
     }
@@ -178,20 +170,16 @@ class AgreementController extends Controller
      * Elimina un convenio específico del sistema.
      * @authenticated
      * @header Authorization Bearer {tu-token-personal-aqui}.
-     * @urlParam id integer required ID del convenio.
+     * @urlParam agreement integer required ID del convenio.
      * @response 200 scenario="Eliminación exitosa"
      * {
      *     "message": "Agreement deleted successfully"
      * }
-     * @param int $id
+     * @param Agreement $agreement
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Agreement $agreement)
     {
-        $agreement = Agreement::find($id);
-        if (!$agreement) {
-            return ApiResponse::data(null, false, 'Agreement not found', 404);
-        }
         $agreement->delete();
         return ApiResponse::data(null, true, 'Agreement deleted successfully', 200);
     }

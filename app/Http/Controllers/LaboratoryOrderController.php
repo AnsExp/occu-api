@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Filters\LaboratoryOrderFilter;
 use App\Http\Requests\LaboratoryOrderRequest;
+use App\Http\Requests\LaboratoryOrderResultRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\LaboratoryOrder;
 use App\Http\Services\LaboratoryOrderService;
@@ -34,12 +35,8 @@ class LaboratoryOrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(LaboratoryOrder $laboratoryOrder)
     {
-        $laboratoryOrder = LaboratoryOrder::find($id);
-        if (!$laboratoryOrder) {
-            return ApiResponse::formResponse(['Laboratory order not found'], false, 'Laboratory order not found', 404);
-        }
         return ApiResponse::data(
             LaboratoryOrderResource::make($laboratoryOrder),
             true,
@@ -51,12 +48,8 @@ class LaboratoryOrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function pdf(int $id)
+    public function pdf(LaboratoryOrder $laboratoryOrder)
     {
-        $laboratoryOrder = LaboratoryOrder::find($id);
-        if (!$laboratoryOrder) {
-            return ApiResponse::formResponse(['Laboratory order not found'], false, 'Laboratory order not found', 404);
-        }
         $pdf = Pdf::loadView('documents.laboratory_order', compact('laboratoryOrder'));
         return $pdf->stream($laboratoryOrder->code . '.pdf');
     }
@@ -71,16 +64,19 @@ class LaboratoryOrderController extends Controller
     }
 
     /**
+     * Store the result of a laboratory order in storage.
+     */
+    public function storeResult(LaboratoryOrder $laboratoryOrder, LaboratoryOrderResultRequest $request)
+    {
+        $laboratoryOrderUpdated = $this->laboratoryOrderService->result($request, $laboratoryOrder);
+        return ApiResponse::data(LaboratoryOrderResource::make($laboratoryOrderUpdated), true, 'Laboratory order result stored successfully', 201);
+    }
+
+    /**
      * Display the specified resource document.
      */
-    public function document($id, $idDocument)
+    public function showResult(LaboratoryOrder $laboratoryOrder, $idDocument)
     {
-        $laboratoryOrder = LaboratoryOrder::find($id);
-        if (!$laboratoryOrder) {
-            return response()->json([
-                'message' => 'Laboratory order not found.'
-            ], 404);
-        }
         $document = $laboratoryOrder->documents()->find($idDocument);
         if (!$document || !$document->file || !occu_storage()->exists($document->file)) {
             return response()->json(['message' => 'File not found'], 404);
@@ -89,9 +85,38 @@ class LaboratoryOrderController extends Controller
     }
 
     /**
+     * Display the specified resource document.
+     */
+    public function zipResult(LaboratoryOrder $laboratoryOrder)
+    {
+        $documents = $laboratoryOrder->documents;
+
+        $zip = new \ZipArchive();
+        $zipPath = occu_storage()->path('temp/' . date('Y-m-d_H-i-s') . '.zip');
+
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+
+            foreach ($documents as $document) {
+
+                if ($document->file && occu_storage()->exists($document->file)) {
+
+                    $zip->addFile(occu_storage()->path($document->file), basename($document->file));
+
+                }
+
+            }
+
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
-    public function update(LaboratoryOrderRequest $request, LaboratoryOrder $laboratoryOrder)
+    public function update(LaboratoryOrder $laboratoryOrder, LaboratoryOrderRequest $request)
     {
         $laboratoryOrder = $this->laboratoryOrderService->update($request, $laboratoryOrder);
         return ApiResponse::data(LaboratoryOrderResource::make($laboratoryOrder), true, 'Laboratory order updated successfully', 200);

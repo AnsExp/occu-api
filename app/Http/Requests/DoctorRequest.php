@@ -8,7 +8,11 @@ class DoctorRequest extends PersonalDataRequest
 {
     protected function prepareForValidation()
     {
-        $this->merge(['is_occupational_doctor' => $this->has('is_occupational_doctor')]);
+        if ($this->has('is_occupational_doctor')) {
+            $this->merge(['is_occupational_doctor' => filter_var($this->input('is_occupational_doctor', false), FILTER_VALIDATE_BOOLEAN)]);
+        } else {
+            $this->merge(['is_occupational_doctor' => false]);
+        }
     }
 
     /**

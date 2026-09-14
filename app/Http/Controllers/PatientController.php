@@ -43,24 +43,16 @@ class PatientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Patient $patient)
     {
-        $patient = Patient::find($id);
-        if (!$patient) {
-            return ApiResponse::data(null, false, 'Patient not found', 404);
-        }
         return ApiResponse::data(PatientResource::make($patient), true, 'Patient retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PatientRequest $request, $id)
+    public function update(Patient $patient, PatientRequest $request)
     {
-        $patient = Patient::find($id);
-        if (!$patient) {
-            return ApiResponse::data(null, false, 'Patient not found', 404);
-        }
         $patient = $this->service->update($request, $patient);
         return ApiResponse::data(PatientResource::make($patient), true, 'Patient updated successfully', 200);
     }
@@ -68,12 +60,8 @@ class PatientController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Patient $patient)
     {
-        $patient = Patient::find($id);
-        if (!$patient) {
-            return ApiResponse::data(null, false, 'Patient not found', 404);
-        }
         $patient->delete();
         return ApiResponse::message(null, true, 'Patient deleted successfully.', 200);
     }

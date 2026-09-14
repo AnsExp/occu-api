@@ -54,21 +54,46 @@ class MedicalDateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(MedicalDate $medicalDate)
     {
-        $medicalDate = MedicalDate::find($id);
-        if (!$medicalDate) {
-            return ApiResponse::data(null, false, 'Medical date not found', 404);
-        }
         return ApiResponse::data(MedicalDateResource::make($medicalDate), true, 'Medical date retrieved successfully', 200);
     }
 
-    public function document($id, $idDocument)
+    public function zipRelationship(MedicalDate $medicalDate)
     {
-        $medicalDate = MedicalDate::find($id);
-        if (!$medicalDate) {
-            return response()->json(['message' => 'Medical date not found'], 404);
+
+        $zip = new \ZipArchive();
+        $zipPath = occu_storage()->path('temp/' . date('Y-m-d_H-i-s') . '.zip');
+
+        $documents = [];
+
+        foreach ($medicalDate->relationship as $relationship) {
+            foreach ($relationship->related->documents as $document) {
+                $documents[] = $document;
+            }
         }
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+
+            foreach ($documents as $document) {
+
+                if ($document->file && occu_storage()->exists($document->file)) {
+
+                    $zip->addFile(occu_storage()->path($document->file), basename($document->file));
+
+                }
+
+            }
+
+            $zip->close();
+
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    public function showResult(MedicalDate $medicalDate, $idDocument)
+    {
         $document = $medicalDate->documents()->find($idDocument);
         if (!$document || !$document->file || !occu_storage()->exists($document->file)) {
             return response()->json(['message' => 'File not found'], 404);
@@ -76,27 +101,38 @@ class MedicalDateController extends Controller
         return response()->file(occu_storage()->path($document->file));
     }
 
-    public function snapshot($id)
+    public function zipResult(MedicalDate $medicalDate)
     {
-        $medicalDate = MedicalDate::find($id);
-        if (!$medicalDate) {
-            return response()->json(['message' => 'Medical date not found'], 404);
+
+        $documents = $medicalDate->documents;
+
+        $zip = new \ZipArchive();
+        $zipPath = occu_storage()->path('temp/' . date('Y-m-d_H-i-s') . '.zip');
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+
+            foreach ($documents as $document) {
+
+                if ($document->file && occu_storage()->exists($document->file)) {
+
+                    $zip->addFile(occu_storage()->path($document->file), basename($document->file));
+
+                }
+
+            }
+
+            $zip->close();
+
         }
-        if ($document = $medicalDate->latestDocument) {
-            return response()->json($document->snapshot, 200);
-        }
-        return response()->json(null, 404);
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function reschedule(RescheduleMedicalDateRequest $request, $id)
+    public function reschedule(MedicalDate $medicalDate, RescheduleMedicalDateRequest $request)
     {
-        $medicalDate = MedicalDate::find($id);
-        if (!$medicalDate) {
-            return ApiResponse::data(null, false, 'Medical date not found', 404);
-        }
         $medicalDate = $this->service->reschedule($request, $medicalDate);
         return ApiResponse::data(MedicalDateResource::make($medicalDate), true, 'Medical date updated successfully', 200);
     }
@@ -104,12 +140,8 @@ class MedicalDateController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(MedicalDate $medicalDate)
     {
-        $medicalDate = MedicalDate::find($id);
-        if (!$medicalDate) {
-            return ApiResponse::data(null, false, 'Medical date not found', 404);
-        }
         $medicalDate->delete();
         return ApiResponse::data(null, true, 'Medical date deleted successfully', 200);
     }

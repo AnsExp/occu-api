@@ -237,10 +237,12 @@ return new class extends Migration {
             $table->string('timezone')->nullable(true);
             $table->json('snapshot')->nullable(true);
             $table->string('version')->nullable(false)->default('1.0');
-            $table->string('sha256')->nullable(false)->unique(true);
+            $table->string('sha256')->nullable(false);
             $table->string('file')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('sha256');
         });
 
         Schema::create('login_attempts', function (Blueprint $table) {

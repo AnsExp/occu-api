@@ -22,9 +22,7 @@ class AudiologyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'timezone' => ['required', 'string'],
-            'specialty.id' => ['required', 'exists:specialties,id'],
-            'medical_date.id' => ['required', 'exists:medical_dates,id'],
+            'timezone' => ['nullable', 'string'],
             'medical_exam' => ['required', 'array'],
             'medical_exam.hearing' => ['required', 'array'],
             'medical_exam.hearing.*' => ['required', 'string'],
@@ -38,10 +36,6 @@ class AudiologyRequest extends FormRequest
         return [
             'timezone.string' => __('validation.string', ['attribute' => 'zona horaria']),
             'timezone.required' => __('validation.required', ['attribute' => 'zona horaria']),
-            'specialty.id.exists' => __('validation.exists', ['attribute' => 'especialidad']),
-            'specialty.id.required' => __('validation.required', ['attribute' => 'especialidad']),
-            'medical_date.id.exists' => __('validation.exists', ['attribute' => 'cita médica']),
-            'medical_date.id.required' => __('validation.required', ['attribute' => 'cita médica']),
             'medical_exam.array' => __('validation.array', ['attribute' => __('audiology.medical_exam')]),
             'medical_exam.required' => __('validation.required', ['attribute' => __('audiology.medical_exam')]),
             'medical_exam.hearing.array' => __('validation.array', ['attribute' => __('audiology.hearing')]),

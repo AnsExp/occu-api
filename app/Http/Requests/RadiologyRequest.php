@@ -2,20 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Doctor;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class RadiologyRequest extends FormRequest
 {
-    protected function prepareForValidation()
-    {
-        if (user_has_role('doctor')) {
-            $doctor = Doctor::where('user_id', auth()->user()->id)->first();
-            $this->merge([
-                'doctor.id' => $doctor->id,
-            ]);
-        }
-    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -33,14 +23,21 @@ class RadiologyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'timezone' => ['required', 'string'],
-            'medical_exam' => ['required', 'array'],
-            'medical_exam.technique' => ['required', 'string'],
-            'medical_exam.report' => ['required', 'string'],
-            'medical_exam.conclusion' => ['required', 'string'],
-            'medical_exam.consent_document' => ['required', 'file', 'mimes:pdf'],
-            'medical_exam.x_ray_files' => ['required', 'array'],
-            'medical_exam.x_ray_files.*' => ['required', 'file', 'mimes:pdf'],
+            'timezone' => ['nullable', 'string'],
+            'files' => ['required', 'array'],
+            'files.*' => ['required', 'file', 'mimes:pdf'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'timezone.string' => 'The timezone must be a string.',
+            'files.required' => 'The files field is required.',
+            'files.array' => 'The files field must be an array.',
+            'files.*.required' => 'Each file is required.',
+            'files.*.file' => 'Each file must be a valid file.',
+            'files.*.mimes' => 'Each file must be a PDF.',
         ];
     }
 }

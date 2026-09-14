@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OphthalmologyRequest;
 use App\Http\Resources\DocumentResource;
 use App\Http\Services\OphthalmologyService;
+use App\Models\MedicalDate;
 
 class OphthalmologyController extends Controller
 {
@@ -15,9 +16,9 @@ class OphthalmologyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(OphthalmologyRequest $request)
+    public function store(MedicalDate $medicalDate, OphthalmologyRequest $request)
     {
-        $ophthalmology = $this->ophthalmologyService->store($request);
+        $ophthalmology = $this->ophthalmologyService->store($medicalDate, $request);
         return DocumentResource::make($ophthalmology);
     }
 }

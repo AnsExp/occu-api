@@ -80,6 +80,10 @@ class MedicalDate extends Model
         return $this->date->setTimezone($this->timezone)->translatedFormat('F j, Y');
     }
 
+    /**
+     * Summary of relationship documents associated with the medical date.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<MedicalDateRelationship, MedicalDate>
+     */
     public function relationship()
     {
         return $this->hasMany(MedicalDateRelationship::class, 'principal_id');
@@ -105,6 +109,10 @@ class MedicalDate extends Model
         return $this->hasOne(VitalSign::class);
     }
 
+    /**
+     * Summary of documents
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Document, MedicalDate>
+     */
     public function documents()
     {
         return $this->morphMany(Document::class, 'documentable');

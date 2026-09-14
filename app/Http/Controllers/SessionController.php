@@ -3,40 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
-use App\Models\AllowedIp;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Requests\SessionPasswordRequest;
+use App\Models\AllowedIp;
 use Illuminate\Support\Facades\Auth;
 
 class SessionController extends Controller
 {
-    public function abilities(User $user)
+    public function data()
     {
-        return response()->json($user->tokens()->first()?->abilities ?? []);
+        $user = Auth::user();
+        return response()->json([
+            'abilities' => $user->tokens()->first()?->abilities ?? [],
+            'limit_password_change' => $user->password_changed_at
+                ->copy()
+                ->addDays((int) config('app.days_password_change'))
+                ->format('Y-m-d H:i:s'),
+        ]);
     }
 
-    public function checkIp(Request $request)
+    public function checkIp()
     {
-        $ip = $request->ip();
-
         if (config('app.debug', false)) {
-            return $this->response($ip, true, 'IP address is allowed (debug mode).');
+            return response()->json([
+                'ip' => request()->ip(),
+                'allowed' => true,
+                'message' => 'IP allowed (debug mode)'
+            ]);
         }
-
-        $allowedIp = AllowedIp::where('ip_address', $ip)->first();
-
-        if (!$allowedIp) {
-            return $this->response($ip, false, 'IP address is not allowed.', 403);
-        }
-
-        $timezoneIp = occu_ip_timezone($ip);
-
-        if ($allowedIp->expires_at && now()->setTimezone($timezoneIp)->format('Y-m-d H:i:s') > $allowedIp->expires_at->format('Y-m-d H:i:s')) {
-            return $this->response($ip, false, 'IP address is not allowed. The allowed period has expired.', 403);
-        }
-
-        return $this->response($ip, true, 'IP address is allowed.');
+        $exists = AllowedIp::where('ip_address', request()->ip())->exists();
+        return response()->json([
+            'ip' => request()->ip(),
+            'allowed' => $exists,
+            'message' => $exists ? 'IP allowed' : 'IP not allowed'
+        ]);
     }
 
     /**
@@ -63,14 +62,5 @@ class SessionController extends Controller
         $user->save();
 
         return ApiResponse::formResponse([], true, 'Password changed successfully.', 200);
-    }
-
-    private function response(string $ip, bool $allowed, string $message, int $status = 200)
-    {
-        return response()->json([
-            'ip' => $ip,
-            'allowed' => $allowed,
-            'message' => $message,
-        ], $status);
     }
 }

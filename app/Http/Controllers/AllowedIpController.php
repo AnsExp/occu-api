@@ -120,12 +120,8 @@ class AllowedIpController extends Controller
      * }
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(AllowedIp $allowedIp)
     {
-        $allowedIp = AllowedIp::find($id);
-        if (!$allowedIp) {
-            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
-        }
         return ApiResponse::data(AllowedIpResource::make($allowedIp), true, 'Allowed IP retrieved successfully', 200);
     }
 
@@ -177,12 +173,8 @@ class AllowedIpController extends Controller
      * }
      * @return JsonResponse
      */
-    public function update(AllowedIpRequest $request, $id)
+    public function update(AllowedIp $allowedIp, AllowedIpRequest $request)
     {
-        $allowedIp = AllowedIp::find($id);
-        if (!$allowedIp) {
-            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
-        }
         $allowedIpUpdated = $this->allowedIpService->update($request, $allowedIp);
         return ApiResponse::data(AllowedIpResource::make($allowedIpUpdated), true, 'Allowed IP updated successfully', 200);
     }
@@ -201,12 +193,8 @@ class AllowedIpController extends Controller
      * }
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(AllowedIp $allowedIp)
     {
-        $allowedIp = AllowedIp::find($id);
-        if (!$allowedIp) {
-            return ApiResponse::data(null, false, 'Allowed IP not found', 404);
-        }
         $allowedIp->delete();
         return ApiResponse::data(null, true, 'Allowed IP deleted successfully', 200);
     }

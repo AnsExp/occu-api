@@ -16,28 +16,20 @@ class AudiologyService
         $this->storageDiskPath = 'certificates/audiology';
     }
 
-    public function store(Request $request)
+    public function store(MedicalDate $medicalDate, Request $request)
     {
-        $medicalDate = MedicalDate::findOrFail($request->input('medical_date.id'));
-        return $this->createDocument($request, $medicalDate);
-    }
+        return DB::transaction(function () use ($medicalDate, $request) {
 
-    public function update(Request $request, MedicalDate $medicalDate)
-    {
-        return $this->createDocument($request, $medicalDate);
-    }
-
-    private function createDocument(Request $request, MedicalDate $medicalDate)
-    {
-        return DB::transaction(function () use ($request, $medicalDate) {
             $snapshot = $request->input('medical_exam', []);
 
-            return $this->createVersionedDocument(
+            $this->createVersionedDocument(
                 $medicalDate,
                 compact('medicalDate', 'snapshot'),
                 $snapshot,
                 $request->input('timezone'),
             );
+
+            return $medicalDate;
         });
     }
 }

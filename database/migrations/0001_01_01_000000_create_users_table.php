@@ -17,7 +17,8 @@ return new class extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            $table->unsignedInteger('failed_attempts')->default(0);
+            $table->unsignedInteger('failed_attempts')->nullable(false)->default(0);
+            $table->timestamp('password_changed_at')->nullable(false)->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamps();
             $table->timestamp('blocked_at')->nullable();
             $table->softDeletes();

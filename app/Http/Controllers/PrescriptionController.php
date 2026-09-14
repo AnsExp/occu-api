@@ -8,6 +8,7 @@ use App\Http\Responses\ApiResponse;
 use App\Models\Prescription;
 use App\Http\Services\PrescriptionService;
 use App\Http\Resources\PrescriptionResource;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class PrescriptionController extends Controller
@@ -43,40 +44,25 @@ class PrescriptionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Prescription $prescription)
     {
-        $prescription = Prescription::find($id);
-        if (!$prescription) {
-            return ApiResponse::data(null, false, 'Prescription not found', 404);
-        }
         return ApiResponse::data(PrescriptionResource::make($prescription), true, 'Prescription retrieved successfully', 200);
     }
 
     /**
      * Display the specified resource file.
      */
-    public function document($id, $idDocument)
+    public function pdf(Prescription $prescription)
     {
-        $prescription = Prescription::find($id);
-        if (!$prescription) {
-            return ApiResponse::data(null, false, 'Prescription not found', 404);
-        }
-        $document = $prescription->documents()->find($idDocument);
-        if (!$document || !$document->file || !occu_storage()->exists($document->file)) {
-            return response()->json(['message' => 'File not found'], 404);
-        }
-        return response()->file(occu_storage()->path($document->file));
+         $pdf = Pdf::loadView('documents.prescription', compact('prescription'));
+        return $pdf->stream($prescription->code . '.pdf');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PrescriptionRequest $request, $id)
+    public function update(Prescription $prescription, PrescriptionRequest $request)
     {
-        $prescription = Prescription::find($id);
-        if (!$prescription) {
-            return ApiResponse::data(null, false, 'Prescription not found', 404);
-        }
         $prescription = $this->prescriptionService->update($request, $prescription);
         return ApiResponse::data(PrescriptionResource::make($prescription), true, 'Prescription updated successfully', 200);
     }
@@ -84,13 +70,9 @@ class PrescriptionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Prescription $prescription)
     {
-        $prescription = Prescription::find($id);
-        if (!$prescription) {
-            return ApiResponse::data(null, false, 'Prescription not found', 404);
-        }
         $prescription->delete();
-        return ApiResponse::message(null, true, 'Prescription deleted successfully.', 200);
+        return ApiResponse::data(null, true, 'Prescription deleted successfully.', 200);
     }
 }

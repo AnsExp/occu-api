@@ -43,24 +43,16 @@ class SpecialtyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Specialty $specialty)
     {
-        $specialty = Specialty::find($id);
-        if (!$specialty) {
-            return ApiResponse::data(null, false, 'Specialty not found', 404);
-        }
         return ApiResponse::data(SpecialtyResource::make($specialty), true, 'Specialty retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(SpecialtyRequest $request, $id)
+    public function update(Specialty $specialty, SpecialtyRequest $request)
     {
-        $specialty = Specialty::find($id);
-        if (!$specialty) {
-            return ApiResponse::data(null, false, 'Specialty not found', 404);
-        }
         $specialty = $this->specialtyService->update($request, $specialty);
         return ApiResponse::data(SpecialtyResource::make($specialty), true, 'Specialty updated successfully', 200);
     }
@@ -68,12 +60,8 @@ class SpecialtyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Specialty $specialty)
     {
-        $specialty = Specialty::find($id);
-        if (!$specialty) {
-            return ApiResponse::data(null, false, 'Specialty not found', 404);
-        }
         $specialty->delete();
         return ApiResponse::data(null, true, 'Specialty deleted successfully.', 200);
     }

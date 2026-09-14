@@ -23,8 +23,7 @@ class OdontologyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'timezone' => ['required', 'string'],
-            'medical_date.id' => ['required', 'exists:medical_dates,id'],
+            'timezone' => ['nullable', 'string'],
             'medical_exam' => ['required', 'array'],
         ];
     }

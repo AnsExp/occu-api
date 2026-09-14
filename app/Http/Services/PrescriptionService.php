@@ -30,8 +30,7 @@ class PrescriptionService
             ]);
 
             $prescription->load('doctor', 'patient');
-            $this->syncMedications($prescription, $request->input('items', []));
-            $this->createDocument($request, $prescription);
+            $this->syncMedications($prescription, $request->input('medications', []));
 
             return $prescription;
         });
@@ -56,8 +55,7 @@ class PrescriptionService
             ]);
 
             $prescription->load('doctor', 'patient');
-            $this->syncMedications($prescription, $request->input('items', []));
-            $this->createDocument($request, $prescription);
+            $this->syncMedications($prescription, $request->input('medications', []));
 
             return $prescription;
         });
@@ -88,22 +86,5 @@ class PrescriptionService
             $code = 'FAR-' . Date('Ymd') . '-' . (($lastOrder?->id ?? 0) + 1 + $offset);
         } while (Prescription::withTrashed(true)->where('code', $code)->exists());
         return $code;
-    }
-
-    private function createDocument(Request $request, Prescription $prescription, bool $isNew = true): void
-    {
-        $this->documentParams = compact('prescription');
-        $this->persistPdf();
-
-        $latest = $prescription->documents()->latest('created_at')->first();
-        $version = $isNew ? '1.0' : ($latest ? number_format(((float) $latest->version) + 0.1, 1) : '1.0');
-
-        $prescription->documents()->create([
-            'version' => $version,
-            'timezone' => $request->input('timezone'),
-            'snapshot' => $request->all(),
-            'sha256' => occu_hash($this->content),
-            'file' => $this->filePath,
-        ]);
     }
 }

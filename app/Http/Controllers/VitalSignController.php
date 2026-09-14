@@ -43,24 +43,16 @@ class VitalSignController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(VitalSign $vitalSign)
     {
-        $vitalSign = VitalSign::find($id);
-        if (!$vitalSign) {
-            return ApiResponse::data(null, false, 'Vital sign not found', 404);
-        }
         return ApiResponse::data(VitalSignResource::make($vitalSign), true, 'Vital sign retrieved successfully', 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(VitalSignRequest $request, $id)
+    public function update(VitalSign $vitalSign, VitalSignRequest $request)
     {
-        $vitalSign = VitalSign::find($id);
-        if (!$vitalSign) {
-            return ApiResponse::data(null, false, 'Vital sign not found', 404);
-        }
         $vitalSign = $this->vitalSignService->update($request, $vitalSign);
         return ApiResponse::data(VitalSignResource::make($vitalSign), true, 'Vital sign updated successfully', 200);
     }
@@ -68,12 +60,8 @@ class VitalSignController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(VitalSign $vitalSign)
     {
-        $vitalSign = VitalSign::find($id);
-        if (!$vitalSign) {
-            return ApiResponse::data(null, false, 'Vital sign not found', 404);
-        }
         $vitalSign->delete();
         return ApiResponse::data(null, true, 'Vital sign deleted successfully', 200);
     }

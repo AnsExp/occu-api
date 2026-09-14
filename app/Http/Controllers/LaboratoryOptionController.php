@@ -31,12 +31,8 @@ class LaboratoryOptionController extends Controller
         );
     }
 
-    public function show(int $id)
+    public function show(LaboratoryOption $laboratoryOption)
     {
-        $laboratoryOption = LaboratoryOption::find($id);
-        if (!$laboratoryOption) {
-            return ApiResponse::data(null, false, 'Laboratory option not found', 404);
-        }
         return ApiResponse::data(LaboratoryOptionResource::make($laboratoryOption), true, 'Laboratory option retrieved successfully', 200);
     }
 
@@ -46,22 +42,14 @@ class LaboratoryOptionController extends Controller
         return ApiResponse::data(LaboratoryOptionResource::make($laboratoryOption), true, 'Laboratory option created successfully', 201);
     }
 
-    public function update(LaboratoryOptionRequest $request, int $id)
+    public function update(LaboratoryOption $laboratoryOption, LaboratoryOptionRequest $request)
     {
-        $laboratoryOption = LaboratoryOption::find($id);
-        if (!$laboratoryOption) {
-            return ApiResponse::data(null, false, 'Laboratory option not found', 404);
-        }
         $laboratoryOptionUpdated = $this->laboratoryOptionService->update($request, $laboratoryOption);
         return ApiResponse::data(LaboratoryOptionResource::make($laboratoryOptionUpdated), true, 'Laboratory option updated successfully', 200);
     }
 
-    public function destroy(int $id)
+    public function destroy(LaboratoryOption $laboratoryOption)
     {
-        $laboratoryOption = LaboratoryOption::find($id);
-        if (!$laboratoryOption) {
-            return ApiResponse::data(null, false, 'Laboratory option not found', 404);
-        }
         $laboratoryOption->delete();
         return ApiResponse::data(null, true, 'Laboratory option deleted successfully', 200);
     }

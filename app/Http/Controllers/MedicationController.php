@@ -37,24 +37,16 @@ class MedicationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(Medication $medication)
     {
-        $medication = Medication::find($id);
-        if (!$medication) {
-            return response()->json(['message' => 'Medication not found'], 404);
-        }
         return response()->json(MedicationResource::make($medication), 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(MedicationRequest $request, $id)
+    public function update(Medication $medication, MedicationRequest $request)
     {
-        $medication = Medication::find($id);
-        if (!$medication) {
-            return response()->json(['message' => 'Medication not found'], 404);
-        }
         $medication = $this->service->update($request, $medication);
         return response()->json(MedicationResource::make($medication), 200);
     }
@@ -62,12 +54,8 @@ class MedicationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Medication $medication)
     {
-        $medication = Medication::find($id);
-        if (!$medication) {
-            return response()->json(['message' => 'Medication not found'], 404);
-        }
         $medication->delete();
         return response()->json(['message' => 'Medication deleted successfully.'], 200);
     }
