@@ -1,17 +1,13 @@
 <?php
 
-// use App\Models\Document;
-// use App\Models\MedicalDate;
-// use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Web\PageController;
 
-// Route::get('/test', function () {
-//     $medicalDate = MedicalDate::find(1);
-//     $document = Document::find(10);
-//     $snapshot = $document->snapshot;
-//     $pdf = Pdf::loadView('documents.ophthalmology', compact('medicalDate', 'snapshot'))->setPaper('A4', 'portrait')->setOption('isRemoteEnabled', true);
-//     return $pdf->stream();
-// });
+Route::get('/', [PageController::class, 'home'])->name('home');
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/plans', [PageController::class, 'plans'])->name('plans');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::get('/services', [PageController::class, 'services'])->name('services');
+Route::get('/companies', [PageController::class, 'companies'])->name('companies');
+Route::get('/specialties', [PageController::class, 'specialties'])->name('specialties');
 
-Route::get('/', fn() => view('sample'));
-
-// http://ip-api.com/json/45.236.143.96
+Route::get('/*', [PageController::class, 'home']);

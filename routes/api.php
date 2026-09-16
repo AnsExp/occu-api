@@ -1,27 +1,27 @@
 <?php
 
-use App\Http\Controllers\AgreementController;
-use App\Http\Controllers\AllowedIpController;
-use App\Http\Controllers\AudiologyController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\OccupationalMedicineController;
-use App\Http\Controllers\OdontologyController;
-use App\Http\Controllers\OphthalmologyController;
-use App\Http\Controllers\PersonalDataController;
-use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\PlanController;
-use App\Http\Controllers\RadiologyController;
-use App\Http\Controllers\SessionController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\VitalSignController;
-use App\Http\Controllers\AuthenticationController;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\PrescriptionController;
-use App\Http\Controllers\LaboratoryOptionController;
-use App\Http\Controllers\LaboratoryOrderController;
-use App\Http\Controllers\MedicalDateController;
-use App\Http\Controllers\SpecialtyController;
-use App\Http\Controllers\MedicationController;
+use App\Http\Controllers\Api\AgreementController;
+use App\Http\Controllers\Api\AllowedIpController;
+use App\Http\Controllers\Api\AudiologyController;
+use App\Http\Controllers\Api\AuditLogController;
+use App\Http\Controllers\Api\OccupationalMedicineController;
+use App\Http\Controllers\Api\OdontologyController;
+use App\Http\Controllers\Api\OphthalmologyController;
+use App\Http\Controllers\Api\PersonalDataController;
+use App\Http\Controllers\Api\DoctorController;
+use App\Http\Controllers\Api\PlanController;
+use App\Http\Controllers\Api\RadiologyController;
+use App\Http\Controllers\Api\SessionController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\VitalSignController;
+use App\Http\Controllers\Api\AuthenticationController;
+use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\PrescriptionController;
+use App\Http\Controllers\Api\LaboratoryOptionController;
+use App\Http\Controllers\Api\LaboratoryOrderController;
+use App\Http\Controllers\Api\MedicalDateController;
+use App\Http\Controllers\Api\SpecialtyController;
+use App\Http\Controllers\Api\MedicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -196,15 +196,19 @@ Route::prefix('v1')->group(function () {
 
                 });
 
-                Route::prefix('session')->group(function () {
-
-                    Route::get('/data', [SessionController::class, 'data']);
-                    Route::get('/check_ip', [SessionController::class, 'checkIp']);
-                    Route::post('/change_password', [SessionController::class, 'changePassword']);
-
-                });
-
             });
+
+        });
+
+    });
+
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::prefix('session')->group(function () {
+
+            Route::get('/check_ip', [SessionController::class, 'checkIp']);
+            Route::get('/data', [SessionController::class, 'data'])->middleware('allowed_ip');
+            Route::post('/change_password', [SessionController::class, 'changePassword'])->middleware('allowed_ip');
 
         });
 

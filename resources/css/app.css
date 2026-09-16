@@ -1,2 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0078FF;
+  --color-secondary: #7CB342;
+  --color-dark: #1E3A5F;
+  --color-light: #E8F0F8;
+  --color-accent: #FFD54F;
+  --color-accent-alt: #4FC3F7;
+}
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

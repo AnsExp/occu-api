@@ -12,11 +12,12 @@ class PrescriptionService
 {
     use DocumentService;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->documentTemplate = 'documents.prescription';
         $this->storageDiskPath = 'prescriptions';
     }
-    
+
     public function store(Request $request)
     {
         return DB::transaction(function () use ($request) {
